@@ -1,4 +1,7 @@
 # React + Vite
+https://github.com/ant-design/ant-design-pro/blob/master/src/global.tsx
+https://pro.ant.design/docs/overview/
+https://ant.design/
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
