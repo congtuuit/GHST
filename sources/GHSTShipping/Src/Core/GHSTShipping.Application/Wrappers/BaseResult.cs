@@ -41,6 +41,7 @@ namespace GHSTShipping.Application.Wrappers
 
         public static BaseResult<TData> Ok(TData data)
             => new() { Success = true, Data = data };
+
         public new static BaseResult<TData> Failure()
             => new() { Success = false };
 
