@@ -1,0 +1,20 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/sources/GHSTShipping/.vs
+/sources/GHSTShipping/ghstshipping.client/obj/Debug
+/sources/GHSTShipping/Src/Core/GHSTShipping.Application/bin/Debug/net8.0
+/sources/GHSTShipping/Src/Core/GHSTShipping.Application/obj
+/sources/GHSTShipping/Src/Core/GHSTShipping.Domain/bin/Debug/netstandard2.1
+/sources/GHSTShipping/Src/Core/GHSTShipping.Domain/obj
+/sources/GHSTShipping/Src/Infrastructure/GHSTShipping.Infrastructure.FileManager/bin/Debug/net8.0
+/sources/GHSTShipping/Src/Infrastructure/GHSTShipping.Infrastructure.FileManager/obj
+/sources/GHSTShipping/Src/Infrastructure/GHSTShipping.Infrastructure.Identity/bin/Debug/net8.0
+/sources/GHSTShipping/Src/Infrastructure/GHSTShipping.Infrastructure.Identity/obj
+/sources/GHSTShipping/Src/Infrastructure/GHSTShipping.Infrastructure.Persistence/bin/Debug/net8.0
+/sources/GHSTShipping/Src/Infrastructure/GHSTShipping.Infrastructure.Persistence/obj
+/sources/GHSTShipping/Src/Infrastructure/GHSTShipping.Infrastructure.Resources/bin/Debug/net8.0
+/sources/GHSTShipping/Src/Infrastructure/GHSTShipping.Infrastructure.Resources/obj
+/sources/GHSTShipping/Src/Presentation/GHSTShipping.WebApi/bin/Debug/net8.0
+/sources/GHSTShipping/Src/Presentation/GHSTShipping.WebApi/obj
