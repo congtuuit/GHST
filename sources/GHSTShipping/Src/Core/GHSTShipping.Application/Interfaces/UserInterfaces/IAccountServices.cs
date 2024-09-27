@@ -7,6 +7,7 @@ namespace GHSTShipping.Application.Interfaces.UserInterfaces
 {
     public interface IAccountServices
     {
+        Task<BaseResult<UserDto>> CreateAccountAsync(CreateAccountRequest request);
         Task<BaseResult<string>> RegisterGhostAccount();
         Task<BaseResult> ChangePassword(ChangePasswordRequest model);
         Task<BaseResult> ChangeUserName(ChangeUserNameRequest model);

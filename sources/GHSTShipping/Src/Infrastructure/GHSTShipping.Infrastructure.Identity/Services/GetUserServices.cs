@@ -21,10 +21,8 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 {
                     Name = p.Name,
                     Email = p.Email,
-                    UserName = p.UserName,
                     PhoneNumber = p.PhoneNumber,
                     Id = p.Id,
-                    Created = p.Created,
                 });
 
             if (!string.IsNullOrEmpty(model.Name))

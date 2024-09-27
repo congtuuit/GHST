@@ -11,5 +11,8 @@
 	<ItemGroup>
 		<ProjectReference Include="..\GHSTShipping.Domain\GHSTShipping.Domain.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Features\Shops\Queries\" />
+	</ItemGroup>
 
 </Project>

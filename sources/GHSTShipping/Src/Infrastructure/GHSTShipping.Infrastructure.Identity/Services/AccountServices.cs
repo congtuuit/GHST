@@ -96,6 +96,67 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             }
         }
 
+        public async Task<BaseResult<UserDto>> CreateAccountAsync(CreateAccountRequest request)
+        {
+            var user = new ApplicationUser()
+            {
+                UserName = request.Email,
+                Name = request.FullName,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+            };
+
+            var existedUser = await userManager.FindByEmailAsync(user.Email);
+            if (existedUser == null)
+            {
+                string password = GeneratePassword(6);
+                await userManager.CreateAsync(user, password);
+
+                return new UserDto
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                };
+            }
+
+            return new UserDto
+            {
+                Id = existedUser.Id,
+                Name = existedUser.Name,
+                Email = existedUser.Email,
+                PhoneNumber = existedUser.PhoneNumber,
+            }; ;
+        }
+
+        private static string GeneratePassword(int length)
+        {
+            const string lowerCase = "abcdefghijklmnopqrstuvwxyz";
+            const string upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string digits = "0123456789";
+            const string specialChars = "!@#$%^&*()_-+=<>?";
+
+            string allChars = lowerCase + upperCase + digits + specialChars;
+            Random random = new Random();
+            StringBuilder password = new StringBuilder();
+
+            // Ensure at least one character from each category
+            password.Append(lowerCase[random.Next(lowerCase.Length)]);
+            password.Append(upperCase[random.Next(upperCase.Length)]);
+            password.Append(digits[random.Next(digits.Length)]);
+            password.Append(specialChars[random.Next(specialChars.Length)]);
+
+            // Fill the rest of the password length with random characters from all categories
+            for (int i = password.Length; i < length; i++)
+            {
+                password.Append(allChars[random.Next(allChars.Length)]);
+            }
+
+            // Shuffle the characters in the password to ensure randomness
+            return new string(password.ToString().OrderBy(c => random.Next()).ToArray());
+        }
+
         private async Task<AuthenticationResponse> GetAuthenticationResponse(ApplicationUser user)
         {
             await userManager.UpdateSecurityStampAsync(user);

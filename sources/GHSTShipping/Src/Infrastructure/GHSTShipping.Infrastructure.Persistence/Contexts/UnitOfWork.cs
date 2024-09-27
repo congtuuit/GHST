@@ -1,4 +1,7 @@
 using GHSTShipping.Application.Interfaces;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.Infrastructure.Persistence.Contexts
@@ -9,9 +12,15 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
         {
             return await dbContext.SaveChangesAsync() > 0;
         }
+
         public bool SaveChanges()
         {
             return dbContext.SaveChanges() > 0;
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            return await dbContext.Database.BeginTransactionAsync(cancellationToken);
         }
     }
 }

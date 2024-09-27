@@ -1,6 +1,6 @@
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Domain.Common;
-using GHSTShipping.Domain.Products.Entities;
+using GHSTShipping.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -11,7 +11,10 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IAuthenticatedUserService authenticatedUser) : DbContext(options)
     {
-        public DbSet<Product> Products { get; set; }
+        public DbSet<CodeSequence> CodeSequences { get; set; }
+
+        public DbSet<Shop> Shops { get; set; }
+
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             var userId = string.IsNullOrEmpty(authenticatedUser.UserId)
