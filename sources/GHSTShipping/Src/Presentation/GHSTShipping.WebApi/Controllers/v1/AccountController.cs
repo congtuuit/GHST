@@ -1,9 +1,11 @@
 using GHSTShipping.Application.DTOs.Account.Requests;
 using GHSTShipping.Application.DTOs.Account.Responses;
+using GHSTShipping.Application.Features.Shops.Commands;
 using GHSTShipping.Application.Interfaces.UserInterfaces;
 using GHSTShipping.Application.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.WebApi.Controllers.v1
@@ -16,18 +18,25 @@ namespace GHSTShipping.WebApi.Controllers.v1
             => await accountServices.Authenticate(request);
 
         [HttpPut, Authorize]
-        public async Task<BaseResult> ChangeUserName(ChangeUserNameRequest model)
-            => await accountServices.ChangeUserName(model);
+        public async Task<BaseResult> ChangeUserNameAsync(ChangeUserNameRequest model)
+            => await accountServices.ChangeUserNameAsync(model);
 
         [HttpPut, Authorize]
-        public async Task<BaseResult> ChangePassword(ChangePasswordRequest model)
-            => await accountServices.ChangePassword(model);
+        public async Task<BaseResult> ChangePasswordAsync(ChangePasswordRequest model)
+            => await accountServices.ChangePasswordAsync(model);
 
         [HttpPost]
+        public async Task<BaseResult<Guid>> RegisterAsync([FromBody] CreateShopCommand command)
+        {
+            return await Mediator.Send(command);
+        }
+
+        [HttpPost]
+        [Obsolete]
         public async Task<BaseResult<AuthenticationResponse>> Start()
         {
-            var ghostUsername = await accountServices.RegisterGhostAccount();
-            return await accountServices.AuthenticateByUserName(ghostUsername.Data);
+            var ghostUsername = await accountServices.RegisterGhostAccountAsync();
+            return await accountServices.AuthenticateByUserNameAsync(ghostUsername.Data);
         }
     }
 }

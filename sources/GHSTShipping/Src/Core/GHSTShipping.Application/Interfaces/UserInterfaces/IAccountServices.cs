@@ -7,12 +7,22 @@ namespace GHSTShipping.Application.Interfaces.UserInterfaces
 {
     public interface IAccountServices
     {
+        /// <summary>
+        /// Create account for shop
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         Task<BaseResult<UserDto>> CreateAccountAsync(CreateAccountRequest request);
-        Task<BaseResult<string>> RegisterGhostAccount();
-        Task<BaseResult> ChangePassword(ChangePasswordRequest model);
-        Task<BaseResult> ChangeUserName(ChangeUserNameRequest model);
+
+        Task<BaseResult<string>> RegisterGhostAccountAsync();
+
+        Task<BaseResult> ChangePasswordAsync(ChangePasswordRequest model);
+
+        Task<BaseResult> ChangeUserNameAsync(ChangeUserNameRequest model);
+
         Task<BaseResult<AuthenticationResponse>> Authenticate(AuthenticationRequest request);
-        Task<BaseResult<AuthenticationResponse>> AuthenticateByUserName(string username);
+
+        Task<BaseResult<AuthenticationResponse>> AuthenticateByUserNameAsync(string username);
 
     }
 }

@@ -8,5 +8,6 @@ namespace GHSTShipping.Application.Wrappers
         AccessDenied = 3,
         ErrorInIdentity = 4,
         Exception = 5,
+        Duplicated = 6,
     }
 }

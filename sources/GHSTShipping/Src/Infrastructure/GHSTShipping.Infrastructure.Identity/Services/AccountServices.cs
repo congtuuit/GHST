@@ -4,9 +4,12 @@ using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.UserInterfaces;
 using GHSTShipping.Application.Wrappers;
+using GHSTShipping.Infrastructure.Identity.Contexts;
+using GHSTShipping.Infrastructure.Identity.Enums;
 using GHSTShipping.Infrastructure.Identity.Models;
 using GHSTShipping.Infrastructure.Identity.Settings;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,9 +19,14 @@ using System.Threading.Tasks;
 
 namespace GHSTShipping.Infrastructure.Identity.Services
 {
-    public class AccountServices(UserManager<ApplicationUser> userManager, IAuthenticatedUserService authenticatedUser, SignInManager<ApplicationUser> signInManager, JwtSettings jwtSettings, ITranslator translator) : IAccountServices
+    public class AccountServices(
+        IdentityContext identityContext,
+        UserManager<ApplicationUser> userManager,
+        IAuthenticatedUserService authenticatedUser,
+        SignInManager<ApplicationUser> signInManager,
+        JwtSettings jwtSettings, ITranslator translator) : IAccountServices
     {
-        public async Task<BaseResult> ChangePassword(ChangePasswordRequest model)
+        public async Task<BaseResult> ChangePasswordAsync(ChangePasswordRequest model)
         {
             var user = await userManager.FindByIdAsync(authenticatedUser.UserId);
 
@@ -31,7 +39,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             return identityResult.Errors.Select(p => new Error(ErrorCode.ErrorInIdentity, p.Description)).ToList();
         }
 
-        public async Task<BaseResult> ChangeUserName(ChangeUserNameRequest model)
+        public async Task<BaseResult> ChangeUserNameAsync(ChangeUserNameRequest model)
         {
             var user = await userManager.FindByIdAsync(authenticatedUser.UserId);
 
@@ -62,7 +70,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             return await GetAuthenticationResponse(user);
         }
 
-        public async Task<BaseResult<AuthenticationResponse>> AuthenticateByUserName(string username)
+        public async Task<BaseResult<AuthenticationResponse>> AuthenticateByUserNameAsync(string username)
         {
             var user = await userManager.FindByNameAsync(username);
             if (user == null)
@@ -73,11 +81,13 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             return await GetAuthenticationResponse(user);
         }
 
-        public async Task<BaseResult<string>> RegisterGhostAccount()
+        public async Task<BaseResult<string>> RegisterGhostAccountAsync()
         {
             var user = new ApplicationUser()
             {
-                UserName = GenerateRandomString(7)
+                UserName = GenerateRandomString(7),
+                Type = "ADMIN",
+                Name = GenerateRandomString(7),
             };
 
             var identityResult = await userManager.CreateAsync(user);
@@ -100,6 +110,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
         {
             var user = new ApplicationUser()
             {
+                Type = AccountTypeConstants.SHOP,
                 UserName = request.Email,
                 Name = request.FullName,
                 Email = request.Email,
@@ -107,27 +118,27 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             };
 
             var existedUser = await userManager.FindByEmailAsync(user.Email);
-            if (existedUser == null)
+            if (existedUser != null)
             {
-                string password = GeneratePassword(6);
-                await userManager.CreateAsync(user, password);
-
-                return new UserDto
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                };
+                return new Error(ErrorCode.Duplicated, "Email address already existed");
             }
+
+            var existedPhone = await identityContext.Users.AnyAsync(i => i.PhoneNumber == request.PhoneNumber);
+            if (existedPhone)
+            {
+                return new Error(ErrorCode.Duplicated, "Phone number already existed");
+            }
+
+            string password = GeneratePassword(6);
+            await userManager.CreateAsync(user, password);
 
             return new UserDto
             {
-                Id = existedUser.Id,
-                Name = existedUser.Name,
-                Email = existedUser.Email,
-                PhoneNumber = existedUser.PhoneNumber,
-            }; ;
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+            };
         }
 
         private static string GeneratePassword(int length)

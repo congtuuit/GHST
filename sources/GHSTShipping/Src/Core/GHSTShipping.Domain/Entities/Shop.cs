@@ -35,6 +35,8 @@ namespace GHSTShipping.Domain.Entities
         [MaxLength(100)]
         public string UniqueCode { get; set; }
 
+        public Guid AccountId { get; set; }
+
         private void GenUniqueCode()
         {
             // Format date to SddMM (S + Day + Month)
@@ -51,8 +53,9 @@ namespace GHSTShipping.Domain.Entities
         {
         }
 
-        public Shop(string name, string phoneNumber, decimal avgMonthlyYield, DateTime registerDate)
+        public Shop(Guid accountId, string name, string phoneNumber, decimal avgMonthlyYield, DateTime registerDate)
         {
+            this.AccountId = accountId;
             this.Name = name;
             this.PhoneNumber = phoneNumber;
             this.AvgMonthlyYield = avgMonthlyYield;

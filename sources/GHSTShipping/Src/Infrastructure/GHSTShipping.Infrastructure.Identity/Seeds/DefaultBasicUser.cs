@@ -1,3 +1,4 @@
+using GHSTShipping.Infrastructure.Identity.Enums;
 using GHSTShipping.Infrastructure.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,15 +10,16 @@ namespace GHSTShipping.Infrastructure.Identity.Seeds
     {
         public static async Task SeedAsync(UserManager<ApplicationUser> userManager)
         {
-            //Seed Default User
+            // Seed Default User
             var defaultUser = new ApplicationUser
             {
-                UserName = "Admin",
-                Email = "Admin@Admin.com",
-                Name = "Saman",
-                PhoneNumber = "09304241296",
+                UserName = "admin",
+                Email = "mjsshunnjer@gmail.com",
+                Name = "Tu Van",
+                PhoneNumber = "0974255412",
                 EmailConfirmed = true,
-                PhoneNumberConfirmed = true
+                PhoneNumberConfirmed = true,
+                Type = AccountTypeConstants.ADMIN
             };
 
             if (!await userManager.Users.AnyAsync())
@@ -25,7 +27,7 @@ namespace GHSTShipping.Infrastructure.Identity.Seeds
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "Sam@12345");
+                    await userManager.CreateAsync(defaultUser, "Tu@2024");
                 }
             }
         }

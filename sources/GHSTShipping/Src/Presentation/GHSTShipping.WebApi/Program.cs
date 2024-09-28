@@ -5,6 +5,8 @@ using GHSTShipping.Infrastructure.FileManager;
 using GHSTShipping.Infrastructure.FileManager.Contexts;
 using GHSTShipping.Infrastructure.Identity;
 using GHSTShipping.Infrastructure.Identity.Contexts;
+using GHSTShipping.Infrastructure.Identity.Models;
+using GHSTShipping.Infrastructure.Identity.Seeds;
 using GHSTShipping.Infrastructure.Persistence;
 using GHSTShipping.Infrastructure.Persistence.Contexts;
 using GHSTShipping.Infrastructure.Resources;
@@ -12,6 +14,7 @@ using GHSTShipping.WebApi.Infrastructure.Extensions;
 using GHSTShipping.WebApi.Infrastructure.Middlewares;
 using GHSTShipping.WebApi.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,7 +54,7 @@ using (var scope = app.Services.CreateScope())
 
     //Seed Data
     //await DefaultRoles.SeedAsync(services.GetRequiredService<RoleManager<ApplicationRole>>());
-    //await DefaultBasicUser.SeedAsync(services.GetRequiredService<UserManager<ApplicationUser>>());
+    await DefaultBasicUser.SeedAsync(services.GetRequiredService<UserManager<ApplicationUser>>());
 }
 
 app.UseCustomLocalization();

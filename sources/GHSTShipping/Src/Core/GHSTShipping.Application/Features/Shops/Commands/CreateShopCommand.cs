@@ -1,5 +1,4 @@
 ﻿using GHSTShipping.Application.DTOs.Account.Requests;
-using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Interfaces.UserInterfaces;
@@ -16,6 +15,14 @@ namespace GHSTShipping.Application.Features.Shops.Commands
         public string ShopName { get; set; }
 
         public decimal AvgMonthlyYield { get; set; }
+
+        public string BankName { get; set; }
+
+        public string BankAccountNumber { get; set; }
+
+        public string BankAccountHolder { get; set; }
+
+        public string BankAddress { get; set; }
     }
 
     public class CreateShopCommandHandler(
@@ -40,10 +47,17 @@ namespace GHSTShipping.Application.Features.Shops.Commands
                 if (createAccount.Success)
                 {
                     Domain.Entities.Shop shop = new(
+                        createAccount.Data.Id,
                         request.FullName,
                         request.PhoneNumber,
                         request.AvgMonthlyYield,
-                        DateTime.UtcNow);
+                        DateTime.UtcNow)
+                    {
+                        BankName = request.BankName,
+                        BankAddress = request.BankAddress,
+                        BankAccountHolder = request.BankAccountHolder,
+                        BankAccountNumber = request.BankAccountNumber
+                    };
 
                     await shopRepository.AddAsync(shop);
                     await unitOfWork.SaveChangesAsync();
@@ -55,7 +69,7 @@ namespace GHSTShipping.Application.Features.Shops.Commands
 
                 await createShopTransaction.RollbackAsync(cancellationToken);
 
-                return new Error(ErrorCode.FieldDataInvalid);
+                return createAccount.Errors;
             }
             catch (Exception ex)
             {
@@ -63,7 +77,6 @@ namespace GHSTShipping.Application.Features.Shops.Commands
 
                 return new Error(ErrorCode.Exception, ex.Message);
             }
-
         }
     }
 }
