@@ -1,27 +1,41 @@
 using FluentValidation;
 using GHSTShipping.Application.Wrappers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;  // Add this using statement
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.WebApi.Infrastructure.Middlewares
 {
-    public class ErrorHandlerMiddleware(RequestDelegate next)
+    public class ErrorHandlerMiddleware
     {
+        private readonly RequestDelegate _next;
+        private readonly ILogger<ErrorHandlerMiddleware> _logger;  // Add logger field
+
+        public ErrorHandlerMiddleware(RequestDelegate next, ILogger<ErrorHandlerMiddleware> logger)  // Update constructor
+        {
+            _next = next;
+            _logger = logger;  // Initialize logger
+        }
+
         public async Task Invoke(HttpContext context)
         {
             try
             {
-                await next(context);
+                await _next(context);
             }
             catch (Exception error)
             {
                 var response = context.Response;
                 response.ContentType = "application/json";
                 var responseModel = BaseResult.Failure();
+
+                // Log the exception
+                _logger.LogError(error, "An unhandled exception occurred: {Message}", error.Message);
 
                 switch (error)
                 {
@@ -44,6 +58,7 @@ namespace GHSTShipping.WebApi.Infrastructure.Middlewares
                         responseModel.AddError(new Error(ErrorCode.Exception, error.Message));
                         break;
                 }
+
                 var result = JsonSerializer.Serialize(responseModel, new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase

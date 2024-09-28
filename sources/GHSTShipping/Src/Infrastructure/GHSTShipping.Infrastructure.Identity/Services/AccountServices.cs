@@ -138,6 +138,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 Name = user.Name,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
+                SecurityStamp = user.SecurityStamp,
             };
         }
 

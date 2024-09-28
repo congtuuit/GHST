@@ -8,7 +8,6 @@ namespace GHSTShipping.Infrastructure.Resources.Services
 {
     public class Translator : ITranslator
     {
-
         private readonly ResourceManager resourceMessages = new(typeof(ResourceMessages).FullName, typeof(ResourceMessages).Assembly);
         private readonly ResourceManager resourceGeneral = new(typeof(ResourceGeneral).FullName, typeof(ResourceGeneral).Assembly);
 

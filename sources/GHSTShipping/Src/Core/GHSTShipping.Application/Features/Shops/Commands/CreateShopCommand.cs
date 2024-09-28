@@ -4,6 +4,7 @@ using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Interfaces.UserInterfaces;
 using GHSTShipping.Application.Wrappers;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,7 +30,9 @@ namespace GHSTShipping.Application.Features.Shops.Commands
         IShopRepository shopRepository,
         IUnitOfWork unitOfWork,
         IAccountServices accountServices,
-        ITranslator translator
+        ITranslator translator,
+        IEmailSender emailSender,
+        ILogger<CreateShopCommandHandler> _logger
         ) : IRequestHandler<CreateShopCommand, BaseResult<Guid>>
     {
         public async Task<BaseResult<Guid>> Handle(CreateShopCommand request, CancellationToken cancellationToken)
@@ -64,6 +67,16 @@ namespace GHSTShipping.Application.Features.Shops.Commands
 
                     await createShopTransaction.CommitAsync(cancellationToken);
 
+                    var sendEmail = await emailSender.SendEmailSetPasswordAsync(
+                        createAccount.Data.Email,
+                        createAccount.Data.Name,
+                        createAccount.Data.SecurityStamp);
+
+                    if (!sendEmail.Success)
+                    {
+                        _logger.LogInformation("Send email failed: {Errors}", sendEmail.Errors);
+                    }
+
                     return shop.Id;
                 }
 
@@ -74,6 +87,8 @@ namespace GHSTShipping.Application.Features.Shops.Commands
             catch (Exception ex)
             {
                 await createShopTransaction.RollbackAsync(cancellationToken);
+
+                _logger.LogError(ex, ex.Message);
 
                 return new Error(ErrorCode.Exception, ex.Message);
             }
