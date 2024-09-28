@@ -24,5 +24,7 @@ namespace GHSTShipping.Application.Interfaces.UserInterfaces
 
         Task<BaseResult<AuthenticationResponse>> AuthenticateByUserNameAsync(string username);
 
+        Task<BaseResult> SetPasswordViaSecurityStampAsync(string securityStamp, string password);
+
     }
 }

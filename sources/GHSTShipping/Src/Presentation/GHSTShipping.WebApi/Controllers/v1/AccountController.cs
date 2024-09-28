@@ -17,16 +17,14 @@ namespace GHSTShipping.WebApi.Controllers.v1
         public async Task<BaseResult<AuthenticationResponse>> Authenticate(AuthenticationRequest request)
             => await accountServices.Authenticate(request);
 
-        [HttpPut, Authorize]
-        public async Task<BaseResult> ChangeUserNameAsync(ChangeUserNameRequest model)
-            => await accountServices.ChangeUserNameAsync(model);
-
-        [HttpPut, Authorize]
-        public async Task<BaseResult> ChangePasswordAsync(ChangePasswordRequest model)
-            => await accountServices.ChangePasswordAsync(model);
-
         [HttpPost]
         public async Task<BaseResult<Guid>> RegisterAsync([FromBody] CreateShopCommand command)
+        {
+            return await Mediator.Send(command);
+        }
+
+        [HttpPut]
+        public async Task<BaseResult> ResetPasswordAsync([FromBody] ResetPasswordCommand command)
         {
             return await Mediator.Send(command);
         }

@@ -142,6 +142,30 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             };
         }
 
+        public async Task<BaseResult> SetPasswordViaSecurityStampAsync(string securityStamp, string password)
+        {
+            var userId = identityContext.Users
+                .Where(i => i.SecurityStamp == securityStamp)
+                .Select(i => i.Id)
+                .FirstOrDefault();
+
+            if (userId == Guid.Empty)
+            {
+                return new Error(ErrorCode.NotFound, "Data can not found");
+            }
+
+            var user = await userManager.FindByIdAsync(userId.ToString());
+            var token = await userManager.GeneratePasswordResetTokenAsync(user!);
+            var identityResult = await userManager.ResetPasswordAsync(user, token, password);
+
+            if (identityResult.Succeeded)
+            {
+                return BaseResult.Ok();
+            }
+
+            return identityResult.Errors.Select(p => new Error(ErrorCode.ErrorInIdentity, p.Description)).ToList();
+        }
+
         private static string GeneratePassword(int length)
         {
             const string lowerCase = "abcdefghijklmnopqrstuvwxyz";
