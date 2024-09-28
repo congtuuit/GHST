@@ -5,9 +5,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import en_US from './en-US';
 import zh_CN from './zh-CN';
+import vi_VN from './vi_VN';
 
 export const localeConfig = {
-  zh_CN: zh_CN,
+  vi_VN: vi_VN,
   en_US: en_US,
 };
 

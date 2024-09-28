@@ -14,6 +14,7 @@ interface Values {
   name: {
     zh_CN: string;
     en_US: string;
+    vi_VN: string;
   };
   value: number;
 }
@@ -23,30 +24,29 @@ interface Data {
   online: Values[];
   offline: Values[];
 }
-
 const data: Data = {
   all: [
-    { name: { zh_CN: '家用电器', en_US: 'appliances' }, value: 4544 },
-    { name: { zh_CN: '食用酒水', en_US: 'drinks' }, value: 3321 },
-    { name: { zh_CN: '个护健康', en_US: 'health' }, value: 3113 },
-    { name: { zh_CN: '服饰箱包', en_US: 'clothing' }, value: 2341 },
-    { name: { zh_CN: '母婴产品', en_US: 'baby' }, value: 1231 },
-    { name: { zh_CN: '其他', en_US: 'others' }, value: 132 },
+    { name: { zh_CN: '家用电器', en_US: 'appliances', vi_VN: 'thiết bị gia dụng' }, value: 4544 },
+    { name: { zh_CN: '食用酒水', en_US: 'drinks', vi_VN: 'đồ uống' }, value: 3321 },
+    { name: { zh_CN: '个护健康', en_US: 'health', vi_VN: 'sức khỏe' }, value: 3113 },
+    { name: { zh_CN: '服饰箱包', en_US: 'clothing', vi_VN: 'thời trang' }, value: 2341 },
+    { name: { zh_CN: '母婴产品', en_US: 'baby', vi_VN: 'sản phẩm cho mẹ và bé' }, value: 1231 },
+    { name: { zh_CN: '其他', en_US: 'others', vi_VN: 'khác' }, value: 132 },
   ],
   online: [
-    { name: { zh_CN: '家用电器', en_US: 'appliances' }, value: 244 },
-    { name: { zh_CN: '食用酒水', en_US: 'drinks' }, value: 231 },
-    { name: { zh_CN: '个护健康', en_US: 'health' }, value: 311 },
-    { name: { zh_CN: '服饰箱包', en_US: 'clothing' }, value: 41 },
-    { name: { zh_CN: '母婴产品', en_US: 'baby' }, value: 121 },
-    { name: { zh_CN: '其他', en_US: 'others' }, value: 111 },
+    { name: { zh_CN: '家用电器', en_US: 'appliances', vi_VN: 'thiết bị gia dụng' }, value: 244 },
+    { name: { zh_CN: '食用酒水', en_US: 'drinks', vi_VN: 'đồ uống' }, value: 231 },
+    { name: { zh_CN: '个护健康', en_US: 'health', vi_VN: 'sức khỏe' }, value: 311 },
+    { name: { zh_CN: '服饰箱包', en_US: 'clothing', vi_VN: 'thời trang' }, value: 41 },
+    { name: { zh_CN: '母婴产品', en_US: 'baby', vi_VN: 'sản phẩm cho mẹ và bé' }, value: 121 },
+    { name: { zh_CN: '其他', en_US: 'others', vi_VN: 'khác' }, value: 111 },
   ],
   offline: [
-    { name: { zh_CN: '家用电器', en_US: 'appliances' }, value: 99 },
-    { name: { zh_CN: '食用酒水', en_US: 'drinks' }, value: 188 },
-    { name: { zh_CN: '个护健康', en_US: 'health' }, value: 344 },
-    { name: { zh_CN: '服饰箱包', en_US: 'clothing' }, value: 255 },
-    { name: { zh_CN: '其他', en_US: 'others' }, value: 65 },
+    { name: { zh_CN: '家用电器', en_US: 'appliances', vi_VN: 'thiết bị gia dụng' }, value: 99 },
+    { name: { zh_CN: '食用酒水', en_US: 'drinks', vi_VN: 'đồ uống' }, value: 188 },
+    { name: { zh_CN: '个护健康', en_US: 'health', vi_VN: 'sức khỏe' }, value: 344 },
+    { name: { zh_CN: '服饰箱包', en_US: 'clothing', vi_VN: 'thời trang' }, value: 255 },
+    { name: { zh_CN: '其他', en_US: 'others', vi_VN: 'khác' }, value: 65 },
   ],
 };
 

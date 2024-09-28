@@ -40,7 +40,7 @@ const ForgotPassword: FC = () => {
       <Col className="right login-page" span={24} md={10} lg={8}>
         <Card className="card">
           <Form<LoginParams> onFinish={onFinished} className="login-page-form" initialValues={initialValues}>
-            <h2>ĐẶT LẠI MẬT KHẨU</h2>
+            <h2 style={{ color: 'white' }}>ĐẶT LẠI MẬT KHẨU</h2>
             <Form.Item
               name="email"
               rules={[
@@ -71,7 +71,12 @@ const ForgotPassword: FC = () => {
               </Button>
             </Form.Item>
 
-            <Button onClick={() => navigate('/login')} htmlType="button" className="login-page-form_button btn-forgot-password" type='ghost'>
+            <Button
+              onClick={() => navigate('/login')}
+              htmlType="button"
+              className="login-page-form_button btn-forgot-password"
+              type="ghost"
+            >
               Đăng nhập
             </Button>
           </Form>

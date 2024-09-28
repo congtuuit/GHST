@@ -4,6 +4,7 @@ export type TagItem = {
   label: {
     zh_CN: string;
     en_US: string;
+    vi_VN: string;
   };
 
   /** tag's route path */

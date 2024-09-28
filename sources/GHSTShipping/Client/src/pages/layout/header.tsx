@@ -12,6 +12,8 @@ import { ReactComponent as LanguageSvg } from '@/assets/header/language.svg';
 import { ReactComponent as MoonSvg } from '@/assets/header/moon.svg';
 import { ReactComponent as SunSvg } from '@/assets/header/sun.svg';
 import { ReactComponent as ZhCnSvg } from '@/assets/header/zh_CN.svg';
+import { ReactComponent as ViVN } from '@/assets/header/vi_VN.svg';
+
 import AntdSvg from '@/assets/logo/antd.svg';
 import ReactSvg from '@/assets/logo/react.svg';
 import { LocaleFormatter, useLocale } from '@/locales';
@@ -103,10 +105,10 @@ const HeaderComponent: FC<HeaderProps> = ({ collapsed, toggle }) => {
               onClick: info => selectLocale(info),
               items: [
                 {
-                  key: 'zh_CN',
-                  icon: <ZhCnSvg />,
-                  disabled: locale === 'zh_CN',
-                  label: '简体中文',
+                  key: 'vi_VN',
+                  icon: <ViVN />,
+                  disabled: locale === 'vi_VN',
+                  label: 'Tiếng Việt',
                 },
                 {
                   key: 'en_US',

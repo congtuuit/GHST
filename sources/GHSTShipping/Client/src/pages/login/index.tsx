@@ -39,19 +39,17 @@ const LoginForm: FC = () => {
       <Col className="right login-page" span={24} md={10} lg={8}>
         <Card className="card">
           <Form<LoginParams> onFinish={onFinished} className="login-page-form" initialValues={initialValues}>
-            <h2>ĐĂNG NHẬP</h2>
+            <h2 style={{ color: 'white' }}>ĐĂNG NHẬP</h2>
             <Form.Item
               name="username"
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập tài khoản",
+                  message: 'Vui lòng nhập tài khoản',
                 },
               ]}
             >
-              <Input
-                placeholder={"Nhập tài khoản"}
-              />
+              <Input placeholder={'Nhập tài khoản'} />
             </Form.Item>
             <Form.Item
               className="mb-0"
@@ -59,19 +57,18 @@ const LoginForm: FC = () => {
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng nhập mật khẩu",
+                  message: 'Vui lòng nhập mật khẩu',
                 },
               ]}
             >
-              <Input
-                type="password"
-                placeholder={"Nhập mật khẩu"}
-              />
+              <Input type="password" placeholder={'Nhập mật khẩu'} />
             </Form.Item>
-            <Button onClick={() => navigate("/forgot-password")} className='btn-forgot-password' type="link">Quên mật khẩu?</Button>
-            <Form.Item className='btn-submit'>
+            <Button onClick={() => navigate('/forgot-password')} className="btn-forgot-password" type="link">
+              Quên mật khẩu?
+            </Button>
+            <Form.Item className="btn-submit">
               <Button htmlType="submit" type="primary" className="login-page-form_button">
-                <LocaleFormatter id="gloabal.tips.login" />
+                Đăng nhập
               </Button>
             </Form.Item>
           </Form>

@@ -3,6 +3,7 @@ export interface Role {
   name: {
     zh_CN: string;
     en_US: string;
+    vi_VN: string;
   };
   code: string;
   id: number;

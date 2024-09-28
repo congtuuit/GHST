@@ -17,6 +17,7 @@ import { useGuide } from '../guide/useGuide';
 import HeaderComponent from './header';
 import MenuComponent from './menu';
 import TagsView from './tagView';
+import mockMenuList from '@/routes/menu';
 
 const { Sider, Content } = Layout;
 const WIDTH = 992;
@@ -65,17 +66,12 @@ const LayoutPage: FC = () => {
   };
 
   const fetchMenuList = useCallback(async () => {
-    const response = await getMenuList();
-    const { status, result } = response;
-    console.log("response ", response)
-    if (status) {
-      setMenuList(result);
-      dispatch(
-        setUserItem({
-          menuList: initMenuListAll(result),
-        }),
-      );
-    }
+    setMenuList(mockMenuList);
+    dispatch(
+      setUserItem({
+        menuList: initMenuListAll(mockMenuList),
+      }),
+    );
   }, [dispatch]);
 
   useEffect(() => {
