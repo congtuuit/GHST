@@ -8,6 +8,7 @@ import { useRoutes } from 'react-router-dom';
 import Dashboard from '@/pages/dashboard';
 import LayoutPage from '@/pages/layout';
 import LoginPage from '@/pages/login';
+import ForgotPasswordPage from '@/pages/forgot-password';
 
 import WrapperRouteComponent from './config';
 
@@ -33,11 +34,15 @@ const RadioCardsPage = lazy(() => import(/* webpackChunkName: "radio-cards'"*/ '
 const routeList: RouteObject[] = [
   {
     path: '/login',
-    element: <WrapperRouteComponent element={<LoginPage />} titleId="title.login" auth={false}/>,
+    element: <WrapperRouteComponent element={<LoginPage />} titleId="title.login" auth={false} />,
+  },
+  {
+    path: '/forgot-password',
+    element: <WrapperRouteComponent element={<ForgotPasswordPage />} titleId="title.forgotpassword" auth={false} />,
   },
   {
     path: '/',
-    element: <WrapperRouteComponent element={<LayoutPage />} titleId=""  />,
+    element: <WrapperRouteComponent element={<LayoutPage />} titleId="" />,
     children: [
       {
         path: '',
@@ -85,7 +90,7 @@ const routeList: RouteObject[] = [
       },
       {
         path: '*',
-        element: <WrapperRouteComponent element={<NotFound />} titleId="title.notFount" auth={false}/>,
+        element: <WrapperRouteComponent element={<NotFound />} titleId="title.notFount" auth={false} />,
       },
     ],
   },

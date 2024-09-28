@@ -10,9 +10,12 @@ export interface LoginParams {
 
 export interface LoginResult {
   /** auth token */
-  token: string;
-  username: string;
-  role: Role;
+  id: string;
+  userName: string;
+  email: string;
+  roles: Role[];
+  isVerified: boolean;
+  jwToken: string;
 }
 
 export interface LogoutParams {

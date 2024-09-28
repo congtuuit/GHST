@@ -1,5 +1,4 @@
 using FluentValidation;
-using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Interfaces;
 
 namespace GHSTShipping.Application.DTOs.Account.Requests
@@ -23,7 +22,7 @@ namespace GHSTShipping.Application.DTOs.Account.Requests
             RuleFor(x => x.Password)
                 .NotEmpty()
                 .NotNull()
-                .Matches(Regexs.Password)
+                //.Matches(Regexs.Password)
                 .WithName(p => translator[nameof(p.Password)]);
         }
     }

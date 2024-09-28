@@ -3,7 +3,7 @@ import type { LoginParams, LoginResult, LogoutParams, LogoutResult } from '../in
 import { request } from './base/request';
 
 /** 登录接口 */
-export const apiLogin = (data: LoginParams) => request<LoginResult>('post', '/user/login', data);
+export const apiLogin = (data: LoginParams) => request<LoginResult>('post', '/Account/Authenticate', data);
 
 /** 登出接口 */
-export const apiLogout = (data: LogoutParams) => request<LogoutResult>('post', '/user/logout', data);
+export const apiLogout = () => request<LogoutResult>('post', '/Account/Logout');

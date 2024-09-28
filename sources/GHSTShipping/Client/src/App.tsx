@@ -13,6 +13,7 @@ import { HistoryRouter, history } from '@/routes/history';
 import { LocaleFormatter, localeConfig } from './locales';
 import RenderRouter from './routes';
 import { setGlobalState } from './stores/global.store';
+import "./main.css";
 
 const App: React.FC = () => {
   const { locale } = useSelector(state => state.user);
@@ -69,9 +70,9 @@ const App: React.FC = () => {
   return (
     <ConfigProvider
       locale={getAntdLocale()}
-      componentSize="middle"
+      componentSize="large"
       theme={{
-        token: { colorPrimary: '#13c2c2' },
+        token: { colorPrimary: '#f34b4b' },
         algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
       }}
     >

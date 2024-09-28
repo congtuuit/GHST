@@ -26,6 +26,21 @@ namespace GHSTShipping.Infrastructure.Identity.Services
         SignInManager<ApplicationUser> signInManager,
         JwtSettings jwtSettings, ITranslator translator) : IAccountServices
     {
+        public async Task<BaseResult> SignOutAsync()
+        {
+            if (authenticatedUser.UserId != null && !string.IsNullOrWhiteSpace(authenticatedUser.UserId))
+            {
+                var user = await userManager.FindByIdAsync(authenticatedUser.UserId);
+                await userManager.UpdateSecurityStampAsync(user);
+
+                return BaseResult.Ok();
+            }
+            else
+            {
+                return BaseResult.Failure();
+            }
+        }
+
         public async Task<BaseResult> ChangePasswordAsync(ChangePasswordRequest model)
         {
             var user = await userManager.FindByIdAsync(authenticatedUser.UserId);

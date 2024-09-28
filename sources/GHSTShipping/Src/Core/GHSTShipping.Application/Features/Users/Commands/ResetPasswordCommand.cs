@@ -4,7 +4,7 @@ using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GHSTShipping.Application.Features.Shops.Commands
+namespace GHSTShipping.Application.Features.Users.Commands
 {
     public class ResetPasswordCommand : IRequest<BaseResult>
     {

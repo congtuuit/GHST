@@ -7,6 +7,8 @@ namespace GHSTShipping.Application.Interfaces.UserInterfaces
 {
     public interface IAccountServices
     {
+        Task<BaseResult> SignOutAsync();
+
         /// <summary>
         /// Create account for shop
         /// </summary>

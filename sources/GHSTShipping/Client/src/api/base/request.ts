@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig, Method } from 'axios';
 
-import { message as $message } from 'antd';
+import { message as $message, message } from 'antd';
 import axios from 'axios';
 
 import store from '@/stores';
@@ -13,6 +13,14 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   config => {
+    const token = localStorage.getItem('t'); // Or get from Redux store using store.getState()
+    if (token) {
+      // Attach the token to the Authorization header
+      // Ensure config.headers is defined
+      config.headers = config.headers ?? {};
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+
     store.dispatch(
       setGlobalState({
         loading: true,
@@ -51,31 +59,31 @@ axiosInstance.interceptors.response.use(
         loading: false,
       }),
     );
+
     // if needs to navigate to login page when request exception
     // history.replace('/login');
-    let errorMessage = '系统异常';
-
+    let errorMessage = 'Xảy ra lỗi';
     if (error?.message?.includes('Network Error')) {
-      errorMessage = '网络错误，请检查您的网络';
+      errorMessage = 'Kết nối mạng gặp sự cố, vui lòng kiểm tra lại!';
     } else {
       errorMessage = error?.message;
     }
 
     console.dir(error);
-    error.message && $message.error(errorMessage);
 
     return {
-      status: false,
       message: errorMessage,
-      result: null,
+      success: false,
+      ...error?.response?.data,
     };
   },
 );
 
 export type Response<T = any> = {
-  status: boolean;
+  success: boolean;
   message: string;
-  result: T;
+  errors?: any;
+  data: T;
 };
 
 export type MyResponse<T = any> = Promise<Response<T>>;
@@ -92,17 +100,19 @@ export const request = <T = any>(
   data?: any,
   config?: AxiosRequestConfig,
 ): MyResponse<T> => {
-  // const prefix = '/api'
-  const prefix = '';
-
-  url = prefix + url;
-
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const endpoint = apiUrl + url;
   if (method === 'post') {
-    return axiosInstance.post(url, data, config);
-  } else {
-    return axiosInstance.get(url, {
-      params: data,
-      ...config,
-    });
+    return axiosInstance.post(endpoint, data, config);
   }
+  if (method === 'put') {
+    return axiosInstance.put(endpoint, data, config);
+  }
+  if (method === 'delete') {
+    return axiosInstance.delete(endpoint, config);
+  }
+  return axiosInstance.get(endpoint, {
+    params: data,
+    ...config,
+  });
 };

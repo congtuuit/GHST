@@ -1,6 +1,7 @@
 using GHSTShipping.Application.DTOs.Account.Requests;
 using GHSTShipping.Application.DTOs.Account.Responses;
 using GHSTShipping.Application.Features.Shops.Commands;
+using GHSTShipping.Application.Features.Users.Commands;
 using GHSTShipping.Application.Interfaces.UserInterfaces;
 using GHSTShipping.Application.Wrappers;
 using Microsoft.AspNetCore.Authorization;
@@ -14,8 +15,11 @@ namespace GHSTShipping.WebApi.Controllers.v1
     public class AccountController(IAccountServices accountServices) : BaseApiController
     {
         [HttpPost]
-        public async Task<BaseResult<AuthenticationResponse>> Authenticate(AuthenticationRequest request)
+        public async Task<BaseResult<AuthenticationResponse>> AuthenticateAsync(AuthenticationRequest request)
             => await accountServices.Authenticate(request);
+
+        [HttpPost]
+        public async Task<BaseResult> LogoutAsync() => await accountServices.SignOutAsync();
 
         [HttpPost]
         public async Task<BaseResult<Guid>> RegisterAsync([FromBody] CreateShopCommand command)

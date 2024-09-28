@@ -5,6 +5,7 @@ import vitePluginImp from 'vite-plugin-imp';
 import svgrPlugin from 'vite-plugin-svgr';
 
 // https://vitejs.dev/config/
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -12,14 +13,14 @@ export default defineConfig({
     },
   },
   server: {
-    port: 8889,
-    proxy: {
-      '/api': {
-        target: `http://localhost:${process.env.PORT}/api`,
-        // changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, ''),
-      },
-    },
+    port: 5555,
+    // proxy: {
+    //   '/api': {
+    //     target: `http://localhost:5001/api`,
+    //     // changeOrigin: true,
+    //     //rewrite: path => path.replace(/^\/api/, ''),
+    //   },
+    // },
   },
   plugins: [
     react({
