@@ -7,7 +7,7 @@ namespace GHSTShipping.Application.Parameters
         public PaginationRequestParameter()
         {
             PageNumber = 1;
-            PageSize = 20;
+            PageSize = 10;
         }
         public PaginationRequestParameter(int pageNumber, int pageSize)
         {

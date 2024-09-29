@@ -1,6 +1,8 @@
 using GHSTShipping.Application.Interfaces;
+using GHSTShipping.Application.Interfaces.Repositories;
+using GHSTShipping.Domain.Entities;
+using GHSTShipping.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,7 +10,12 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
 {
     public class UnitOfWork(ApplicationDbContext dbContext) : IUnitOfWork
     {
-        public async Task<bool> SaveChangesAsync()
+        private IGenericRepository<Shop> _shop;
+
+        public IGenericRepository<Shop> Shops => _shop ??= new GenericRepository<Shop>(dbContext);
+
+
+        public async Task<bool> SaveChangesAsync(CancellationToken cancellation = default)
         {
             return await dbContext.SaveChangesAsync() > 0;
         }

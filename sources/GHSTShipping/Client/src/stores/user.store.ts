@@ -1,4 +1,4 @@
-import type { Role } from '@/interface/user/login';
+import type { LoginResult, Role } from '@/interface/user/login';
 import type { Locale, UserState } from '@/interface/user/user';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
@@ -13,8 +13,9 @@ const initialState: UserState = {
   newUser: JSON.parse(localStorage.getItem('newUser')!) ?? true,
   logged: localStorage.getItem('t') ? true : false,
   menuList: [],
-  username: localStorage.getItem('userName') || '',
-  role: (localStorage.getItem('userName') || '') as Role,
+  userName: localStorage.getItem('userName') || '',
+  roles: [],
+  session: (JSON.parse(localStorage.getItem('session') ?? "{}") || {}) as LoginResult,
 };
 
 const userSlice = createSlice({
@@ -22,10 +23,9 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUserItem(state, action: PayloadAction<Partial<UserState>>) {
-      const { username } = action.payload;
-
-      if (username !== state.username) {
-        localStorage.setItem('username', action.payload.username || '');
+      const { userName } = action.payload;
+      if (userName !== state.userName) {
+        localStorage.setItem('userName', action.payload.userName || '');
       }
 
       Object.assign(state, action.payload);

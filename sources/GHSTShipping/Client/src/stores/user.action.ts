@@ -17,7 +17,8 @@ export const loginAsync = createAsyncAction<LoginParams, boolean>(payload => {
       dispatch(
         setUserItem({
           logged: true,
-          username: data.userName,
+          userName: data.userName,
+          session: data
         }),
       );
 

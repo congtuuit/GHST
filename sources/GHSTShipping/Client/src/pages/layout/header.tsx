@@ -132,18 +132,18 @@ const HeaderComponent: FC<HeaderProps> = ({ collapsed, toggle }) => {
                     key: '1',
                     icon: <UserOutlined />,
                     label: (
-                      <span onClick={() => navigate('/dashboard')}>
+                      <div onClick={() => navigate('/dashboard')}>
                         <LocaleFormatter id="header.avator.account" />
-                      </span>
+                      </div>
                     ),
                   },
                   {
                     key: '2',
                     icon: <LogoutOutlined />,
                     label: (
-                      <span onClick={() => onActionClick('logout')}>
+                      <div onClick={() => onActionClick('logout')}>
                         <LocaleFormatter id="header.avator.logout" />
-                      </span>
+                      </div>
                     ),
                   },
                 ],

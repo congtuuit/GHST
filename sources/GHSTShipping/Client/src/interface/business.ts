@@ -6,3 +6,10 @@ export interface BuniesssUser {
   address: string;
   tags: string[];
 }
+
+export interface PaginationResponse {
+  count: number;
+  pageNumber: number;
+  pageSize: number;
+  data: any[];
+}

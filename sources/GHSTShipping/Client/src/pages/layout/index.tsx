@@ -17,7 +17,8 @@ import { useGuide } from '../guide/useGuide';
 import HeaderComponent from './header';
 import MenuComponent from './menu';
 import TagsView from './tagView';
-import mockMenuList from '@/routes/menu';
+import defaultMenu from '@/routes/defaultMenu';
+import adminMenu from '@/routes/adminMenu';
 
 const { Sider, Content } = Layout;
 const WIDTH = 992;
@@ -27,7 +28,7 @@ const LayoutPage: FC = () => {
   const [openKey, setOpenkey] = useState<string>();
   const [selectedKey, setSelectedKey] = useState<string>(location.pathname);
   const [menuList, setMenuList] = useState<MenuList>([]);
-  const { device, collapsed, newUser } = useSelector(state => state.user);
+  const { device, collapsed, newUser, session } = useSelector(state => state.user);
   const token = antTheme.useToken();
 
   const isMobile = device === 'MOBILE';
@@ -66,6 +67,13 @@ const LayoutPage: FC = () => {
   };
 
   const fetchMenuList = useCallback(async () => {
+    const roles = session.roles;
+    let mockMenuList = defaultMenu;
+    const isAdmin = roles.includes("ADMIN");
+    if (isAdmin) {
+      mockMenuList = adminMenu;
+    }
+
     setMenuList(mockMenuList);
     dispatch(
       setUserItem({

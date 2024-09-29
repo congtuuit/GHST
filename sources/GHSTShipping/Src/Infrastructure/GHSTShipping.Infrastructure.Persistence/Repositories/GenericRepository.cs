@@ -1,8 +1,10 @@
 using GHSTShipping.Application.DTOs;
 using GHSTShipping.Application.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.Infrastructure.Persistence.Repositories
@@ -36,6 +38,34 @@ namespace GHSTShipping.Infrastructure.Persistence.Repositories
                  .Set<T>()
                  .AsNoTracking()
                  .ToListAsync();
+        }
+
+        public IQueryable<T> All()
+        {
+            return dbContext.Set<T>();
+        }
+
+        public IQueryable<T> Where(Expression<Func<T, bool>> predicate)
+        {
+            return dbContext.Set<T>().Where(predicate);
+        }
+
+        public IQueryable<T> FromSqlRaw(string sql, params object[] parameters)
+        {
+            return dbContext.Set<T>().FromSqlRaw(sql, parameters);
+        }
+
+        public IQueryable<T> FromSql(FormattableString sql) => dbContext.Set<T>().FromSql(sql);
+
+        public void ModifyRange(IEnumerable<T> entities)
+        {
+            dbContext.AttachRange(entities);
+        }
+
+        public void ModifyProperty<TProperty>(T entity, Expression<Func<T, TProperty>> propertyExpression)
+        {
+            dbContext.Set<T>().Attach(entity);
+            dbContext.Entry(entity).Property(propertyExpression).IsModified = true;
         }
 
         protected async Task<PaginationResponseDto<TEntity>> Paged<TEntity>(IQueryable<TEntity> query, int pageNumber, int pageSize) where TEntity : class

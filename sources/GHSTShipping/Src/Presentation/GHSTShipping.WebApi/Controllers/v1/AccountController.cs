@@ -1,10 +1,8 @@
 using GHSTShipping.Application.DTOs.Account.Requests;
 using GHSTShipping.Application.DTOs.Account.Responses;
-using GHSTShipping.Application.Features.Shops.Commands;
 using GHSTShipping.Application.Features.Users.Commands;
 using GHSTShipping.Application.Interfaces.UserInterfaces;
 using GHSTShipping.Application.Wrappers;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;

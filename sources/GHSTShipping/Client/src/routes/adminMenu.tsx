@@ -1,6 +1,6 @@
 import { MenuList } from '@/interface/layout/menu.interface';
 
-const mockMenuList: MenuList = [
+const adminMenu: MenuList = [
   {
     code: 'dashboard',
     label: {
@@ -10,6 +10,46 @@ const mockMenuList: MenuList = [
     },
     icon: 'dashboard',
     path: '/dashboard',
+  },
+  {
+    code: 'customer',
+    label: {
+      zh_CN: '',
+      en_US: 'Customer',
+      vi_VN: 'Khách hàng', // Vietnamese translation
+    },
+    icon: 'customer',
+    path: '/customer',
+  },
+  {
+    code: 'settings',
+    label: {
+      zh_CN: '',
+      en_US: 'Settings',
+      vi_VN: 'Cấu hình hệ thống', // Vietnamese translation
+    },
+    icon: 'settings',
+    path: '/settings',
+  },
+  {
+    code: 'operation-report',
+    label: {
+      zh_CN: '',
+      en_US: 'Operation report',
+      vi_VN: 'Báo cáo vận hành', // Vietnamese translation
+    },
+    icon: 'report',
+    path: '/operation-report',
+  },
+  {
+    code: 'order',
+    label: {
+      zh_CN: '',
+      en_US: 'Order',
+      vi_VN: 'Đơn hàng', // Vietnamese translation
+    },
+    icon: 'order',
+    path: '/order',
   },
   {
     code: 'documentation',
@@ -186,4 +226,4 @@ const mockMenuList: MenuList = [
   },
 ];
 
-export default mockMenuList;
+export default adminMenu;

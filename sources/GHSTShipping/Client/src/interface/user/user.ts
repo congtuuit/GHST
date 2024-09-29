@@ -1,11 +1,11 @@
-import type { Role } from './login';
+import type { LoginResult, Role } from './login';
 import type { Device } from '@/interface/layout/index.interface';
 import type { MenuChild } from '@/interface/layout/menu.interface';
 
 export type Locale =  'en_US' | 'vi_VN';
 
 export interface UserState {
-  username: string;
+  userName: string;
 
   /** menu list for init tagsView */
   menuList: MenuChild[];
@@ -13,7 +13,7 @@ export interface UserState {
   /** login status */
   logged: boolean;
 
-  role: Role;
+  roles: Role[];
 
   /** user's device */
   device: Device;
@@ -29,4 +29,6 @@ export interface UserState {
 
   /** Is first time to view the site ? */
   newUser: boolean;
+
+  session: LoginResult;
 }

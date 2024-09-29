@@ -9,10 +9,13 @@ import { useNavigate } from 'react-router-dom';
 import { useLocale } from '@/locales';
 
 const PrivateRoute: FC<RouteProps> = props => {
-  const { logged } = useSelector(state => state.user);
+  const { logged, session } = useSelector(state => state.user);
   const navigate = useNavigate();
   const { formatMessage } = useLocale();
   const location = useLocation();
+
+  // TODO check token
+  // console.log("logged ", logged)
 
   return logged ? (
     (props.element as React.ReactElement)

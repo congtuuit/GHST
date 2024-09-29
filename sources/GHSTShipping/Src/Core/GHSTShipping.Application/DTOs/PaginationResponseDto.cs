@@ -9,4 +9,11 @@ namespace GHSTShipping.Application.DTOs
         public int PageNumber { get; set; } = pageNumber;
         public int PageSize { get; set; } = pageSize;
     }
+
+    public static class PageSetting
+    {
+        public static int Page { get; set; } = 1;
+
+        public static int PageSize { get; set; } = 10;
+    }
 }

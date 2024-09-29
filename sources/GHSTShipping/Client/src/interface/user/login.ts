@@ -1,5 +1,5 @@
 /** user's role */
-export type Role = 'guest' | 'admin';
+export type Role = 'SHOP' | 'ADMIN';
 
 export interface LoginParams {
   /** 用户名 */
@@ -13,7 +13,7 @@ export interface LoginResult {
   id: string;
   userName: string;
   email: string;
-  roles: Role[];
+  roles: string[];
   isVerified: boolean;
   jwToken: string;
 }

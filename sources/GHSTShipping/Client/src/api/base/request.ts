@@ -1,4 +1,4 @@
-import type { AxiosRequestConfig, Method } from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse, Method } from 'axios';
 
 import { message as $message, message } from 'antd';
 import axios from 'axios';
@@ -6,6 +6,7 @@ import axios from 'axios';
 import store from '@/stores';
 import { setGlobalState } from '@/stores/global.store';
 // import { history } from '@/routes/history';
+import { useNavigate } from 'react-router-dom'; // v6 navigation
 
 const axiosInstance = axios.create({
   timeout: 6000,
@@ -47,10 +48,6 @@ axiosInstance.interceptors.response.use(
       }),
     );
 
-    if (config?.data?.message) {
-      // $message.success(config.data.message)
-    }
-
     return config?.data;
   },
   error => {
@@ -70,6 +67,11 @@ axiosInstance.interceptors.response.use(
     }
 
     console.dir(error);
+
+    if (error.response.status === 401) {
+      localStorage.clear();
+      window.location.href = '/login';
+    }
 
     return {
       message: errorMessage,

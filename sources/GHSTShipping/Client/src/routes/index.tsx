@@ -9,6 +9,7 @@ import Dashboard from '@/pages/dashboard';
 import LayoutPage from '@/pages/layout';
 import LoginPage from '@/pages/login';
 import ForgotPasswordPage from '@/pages/forgot-password';
+import CustomerPage from '@/pages/customer';
 
 import WrapperRouteComponent from './config';
 
@@ -52,6 +53,13 @@ const routeList: RouteObject[] = [
         path: 'dashboard',
         element: <WrapperRouteComponent element={<Dashboard />} titleId="title.dashboard" />,
       },
+      {
+        path: 'customer',
+        element: <WrapperRouteComponent element={<CustomerPage />} titleId="title.customer" />,
+      },
+
+
+
       {
         path: 'documentation',
         element: <WrapperRouteComponent element={<Documentation />} titleId="title.documentation" />,

@@ -1,3 +1,4 @@
+using Azure.Core;
 using GHSTShipping.Application.DTOs.Account.Requests;
 using GHSTShipping.Application.DTOs.Account.Responses;
 using GHSTShipping.Application.Helpers;
@@ -12,8 +13,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -175,6 +178,14 @@ namespace GHSTShipping.Infrastructure.Identity.Services
 
             if (identityResult.Succeeded)
             {
+                // Active user
+                if (user.EmailConfirmed == false)
+                {
+                    identityContext.Attach(user);
+                    user.EmailConfirmed = true;
+                    await identityContext.SaveChangesAsync();
+                }
+                   
                 return BaseResult.Ok();
             }
 
@@ -215,6 +226,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             var jwToken = await GenerateJwtToken();
 
             var rolesList = await userManager.GetRolesAsync(user);
+            rolesList.Add(user.Type);
 
             return new AuthenticationResponse()
             {
@@ -224,17 +236,25 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 UserName = user.UserName,
                 Roles = rolesList,
                 IsVerified = user.EmailConfirmed,
+                FullName = user.Name,
             };
 
             async Task<JwtSecurityToken> GenerateJwtToken()
             {
                 var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));
                 var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+                var claimsPrincipal = await signInManager.ClaimsFactory.CreateAsync(user);
+                var claims = new List<Claim>
+                {
+                    new Claim("DisplayName", user.Name) // Add your custom claim
+                };
+
+                claims.AddRange(claimsPrincipal.Claims);
 
                 return new JwtSecurityToken(
                     issuer: jwtSettings.Issuer,
                     audience: jwtSettings.Audience,
-                    claims: (await signInManager.ClaimsFactory.CreateAsync(user)).Claims,
+                    claims: claims,
                     expires: DateTime.UtcNow.AddMinutes(jwtSettings.DurationInMinutes),
                     signingCredentials: signingCredentials);
             }

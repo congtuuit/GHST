@@ -10,5 +10,7 @@ namespace GHSTShipping.Application.DTOs.Account.Responses
         public IList<string> Roles { get; set; }
         public bool IsVerified { get; set; }
         public string JwToken { get; set; }
+
+        public string FullName { get; set; }
     }
 }
