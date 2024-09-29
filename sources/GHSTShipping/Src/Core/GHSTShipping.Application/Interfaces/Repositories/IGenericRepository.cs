@@ -14,6 +14,7 @@ namespace GHSTShipping.Application.Interfaces.Repositories
         void Update(T entity);
         void Delete(T entity);
 
+        void Modify(T entities);
         void ModifyRange(IEnumerable<T> entities);
         void ModifyProperty<TProperty>(T entity, Expression<Func<T, TProperty>> propertyExpression);
 

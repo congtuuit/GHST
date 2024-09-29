@@ -1,5 +1,6 @@
 using GHSTShipping.Application.DTOs;
 using GHSTShipping.Application.Interfaces.Repositories;
+using GHSTShipping.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace GHSTShipping.Infrastructure.Persistence.Repositories
 {
-    public class GenericRepository<T>(DbContext dbContext) : IGenericRepository<T> where T : class
+    public class GenericRepository<T>(DbContext dbContext) : IGenericRepository<T> where T : AuditableBaseEntity
     {
         public virtual async Task<T> GetByIdAsync(long id)
         {
@@ -29,7 +30,8 @@ namespace GHSTShipping.Infrastructure.Persistence.Repositories
 
         public void Delete(T entity)
         {
-            dbContext.Set<T>().Remove(entity);
+            dbContext.Set<T>().Attach(entity);
+            entity.IsDeleted = true;
         }
 
         public async Task<IReadOnlyList<T>> GetAllAsync()
@@ -56,6 +58,11 @@ namespace GHSTShipping.Infrastructure.Persistence.Repositories
         }
 
         public IQueryable<T> FromSql(FormattableString sql) => dbContext.Set<T>().FromSql(sql);
+
+        public void Modify(T entities)
+        {
+            dbContext.Attach(entities);
+        }
 
         public void ModifyRange(IEnumerable<T> entities)
         {

@@ -33,7 +33,6 @@ namespace GHSTShipping.Application.Features.Users.Queries
                 .All()
                 .Select(i => new ShopDto
                 {
-                    //No = skipCount + index + 1,
                     Id = i.Id,
                     ShopName = i.Name,
                     ShopUniqueCode = i.UniqueCode,
@@ -43,6 +42,13 @@ namespace GHSTShipping.Application.Features.Users.Queries
                     IsVerified = i.IsVerified,
                 })
                 .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);
+
+            int index = 0;
+            foreach (var item in pagingResult.Data)
+            {
+                item.No = skipCount + index + 1;
+                index++;
+            }
 
             return BaseResult<PaginationResponseDto<ShopDto>>.Ok(pagingResult);
         }

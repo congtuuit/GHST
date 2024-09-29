@@ -1,9 +1,11 @@
 import { useEffect, useState, type FC } from 'react';
-import { Button, Table, Tag } from 'antd';
+import { Button, Table, TablePaginationConfig, Tag } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { apiActiveShops, apiGetShops } from '@/api/user.api';
+import { PaginationResponse } from '@/interface/business';
+import { FilterValue } from 'antd/es/table/interface';
 
-interface ColumnType {
+interface ShopDatatableDto {
   key: string;
   id: string;
   code: string;
@@ -16,24 +18,26 @@ interface ColumnType {
 }
 
 const CustomerTable: FC = () => {
-  const [dataSource, setDataSource] = useState<ColumnType[]>([]);
+  const [paginationResponse, setPaginationResponse] = useState<PaginationResponse>();
+  const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
+  const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
+  const [reloadTable, setReloadTable] = useState<Boolean>(false);
 
-  const getShops = async () => {
-    const { success, data } = await apiGetShops();
+  // const getShops = async () => {
+  //   const { success, data } = await apiGetShops();
+  //   if (success) {
+  //     setPaginationResponse(data);
+  //   }
+  // };
+
+  const fetchShops = async (
+    pageNumber: number | undefined = 1,
+    pageSize: number | undefined = 10,
+  ) => {
+    const { success, data } = await apiGetShops(pageNumber, pageSize);
     if (success) {
-      setDataSource(data?.data?.map(i => mappingToDatatable(i)));
+      setPaginationResponse(data);
     }
-  };
-
-  const mappingToDatatable = (input: any) => {
-    return {
-      ...input,
-      loading: false, // Initialize loading state to false
-    };
-  };
-
-  const refreshData = () => {
-    getShops(); // Call getShops to refresh the data
   };
 
   const columns = [
@@ -42,50 +46,54 @@ const CustomerTable: FC = () => {
       dataIndex: 'no',
       key: 'no',
       width: 50,
+      align: 'center' as const,
     },
     {
-      title: 'Code',
+      title: 'Mã KH riêng',
       dataIndex: 'shopUniqueCode',
       key: 'code',
       width: 120,
     },
     {
-      title: 'Register Date',
+      title: 'Ngày đăng ký',
       dataIndex: 'registerDate',
       key: 'registerDate',
       width: 150,
     },
     {
-      title: 'Shop Name',
+      title: 'Tên cửa hàng',
       dataIndex: 'shopName',
       key: 'shopName',
     },
     {
-      title: 'Full Name',
+      title: 'Tên khách hàng',
       dataIndex: 'fullName',
       key: 'fullName',
       width: 'auto',
     },
     {
-      title: 'Avg Monthly Capacity',
+      title: 'Sản lượng trung bình',
       dataIndex: 'avgMonthlyCapacity',
       key: 'avgMonthlyCapacity',
       width: 180,
+      align: 'right' as const,
     },
     {
-      title: 'Status',
+      title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
       width: 120,
-      render: (value: any, record: ColumnType) => (
+      align: 'center' as const,
+      render: (value: any, record: ShopDatatableDto) => (
         <Tag color={record['isVerified'] === true ? 'green' : 'orange'}>{value}</Tag>
       ),
     },
     {
-      title: 'Action',
+      title: 'Thao tác',
       key: 'action',
       width: 100,
-      render: (_: any, record: ColumnType) => {
+      align: 'center' as const,
+      render: (_: any, record: ShopDatatableDto) => {
         const { isVerified } = record;
         if (isVerified) {
           return null;
@@ -107,26 +115,55 @@ const CustomerTable: FC = () => {
   ];
 
   // Handle the Activate action
-  const handleActivate = async (record: ColumnType) => {
-
-    // Call API to activate the shop
+  const handleActivate = async (record: ShopDatatableDto) => {
     await apiActiveShops(record.id);
+    setReloadTable(!reloadTable);
+  };
 
-    refreshData();
+  const handleChangeTable = (config: TablePaginationConfig, filters: Record<string, FilterValue | null>) => {
+    const { current, pageSize } = config;
+    setTablePaginationConfig(config);
+    setTableFilters(filters);
+    fetchShops(current, pageSize);
   };
 
   useEffect(() => {
-    getShops();
+    let _pageNumber: number | undefined = -1,
+      _pageSize: number | undefined = -1,
+      _supplierFilter: FilterValue | null = null;
+    if (tablePaginationConfig) {
+      const { current, pageSize } = tablePaginationConfig;
+      _pageNumber = current;
+      _pageSize = pageSize;
+    }
+    if (tableFilters) {
+      _supplierFilter = tableFilters?.supplier;
+    }
+    if (Boolean(_pageSize) && (_pageSize as number) > 0 && Boolean(_pageNumber) && (_pageNumber as number) > 0) {
+      fetchShops(_pageNumber, _pageSize);
+    } else {
+      fetchShops();
+    }
+  }, [tablePaginationConfig, tableFilters, reloadTable]);
+
+
+  useEffect(() => {
+    fetchShops();
   }, []);
 
   return (
     <Table
       style={{ width: '100%' }}
       columns={columns}
-      dataSource={dataSource}
-      pagination={{ pageSize: 10 }} // Optional: Set pagination size
+      dataSource={paginationResponse?.data as ShopDatatableDto[]}
       rowKey="key" // Unique key for rows
       scroll={{ x: 'max-content' }} // Enable horizontal scrolling for wide tables
+      pagination={{
+        pageSize: paginationResponse?.pageSize,
+        current: paginationResponse?.pageNumber,
+        total: paginationResponse?.count,
+      }}
+      onChange={handleChangeTable}
     />
   );
 };

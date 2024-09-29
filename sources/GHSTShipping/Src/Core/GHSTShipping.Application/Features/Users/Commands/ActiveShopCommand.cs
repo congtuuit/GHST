@@ -5,6 +5,7 @@ using GHSTShipping.Application.Wrappers;
 using GHSTShipping.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
@@ -21,7 +22,8 @@ namespace GHSTShipping.Application.Features.Users.Commands
         IAuthenticatedUserService authenticatedUser,
         IShopRepository shopRepository,
         IAccountServices accountServices,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        ILogger<ActiveShopCommandHandler> logger
         ) : IRequestHandler<ActiveShopCommand, BaseResult>
     {
         public async Task<BaseResult> Handle(ActiveShopCommand request, CancellationToken cancellationToken)
@@ -43,11 +45,15 @@ namespace GHSTShipping.Application.Features.Users.Commands
                     shop.IsVerified = true;
                     shopRepository.ModifyProperty(shop, i => i.IsVerified);
                     await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    await transaction.CommitAsync(cancellationToken);
                 }
-                catch (Exception ex) { 
-                
+                catch (Exception ex)
+                {
+                    logger.LogError(ex.Message, ex);
+
+                    await transaction.RollbackAsync(cancellationToken);
                 }
-               
             }
 
             return BaseResult.Ok();

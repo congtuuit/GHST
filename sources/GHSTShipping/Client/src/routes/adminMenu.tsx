@@ -20,6 +20,26 @@ const adminMenu: MenuList = [
     },
     icon: 'customer',
     path: '/customer',
+    children: [
+      {
+        code: 'customer_list',
+        label: {
+          zh_CN: '基本',
+          en_US: 'List',
+          vi_VN: 'Danh sách KH', // Vietnamese translation
+        },
+        path: '/customer/list',
+      },
+      {
+        code: 'customer_pricing_plan',
+        label: {
+          zh_CN: '基本',
+          en_US: 'Pricing plan',
+          vi_VN: 'Bảng giá', // Vietnamese translation
+        },
+        path: '/customer/price-plan',
+      },
+    ]
   },
   {
     code: 'settings',

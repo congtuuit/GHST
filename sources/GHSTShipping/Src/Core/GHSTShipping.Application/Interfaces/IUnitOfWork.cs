@@ -12,7 +12,7 @@ namespace GHSTShipping.Application.Interfaces
 
         Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
 
-
         IGenericRepository<Shop> Shops { get; }
+        IGenericRepository<ShopPricePlan> ShopPricePlanes { get; }
     }
 }

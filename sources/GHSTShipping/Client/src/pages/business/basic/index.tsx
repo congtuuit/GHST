@@ -4,9 +4,12 @@ import type { FC } from 'react';
 
 import { Space, Tag } from 'antd';
 
-import { getBusinessUserList } from '@/api/business';
 import MyButton from '@/components/basic/button';
 import MyPage from '@/components/business/page';
+
+function getBusinessUserList() {
+  return [];
+}
 
 const tableColums: MyPageTableOptions<BuniesssUser> = [
   {
@@ -45,7 +48,7 @@ const tableColums: MyPageTableOptions<BuniesssUser> = [
 ];
 
 const BusinessBasicPage: FC = () => {
-  return <MyPage pageApi={getBusinessUserList} tableOptions={tableColums}></MyPage>;
+  return <MyPage pageApi={getBusinessUserList} tableOptions={[]}></MyPage>;
 };
 
 export default BusinessBasicPage;

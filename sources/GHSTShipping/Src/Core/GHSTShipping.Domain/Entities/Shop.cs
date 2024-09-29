@@ -1,5 +1,6 @@
 ﻿using GHSTShipping.Domain.Common;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -36,6 +37,8 @@ namespace GHSTShipping.Domain.Entities
         public string UniqueCode { get; set; }
 
         public Guid AccountId { get; set; }
+
+        public virtual ICollection<ShopPricePlan> ShopPricePlanes { get; set; } = new List<ShopPricePlan>();
 
         private void GenUniqueCode()
         {

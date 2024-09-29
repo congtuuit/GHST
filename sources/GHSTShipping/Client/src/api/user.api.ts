@@ -9,6 +9,8 @@ export const apiLogin = (data: LoginParams) => request<LoginResult>('post', '/ac
 /** 登出接口 */
 export const apiLogout = () => request<LogoutResult>('post', '/account/logout');
 
-export const apiGetShops = () => request<PaginationResponse>('get', '/users/shops');
+export const apiGetShops = (pageNumber: number | undefined = 1, pageSize: number | undefined = 10) => {
+  return request<PaginationResponse>('get', `/users/shops?pageNumber=${pageNumber}&pageSize=${pageSize}`);
+};
 
 export const apiActiveShops = (shopId: string) => request<PaginationResponse>('put', `/users/ActiveShop/${shopId}`);

@@ -11,8 +11,10 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
     public class UnitOfWork(ApplicationDbContext dbContext) : IUnitOfWork
     {
         private IGenericRepository<Shop> _shop;
+        private IGenericRepository<ShopPricePlan> _shopPricePlan;
 
         public IGenericRepository<Shop> Shops => _shop ??= new GenericRepository<Shop>(dbContext);
+        public IGenericRepository<ShopPricePlan> ShopPricePlanes => _shopPricePlan ??= new GenericRepository<ShopPricePlan>(dbContext);
 
 
         public async Task<bool> SaveChangesAsync(CancellationToken cancellation = default)

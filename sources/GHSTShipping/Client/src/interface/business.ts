@@ -13,3 +13,19 @@ export interface PaginationResponse {
   pageSize: number;
   data: any[];
 }
+
+export interface ShopPricePlanDto {
+  id: string | undefined; // Guid in C# can be represented as a string in TypeScript
+  shopId: string | undefined;
+  supplier: 
+    | 'GHN' 
+    | 'SHOPEE EXPRESS' 
+    | 'J&T' 
+    | 'Best' 
+    | 'Viettel' 
+    | 'GHTK'; // Các giá trị cho supplier
+  privatePrice: number;
+  officialPrice: number;
+  capacity: number;
+}
+
