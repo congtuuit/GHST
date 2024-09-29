@@ -14,11 +14,9 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IAuthenticatedUserService authenticatedUser) : DbContext(options)
     {
         public DbSet<CodeSequence> CodeSequences { get; set; }
-
         public DbSet<Shop> Shops { get; set; }
-
         public DbSet<ShopPricePlan> ShopPricePlanes { get; set; }
-
+        public DbSet<PartnerConfig> PartnerConfigs { get; set; }
 
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
