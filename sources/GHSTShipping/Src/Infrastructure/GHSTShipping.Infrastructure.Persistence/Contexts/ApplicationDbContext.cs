@@ -1,6 +1,7 @@
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Domain.Common;
 using GHSTShipping.Domain.Entities;
+using GHSTShipping.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -78,6 +79,7 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
                     entityType.SetQueryFilter(lambdaExpression);
                 }
             }
+
 
             base.OnModelCreating(builder);
         }

@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GHSTShipping.Infrastructure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GHSTShipping.Infrastructure.Resources", "Src\Infrastructure\GHSTShipping.Infrastructure.Resources\GHSTShipping.Infrastructure.Resources.csproj", "{EBC20A53-ECB3-420F-AEDB-944B301CD1D3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Delivery.GHN", "Src\Infrastructure\Delivery.GHN\Delivery.GHN.csproj", "{8F656440-949A-430D-B0D5-5FB960790823}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{EBC20A53-ECB3-420F-AEDB-944B301CD1D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBC20A53-ECB3-420F-AEDB-944B301CD1D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBC20A53-ECB3-420F-AEDB-944B301CD1D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F656440-949A-430D-B0D5-5FB960790823}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F656440-949A-430D-B0D5-5FB960790823}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F656440-949A-430D-B0D5-5FB960790823}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F656440-949A-430D-B0D5-5FB960790823}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{68B1DDDD-3B95-452C-899E-7A2D36F5406D} = {0808AD5E-5C61-4945-904A-EFB8EFF146E9}
 		{BEB74B88-8CDF-4518-9FDE-19BB9F96D37C} = {0808AD5E-5C61-4945-904A-EFB8EFF146E9}
 		{EBC20A53-ECB3-420F-AEDB-944B301CD1D3} = {0808AD5E-5C61-4945-904A-EFB8EFF146E9}
+		{8F656440-949A-430D-B0D5-5FB960790823} = {0808AD5E-5C61-4945-904A-EFB8EFF146E9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F8FB1C8-06FF-4119-A197-7AF65D40EB4E}

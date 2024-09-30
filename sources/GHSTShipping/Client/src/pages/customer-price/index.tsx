@@ -1,15 +1,12 @@
-import { useState, lazy, type FC, useEffect } from 'react';
-
-import { Card, Row, Typography, Select, Col, Form, Button, Table, message } from 'antd';
-
-import { LocaleFormatter } from '@/locales';
-import './index.css';
+import { useState, type FC, useEffect } from 'react';
+import { Card, Row, Select, Col, Button, message } from 'antd';
 import { apiGetShops } from '@/api/user.api';
-import { PlusOutlined } from '@ant-design/icons';
+import { ReloadOutlined } from '@ant-design/icons';
 import PriceConfigurationForm from './PriceConfigurationForm';
-import { apiCreateShopPricePlan, apiGetShopPricePlanes } from '@/api/business.api';
+import { apiCreateShopPricePlan } from '@/api/business.api';
 import { ShopPricePlanDto } from '@/interface/business';
 import PriceTable from './price-table';
+import './index.css';
 
 const { Option } = Select;
 
@@ -88,7 +85,9 @@ const CustomerPricePage: FC = () => {
       <Row>
         <Card title="Cấu hình bảng giá" style={{ width: '100%' }}>
           <PriceConfigurationForm onSubmit={handleUpdatePriceConfig} data={updateShopPricePlan} />
-          <Button onClick={() => setRefreshTable(!refreshTable)}>Làm mới</Button>
+          <Button onClick={() => setRefreshTable(!refreshTable)}>
+            <ReloadOutlined /> Làm mới
+          </Button>
           <Row>
             <PriceTable refreshTable={refreshTable} selectedShop={selectedShop} onEdit={handleEdit} />
           </Row>

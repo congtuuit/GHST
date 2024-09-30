@@ -9,6 +9,7 @@ using GHSTShipping.Infrastructure.Identity.Models;
 using GHSTShipping.Infrastructure.Identity.Seeds;
 using GHSTShipping.Infrastructure.Persistence;
 using GHSTShipping.Infrastructure.Persistence.Contexts;
+using GHSTShipping.Infrastructure.Persistence.Seeds;
 using GHSTShipping.Infrastructure.Resources;
 using GHSTShipping.WebApi.Infrastructure.Extensions;
 using GHSTShipping.WebApi.Infrastructure.Middlewares;
@@ -19,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Delivery.GHN;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +39,10 @@ builder.Services.AddSwaggerWithVersioning();
 builder.Services.AddAnyCors();
 builder.Services.AddCustomLocalization(builder.Configuration);
 builder.Services.AddHealthChecks();
+
+// Add GHN delivery lib
+builder.Services.UseGhnApiClient();
+
 builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
 var app = builder.Build();
@@ -55,6 +61,7 @@ using (var scope = app.Services.CreateScope())
     //Seed Data
     //await DefaultRoles.SeedAsync(services.GetRequiredService<RoleManager<ApplicationRole>>());
     await DefaultBasicUser.SeedAsync(services.GetRequiredService<UserManager<ApplicationUser>>());
+    await DeliveryPartnerConfig.SeedAsync(services.GetRequiredService<ApplicationDbContext>());
 }
 
 app.UseCustomLocalization();

@@ -1,4 +1,6 @@
 ﻿using GHSTShipping.Domain.Common;
+using GHSTShipping.Domain.DTOs;
+using GHSTShipping.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -20,7 +22,27 @@ namespace GHSTShipping.Domain.Entities
 
         public string ProdEnv { get; set; }
 
-        [MaxLength(100)]
-        public string PartnerName { get; set; }
+        public bool IsActivated { get; set; }
+
+        public EnumDeliveryPartner DeliveryPartner { get; set; }
+
+        public string DeliveryPartnerName
+        {
+            get
+            {
+                return DeliveryPartner.GetCode();
+            }
+        }
+
+        public PartnerConfig() { }
+
+        public PartnerConfig(PartnerConfigDto dto)
+        {
+            ApiKey = dto.ApiKey;
+            UserName = dto.UserName;
+            SanboxEnv = dto.SanboxEnv;
+            ProdEnv = dto.ProdEnv;
+            DeliveryPartner = dto.DeliveryPartner;
+        }
     }
 }

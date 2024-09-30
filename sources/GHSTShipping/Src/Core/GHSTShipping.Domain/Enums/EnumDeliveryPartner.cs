@@ -2,7 +2,7 @@
 
 namespace GHSTShipping.Domain.Enums
 {
-    public enum EnumSupplier
+    public enum EnumDeliveryPartner
     {
         None = 0,
         GHN = 1,
@@ -25,22 +25,22 @@ namespace GHSTShipping.Domain.Enums
 
     public static class EnumSupplierExtension
     {
-        public static string GetCode(this EnumSupplier input)
+        public static string GetCode(this EnumDeliveryPartner input)
         {
             switch (input)
             {
-                case EnumSupplier.GHN:
+                case EnumDeliveryPartner.GHN:
                 default:
                     return EnumSupplierConstants.GHN;
-                case EnumSupplier.SPX:
+                case EnumDeliveryPartner.SPX:
                     return EnumSupplierConstants.SHOPEE_EXPRESS;
-                case EnumSupplier.JT:
+                case EnumDeliveryPartner.JT:
                     return EnumSupplierConstants.J_T;
-                case EnumSupplier.Best:
+                case EnumDeliveryPartner.Best:
                     return EnumSupplierConstants.BEST;
-                case EnumSupplier.Viettel:
+                case EnumDeliveryPartner.Viettel:
                     return EnumSupplierConstants.VIETTEL;
-                case EnumSupplier.GHTK:
+                case EnumDeliveryPartner.GHTK:
                     return EnumSupplierConstants.GHTK;
             }
         }

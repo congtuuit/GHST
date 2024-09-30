@@ -11,6 +11,9 @@ namespace GHSTShipping.Application
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceRegistration).Assembly));
 
+
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
             return services;
         }
     }

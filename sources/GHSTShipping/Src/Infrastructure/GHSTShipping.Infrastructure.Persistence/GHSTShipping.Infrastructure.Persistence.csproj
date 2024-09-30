@@ -21,7 +21,6 @@
 	<ItemGroup>
 	  <Folder Include="Contexts\Configurations\" />
 	  <Folder Include="Migrations\" />
-	  <Folder Include="Seeds\" />
 	</ItemGroup>
 
 </Project>
