@@ -14,7 +14,10 @@ namespace GHSTShipping.WebApi.Controllers.v1
     {
         [HttpPost]
         public async Task<BaseResult<AuthenticationResponse>> AuthenticateAsync(AuthenticationRequest request)
-            => await accountServices.Authenticate(request);
+        {
+
+            return await accountServices.Authenticate(request);
+        }
 
         [HttpPost]
         public async Task<BaseResult> LogoutAsync() => await accountServices.SignOutAsync();

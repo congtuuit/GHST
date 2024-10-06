@@ -1,4 +1,6 @@
 using FluentValidation;
+using GHSTShipping.Application.Interfaces;
+using GHSTShipping.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -13,6 +15,9 @@ namespace GHSTShipping.Application
 
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+
+            services.AddScoped<IPartnerConfigService, PartnerConfigService>();
 
             return services;
         }

@@ -38,7 +38,10 @@ namespace GHSTShipping.Domain.Entities
 
         public Guid AccountId { get; set; }
 
+        public bool AllowPublishOrder { get; set; }
+
         public virtual ICollection<ShopPricePlan> ShopPricePlanes { get; set; } = new List<ShopPricePlan>();
+        public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
         private void GenUniqueCode()
         {

@@ -1,4 +1,3 @@
-using Azure.Core;
 using GHSTShipping.Application.DTOs.Account.Requests;
 using GHSTShipping.Application.DTOs.Account.Responses;
 using GHSTShipping.Application.Helpers;
@@ -185,7 +184,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                     user.EmailConfirmed = true;
                     await identityContext.SaveChangesAsync();
                 }
-                   
+
                 return BaseResult.Ok();
             }
 
@@ -237,6 +236,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 Roles = rolesList,
                 IsVerified = user.EmailConfirmed,
                 FullName = user.Name,
+                PhoneNumber = user.PhoneNumber,
             };
 
             async Task<JwtSecurityToken> GenerateJwtToken()

@@ -6,6 +6,5 @@ namespace GHSTShipping.Infrastructure.Persistence.Repositories
 {
     public class ShopRepository(ApplicationDbContext dbContext) : GenericRepository<Shop>(dbContext), IShopRepository
     {
-
     }
 }

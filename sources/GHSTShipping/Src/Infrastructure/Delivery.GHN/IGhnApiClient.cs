@@ -94,7 +94,7 @@ namespace Delivery.GHN
         /// <param name="config">The API configuration, including base URL and token.</param>
         /// <param name="provinceId">The ID of the province for which to retrieve districts.</param>
         /// <returns>A task representing the asynchronous operation, with a response containing the list of districts.</returns>
-        Task<IEnumerable<DistrictResponse>> GetDistrictAsync(ApiConfig config, int provinceId);
+        Task<IEnumerable<DistrictResponse>> GetDistrictAsync(ApiConfig config);
 
         Task<IEnumerable<WardResponse>> GetWardAsync(ApiConfig config, int districtId);
 

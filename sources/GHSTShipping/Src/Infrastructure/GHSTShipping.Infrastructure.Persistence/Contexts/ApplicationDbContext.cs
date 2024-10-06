@@ -1,12 +1,13 @@
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Domain.Common;
+using GHSTShipping.Domain.DTOs;
 using GHSTShipping.Domain.Entities;
-using GHSTShipping.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,6 +19,10 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
         public DbSet<Shop> Shops { get; set; }
         public DbSet<ShopPricePlan> ShopPricePlanes { get; set; }
         public DbSet<PartnerConfig> PartnerConfigs { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+
+        public DbSet<SP_OrderCodeResult> OrderCodeResults { get; set; }
 
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
@@ -54,6 +59,9 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            // No need to map OrderCodeResult to a table since it's used for raw SQL results
+            builder.Entity<SP_OrderCodeResult>().HasNoKey(); // Indicates it's not a database entity
+
             //All Decimals will have 18,6 Range
             foreach (var property in builder.Model.GetEntityTypes()
             .SelectMany(t => t.GetProperties())

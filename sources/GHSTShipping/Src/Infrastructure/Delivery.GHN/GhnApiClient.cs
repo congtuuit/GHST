@@ -37,7 +37,10 @@ namespace Delivery.GHN
         {
             try
             {
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -72,7 +75,10 @@ namespace Delivery.GHN
         {
             try
             {
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -105,7 +111,10 @@ namespace Delivery.GHN
         {
             try
             {
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -140,7 +149,10 @@ namespace Delivery.GHN
             try
             {
                 // Configure the HttpClient
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Add("ShopId", $"{shopId}"); // Add ShopId header
@@ -176,7 +188,10 @@ namespace Delivery.GHN
             try
             {
                 // Configure the HttpClient
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Add("ShopId", $"{shopId}"); // Add ShopId header
@@ -213,7 +228,10 @@ namespace Delivery.GHN
             try
             {
                 // Configure the HttpClient
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Add("ShopId", $"{shopId}"); // Add ShopId header
@@ -248,14 +266,24 @@ namespace Delivery.GHN
             try
             {
                 // Configure the HttpClient
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Add("ShopId", $"{shopId}"); // Add ShopId header
+                _httpClient.DefaultRequestHeaders.Add("shop_id", $"{shopId}"); // Add ShopId header
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(ApiEndpoints.CREATE_DRAFT_ORDER, content);
+                var payload = JsonConvert.SerializeObject(request);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var httpRequest = new HttpRequestMessage(HttpMethod.Post, ApiEndpoints.CREATE_DRAFT_ORDER)
+                {
+                    Content = content
+                };
+
+                var response = await _httpClient.SendAsync(httpRequest);
                 response.EnsureSuccessStatusCode();
 
                 var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -281,7 +309,10 @@ namespace Delivery.GHN
         {
             try
             {
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -308,7 +339,10 @@ namespace Delivery.GHN
         {
             try
             {
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -337,7 +371,10 @@ namespace Delivery.GHN
         {
             try
             {
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -366,18 +403,22 @@ namespace Delivery.GHN
             }
         }
 
-        public async Task<IEnumerable<DistrictResponse>> GetDistrictAsync(ApiConfig config, int provinceId)
+        public async Task<IEnumerable<DistrictResponse>> GetDistrictAsync(ApiConfig config)
         {
             try
             {
                 // Set the base address for the HttpClient
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
+
                 _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // Construct the URL with the province ID as a query parameter
-                var requestUrl = $"{ApiEndpoints.GET_DISTRICT}?province_id={provinceId}";
+                var requestUrl = $"{ApiEndpoints.GET_DISTRICT}";
 
                 // Send the GET request
                 var response = await _httpClient.GetAsync(requestUrl);
@@ -411,7 +452,10 @@ namespace Delivery.GHN
             try
             {
                 // Set the base address for the HttpClient
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -450,7 +494,10 @@ namespace Delivery.GHN
         {
             try
             {
-                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                if (_httpClient.BaseAddress == null)
+                {
+                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
+                }
                 _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

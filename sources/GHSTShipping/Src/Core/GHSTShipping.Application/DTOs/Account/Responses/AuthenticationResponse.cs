@@ -12,5 +12,6 @@ namespace GHSTShipping.Application.DTOs.Account.Responses
         public string JwToken { get; set; }
 
         public string FullName { get; set; }
+        public string PhoneNumber { get; set; }
     }
 }

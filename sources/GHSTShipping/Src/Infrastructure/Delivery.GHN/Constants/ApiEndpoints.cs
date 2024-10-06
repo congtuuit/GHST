@@ -20,7 +20,7 @@
 
         public const string GET_PROVINCE = "/shiip/public-api/master-data/province";
 
-        public const string GET_DISTRICT = "/shiip/public-api/master-data/district";
+        public const string GET_DISTRICT = "/shiip/public-api/v2/master-data/districts";
 
         public const string GET_WARD = "/shiip/public-api/master-data/ward";
 

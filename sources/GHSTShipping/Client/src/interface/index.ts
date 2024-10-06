@@ -15,3 +15,8 @@ export interface PageData<T> {
   total: number;
   data: T[];
 }
+
+export interface IPaginationRequestParameter {
+  pageNumber: number;
+  pageSize: number;
+}

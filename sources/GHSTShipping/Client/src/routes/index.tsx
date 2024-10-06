@@ -11,6 +11,10 @@ import LoginPage from '@/pages/login';
 import ForgotPasswordPage from '@/pages/forgot-password';
 import CustomerPage from '@/pages/customer';
 import CustomerPricePage from '@/pages/customer-price';
+import OrdersPage from '@/pages/orders';
+import CreateOrderPage from '@/pages/orders/create';
+
+
 
 import WrapperRouteComponent from './config';
 
@@ -61,6 +65,14 @@ const routeList: RouteObject[] = [
       {
         path: 'customer/price-plan',
         element: <WrapperRouteComponent element={<CustomerPricePage />} titleId="title.customerPrice" />,
+      },
+      {
+        path: 'order/list',
+        element: <WrapperRouteComponent element={<OrdersPage />} titleId="title.orderList" />,
+      },
+      {
+        path: 'order/create',
+        element: <WrapperRouteComponent element={<CreateOrderPage />} titleId="title.createOrder" />,
       },
 
       {

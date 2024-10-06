@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.WebApi.Infrastructure.Middlewares
@@ -51,6 +50,11 @@ namespace GHSTShipping.WebApi.Infrastructure.Middlewares
                         // not found error
                         response.StatusCode = (int)HttpStatusCode.NotFound;
                         responseModel.AddError(new Error(ErrorCode.NotFound, e.Message));
+                        break;
+                    case UnauthorizedAccessException e:
+                        // not found error
+                        response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        responseModel.AddError(new Error(ErrorCode.AccessDenied, e.Message));
                         break;
                     default:
                         // unhandled error

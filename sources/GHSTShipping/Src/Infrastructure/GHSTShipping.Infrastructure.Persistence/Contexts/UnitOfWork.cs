@@ -12,10 +12,11 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
     {
         private IGenericRepository<Shop> _shop;
         private IGenericRepository<ShopPricePlan> _shopPricePlan;
+        private IGenericRepository<Order> _order;
 
         public IGenericRepository<Shop> Shops => _shop ??= new GenericRepository<Shop>(dbContext);
         public IGenericRepository<ShopPricePlan> ShopPricePlanes => _shopPricePlan ??= new GenericRepository<ShopPricePlan>(dbContext);
-
+        public IGenericRepository<Order> Orders => _order ??= new GenericRepository<Order>(dbContext);
 
         public async Task<bool> SaveChangesAsync(CancellationToken cancellation = default)
         {

@@ -27,6 +27,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Core\GHSTShipping.Application\GHSTShipping.Application.csproj" />
+		<ProjectReference Include="..\..\Core\GHSTShipping.Domain\GHSTShipping.Domain.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Delivery.GHN\Delivery.GHN.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\GHSTShipping.Infrastructure.FileManager\GHSTShipping.Infrastructure.FileManager.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\GHSTShipping.Infrastructure.Identity\GHSTShipping.Infrastructure.Identity.csproj" />

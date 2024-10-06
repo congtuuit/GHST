@@ -16,6 +16,8 @@ export interface LoginResult {
   roles: string[];
   isVerified: boolean;
   jwToken: string;
+  phoneNumber: string;
+  fullName: string;
 }
 
 export interface LogoutParams {

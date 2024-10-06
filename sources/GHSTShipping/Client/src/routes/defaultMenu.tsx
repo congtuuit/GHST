@@ -26,10 +26,32 @@ const defaultMenu: MenuList = [
     label: {
       zh_CN: '',
       en_US: 'Order',
-      vi_VN: 'Đơn hàng', // Vietnamese translation
+      vi_VN: 'Quản lý đơn hàng', // Vietnamese translation
     },
     icon: 'order',
     path: '/order',
+    children: [
+      {
+        code: 'order_list',
+        label: {
+          zh_CN: '',
+          en_US: 'Order',
+          vi_VN: 'DS đơn hàng', // Vietnamese translation
+        },
+        icon: 'order',
+        path: '/order/list',
+      },
+      {
+        code: 'order_create',
+        label: {
+          zh_CN: '',
+          en_US: 'Create order',
+          vi_VN: 'Tạo đơn hàng', // Vietnamese translation
+        },
+        icon: 'order',
+        path: '/order/create',
+      },
+    ],
   },
   {
     code: 'documentation',
