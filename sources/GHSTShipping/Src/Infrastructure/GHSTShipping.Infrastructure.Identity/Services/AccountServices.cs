@@ -212,6 +212,14 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 return resetPassResult.Errors.Select(p => new Error(ErrorCode.ErrorInIdentity, p.Description)).ToList();
             }
 
+            // Active user
+            if (user.EmailConfirmed == false)
+            {
+                identityContext.Attach(user);
+                user.EmailConfirmed = true;
+                await identityContext.SaveChangesAsync();
+            }
+
             return BaseResult.Ok();
         }
 

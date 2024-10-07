@@ -1,7 +1,6 @@
 import type { IForgotPasswordDto } from '@/interface/user/login';
 import type { FC } from 'react';
-import { Button, Card, Col, Form, Input, Row } from 'antd';
-import { useDispatch } from 'react-redux';
+import { Button, Card, Col, Form, Input, message, Row } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { formatSearch } from '@/utils/formatSearch';
 import { apiForgotPassword } from '@/api/user.api';
@@ -10,15 +9,13 @@ import './index.less';
 const ForgotPassword: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
 
   const onFinished = async (form: IForgotPasswordDto) => {
-    const res = dispatch(await apiForgotPassword(form));
-    console.log("res ", res);
-    
-    if (!!res) {
+    const response = await apiForgotPassword(form);
+    if(response.success) {
+      message.success("Email đặt lại mật khẩu đã được gửi đến email của bạn!")
       const search = formatSearch(location.search);
-      const from = search.from || { pathname: '/' };
+      const from = search.from || { pathname: '/login' };
       navigate(from);
     }
   };
