@@ -10,6 +10,8 @@ namespace GHSTShipping.Application.Features.Users.Commands
     {
         public string Token { get; set; }
 
+        public string Email { get; set; }
+
         public string Password { get; set; }
 
         public string ConfirmPassword { get; set; }
@@ -29,9 +31,9 @@ namespace GHSTShipping.Application.Features.Users.Commands
                 return BaseResult.Failure(new Error(ErrorCode.FieldDataInvalid, "Password not matching"));
             }
 
-            var resetPassword = await accountServices.SetPasswordViaSecurityStampAsync(request.Token, request.Password);
+            var result = await accountServices.ResetPasswordAsync(request.Token, request.Email, request.Password);
 
-            return resetPassword;
+            return result;
         }
     }
 }

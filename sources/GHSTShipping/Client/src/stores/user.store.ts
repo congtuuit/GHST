@@ -16,7 +16,7 @@ const initialState: UserState = {
   menuList: [],
   userName: localStorage.getItem('userName') || '',
   roles: [],
-  session: (JSON.parse(localStorage.getItem('session') ?? "{}") || {}) as LoginResult,
+  session: (JSON.parse(localStorage.getItem('session') ?? "null") || null) as LoginResult,
 };
 
 const userSlice = createSlice({

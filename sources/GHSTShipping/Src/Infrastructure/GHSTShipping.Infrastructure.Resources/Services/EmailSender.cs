@@ -19,7 +19,7 @@ namespace GHSTShipping.Infrastructure.Resources.Services
         {
             string appName = "GHST";
             string emailTemplate = ProjectResources.EmailTemplate.VI_SET_PASSWORD;
-            string link = $"{_clientHost}/set-password?token={token}";
+            string link = $"{_clientHost}/reset-password?token={token}";
             emailTemplate = emailTemplate.Replace("{{userName}}", fullName).Replace("{{link}}", link);
 
             var result = await SendEmailAsync(appName, emailAddress, $"[{appName}] Xác nhận đăng ký tài khoản", emailTemplate);

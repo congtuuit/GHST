@@ -1,36 +1,24 @@
-import type { LoginParams } from '@/interface/user/login';
+import type { IForgotPasswordDto } from '@/interface/user/login';
 import type { FC } from 'react';
-
-import './index.less';
-
-import { Button, Card, Checkbox, Col, Form, Input, Row } from 'antd';
+import { Button, Card, Col, Form, Input, Row } from 'antd';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-
-import { LocaleFormatter, useLocale } from '@/locales';
 import { formatSearch } from '@/utils/formatSearch';
-
-import { loginAsync } from '../../stores/user.action';
-
-const initialValues: LoginParams = {
-  username: 'guest',
-  password: 'guest',
-  // remember: true
-};
+import { apiForgotPassword } from '@/api/user.api';
+import './index.less';
 
 const ForgotPassword: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const { formatMessage } = useLocale();
 
-  const onFinished = async (form: LoginParams) => {
-    const res = dispatch(await loginAsync(form));
-
+  const onFinished = async (form: IForgotPasswordDto) => {
+    const res = dispatch(await apiForgotPassword(form));
+    console.log("res ", res);
+    
     if (!!res) {
       const search = formatSearch(location.search);
       const from = search.from || { pathname: '/' };
-
       navigate(from);
     }
   };
@@ -39,7 +27,7 @@ const ForgotPassword: FC = () => {
     <Row className="login-wrapper">
       <Col className="right login-page" span={24} md={10} lg={8}>
         <Card className="card">
-          <Form<LoginParams> onFinish={onFinished} className="login-page-form" initialValues={initialValues}>
+          <Form<IForgotPasswordDto> onFinish={onFinished} className="login-page-form">
             <h2 style={{ color: 'white' }}>ĐẶT LẠI MẬT KHẨU</h2>
             <Form.Item
               name="email"

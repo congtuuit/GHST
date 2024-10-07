@@ -1,6 +1,7 @@
 using GHSTShipping.Application.DTOs.Account.Requests;
 using GHSTShipping.Application.DTOs.Account.Responses;
 using GHSTShipping.Application.Wrappers;
+using System;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.Application.Interfaces.UserInterfaces
@@ -26,6 +27,13 @@ namespace GHSTShipping.Application.Interfaces.UserInterfaces
 
         Task<BaseResult<AuthenticationResponse>> AuthenticateByUserNameAsync(string username);
 
+        [Obsolete]
         Task<BaseResult> SetPasswordViaSecurityStampAsync(string securityStamp, string password);
+
+        Task<BaseResult> HandleSendEmailToSetPasswrodAsync(string email);
+
+        Task<BaseResult> HandleSendEmailForgotPasswordAsync(ForgotPasswordRequest request);
+
+        Task<BaseResult> ResetPasswordAsync(string token, string email, string newPassword);
     }
 }

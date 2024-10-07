@@ -18,6 +18,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace GHSTShipping.Infrastructure.Identity.Services
 {
@@ -26,6 +27,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
         UserManager<ApplicationUser> userManager,
         IAuthenticatedUserService authenticatedUser,
         SignInManager<ApplicationUser> signInManager,
+        IEmailSender emailSender,
         JwtSettings jwtSettings, ITranslator translator) : IAccountServices
     {
         public async Task<BaseResult> SignOutAsync()
@@ -189,6 +191,76 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             }
 
             return identityResult.Errors.Select(p => new Error(ErrorCode.ErrorInIdentity, p.Description)).ToList();
+        }
+
+        public async Task<BaseResult> ResetPasswordAsync(string token, string email, string newPassword)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return BaseResult.Failure(new Error(ErrorCode.NotFound, "Invalid email"));
+            }
+
+            var tokenDecoded = HttpUtility.UrlDecode(token);
+
+            // Perform password reset
+            var resetPassResult = await userManager.ResetPasswordAsync(user, tokenDecoded, newPassword);
+            if (!resetPassResult.Succeeded)
+            {
+                var errors = resetPassResult.Errors.Select(e => e.Description);
+
+                return resetPassResult.Errors.Select(p => new Error(ErrorCode.ErrorInIdentity, p.Description)).ToList();
+            }
+
+            return BaseResult.Ok();
+        }
+
+        public async Task<BaseResult> HandleSendEmailToSetPasswrodAsync(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist or is not confirmed
+                return BaseResult.Failure(new Error(ErrorCode.NotFound, "Not found"));
+            }
+
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var tokenEndcoded = HttpUtility.UrlEncode(token);
+            var resetLinkToken = $"{tokenEndcoded}&email={user.Email}";
+            var sendEmail = await emailSender.SendEmailSetPasswordAsync(user.Email, user.Name, resetLinkToken);
+
+            if (sendEmail.Success)
+            {
+                return BaseResult.Ok("Password reset link has been sent to your email.");
+            }
+            else
+            {
+                return BaseResult.Failure(new Error(ErrorCode.Exception, "An email set the password has been sent."));
+            }
+        }
+
+        public async Task<BaseResult> HandleSendEmailForgotPasswordAsync(ForgotPasswordRequest request)
+        {
+            var user = await userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist or is not confirmed
+                return BaseResult.Failure(new Error(ErrorCode.NotFound, "Not found"));
+            }
+
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var tokenEndcoded = HttpUtility.UrlEncode(token);
+            var resetLinkToken = $"{tokenEndcoded}&email={user.Email}";
+            var sendEmail = await emailSender.SendEmailResetPasswordAsync(user.Email, user.Name, resetLinkToken);
+
+            if (sendEmail.Success)
+            {
+                return BaseResult.Ok("Password reset link has been sent to your email.");
+            }
+            else
+            {
+                return BaseResult.Failure(new Error(ErrorCode.Exception, "If your email is confirmed, you'll receive a reset link."));
+            }
         }
 
         private static string GeneratePassword(int length)

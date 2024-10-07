@@ -13,10 +13,9 @@ import CustomerPage from '@/pages/customer';
 import CustomerPricePage from '@/pages/customer-price';
 import OrdersPage from '@/pages/orders';
 import CreateOrderPage from '@/pages/orders/create';
-
-
-
 import WrapperRouteComponent from './config';
+import RegisterPage from '@/pages/register';
+import ResetPasswordPage from '@/pages/reset-password';
 
 const NotFound = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/404'));
 const Documentation = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/doucumentation'));
@@ -43,8 +42,16 @@ const routeList: RouteObject[] = [
     element: <WrapperRouteComponent element={<LoginPage />} titleId="title.login" auth={false} />,
   },
   {
+    path: '/register',
+    element: <WrapperRouteComponent element={<RegisterPage />} titleId="title.register" auth={false} />,
+  },
+  {
     path: '/forgot-password',
-    element: <WrapperRouteComponent element={<ForgotPasswordPage />} titleId="title.forgotpassword" auth={false} />,
+    element: <WrapperRouteComponent element={<ForgotPasswordPage />} titleId="title.forgotPassword" auth={false} />,
+  },
+  {
+    path: '/reset-password',
+    element: <WrapperRouteComponent element={<ResetPasswordPage />} titleId="title.resetPassword" auth={false} />,
   },
   {
     path: '/',

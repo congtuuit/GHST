@@ -1,3 +1,7 @@
 :root {
     --mainColor: #f34b4b;
 }
+
+.mb-0 {
+    margin-bottom: 0;
+}

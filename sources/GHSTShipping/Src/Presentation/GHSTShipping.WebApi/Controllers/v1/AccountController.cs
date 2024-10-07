@@ -28,6 +28,12 @@ namespace GHSTShipping.WebApi.Controllers.v1
             return await Mediator.Send(command);
         }
 
+        [HttpPost]
+        public async Task<BaseResult> ForgotPasswordAsync([FromBody] ForgotPasswordRequest request)
+        {
+            return await accountServices.HandleSendEmailForgotPasswordAsync(request);
+        }
+
         [HttpPut]
         public async Task<BaseResult> ResetPasswordAsync([FromBody] ResetPasswordCommand command)
         {

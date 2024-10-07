@@ -25,3 +25,15 @@ export interface LogoutParams {
 }
 
 export interface LogoutResult {}
+
+export interface IResetPasswordDto {
+  token: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface IForgotPasswordDto {
+  email: string;
+  phoneNumber: string;
+}

@@ -5,6 +5,7 @@ import { Button, Result } from 'antd';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 import { useLocale } from '@/locales';
 
@@ -15,7 +16,12 @@ const PrivateRoute: FC<RouteProps> = props => {
   const location = useLocation();
 
   // TODO check token
-  // console.log("logged ", logged)
+  console.log('logged ', logged);
+  console.log('session ', Boolean(session));
+
+  if (!logged && !Boolean(session)) {
+    return <Navigate to="/login" />;
+  }
 
   return logged ? (
     (props.element as React.ReactElement)

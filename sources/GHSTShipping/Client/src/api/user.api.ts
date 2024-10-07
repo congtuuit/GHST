@@ -1,7 +1,7 @@
 import { PaginationResponse } from '@/interface/business';
-import type { LoginParams, LoginResult, LogoutParams, LogoutResult } from '../interface/user/login';
-
+import type { IForgotPasswordDto, IResetPasswordDto, LoginParams, LoginResult, LogoutResult } from '../interface/user/login';
 import { request } from './base/request';
+import { IRegisterFormValues } from '@/pages/register';
 
 /** 登录接口 */
 export const apiLogin = (data: LoginParams) => request<LoginResult>('post', '/account/authenticate', data);
@@ -13,4 +13,10 @@ export const apiGetShops = (pageNumber: number | undefined = 1, pageSize: number
   return request<PaginationResponse>('get', `/users/shops?pageNumber=${pageNumber}&pageSize=${pageSize}`);
 };
 
-export const apiActiveShops = (shopId: string) => request<PaginationResponse>('put', `/users/ActiveShop/${shopId}`);
+export const apiActiveShops = (shopId: string) => request<PaginationResponse>('put', `/users/activeshop/${shopId}`);
+
+export const apiRegisterShop = (data: IRegisterFormValues) => request<string>('post', '/account/register', data);
+
+export const apiResetPassword = (data: IResetPasswordDto) => request<string>('put', '/account/resetpassword', data);
+
+export const apiForgotPassword = (data: IForgotPasswordDto) => request<string>('post', '/account/forgotpassword', data);

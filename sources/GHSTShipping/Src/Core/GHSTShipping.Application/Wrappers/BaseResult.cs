@@ -6,10 +6,14 @@ namespace GHSTShipping.Application.Wrappers
     public class BaseResult
     {
         public bool Success { get; set; }
+        public string? Message { get; set; }
         public List<Error> Errors { get; set; }
 
         public static BaseResult Ok()
             => new() { Success = true };
+
+        public static BaseResult Ok(string message)
+            => new() { Success = true, Message = message };
 
         public static BaseResult Failure()
             => new() { Success = false };

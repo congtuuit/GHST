@@ -17,6 +17,7 @@ import { LocaleFormatter, localeConfig } from './locales';
 import RenderRouter from './routes';
 import { setGlobalState } from './stores/global.store';
 import './main.css';
+// import 'antd/dist/antd.css';
 
 const App: React.FC = () => {
   const { locale } = useSelector(state => state.user);
@@ -76,7 +77,8 @@ const App: React.FC = () => {
       componentSize="middle"
       theme={{
         token: { colorPrimary: '#f34b4b' },
-        algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+        //algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+        algorithm: antdTheme.defaultAlgorithm,
       }}
     >
       <IntlProvider locale={locale.split('_')[0]} messages={localeConfig[locale]}>

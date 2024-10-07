@@ -1,20 +1,16 @@
 import type { LoginParams } from '@/interface/user/login';
 import type { FC } from 'react';
-
-import './index.less';
-
-import { Button, Card, Checkbox, Col, Form, Input, Row } from 'antd';
+import { Button, Card, Col, Form, Input, Row, Typography } from 'antd';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-
-import { LocaleFormatter, useLocale } from '@/locales';
 import { formatSearch } from '@/utils/formatSearch';
-
 import { loginAsync } from '../../stores/user.action';
+import './index.less';
+import CommonDialog from '@/components/core/CommonDialog';
 
 const initialValues: LoginParams = {
   username: 'congtuuit@gmail.com',
-  password: 'aA@123123',
+  password: '123123',
   // remember: true
 };
 
@@ -22,7 +18,6 @@ const LoginForm: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const { formatMessage } = useLocale();
 
   const onFinished = async (form: LoginParams) => {
     const res = await dispatch(loginAsync(form));
@@ -71,6 +66,12 @@ const LoginForm: FC = () => {
                 Đăng nhập
               </Button>
             </Form.Item>
+            <Row align="middle" justify="center">
+              <Typography.Text style={{ margin: 'auto', color: '#d6d6d6' }}>
+                Bạn chưa có tài khoản{' '}
+                <Typography.Link onClick={() => navigate('/register')}>Đăng ký ngay</Typography.Link>{' '}
+              </Typography.Text>
+            </Row>
           </Form>
         </Card>
       </Col>
