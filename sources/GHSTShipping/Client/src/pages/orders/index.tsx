@@ -1,20 +1,6 @@
-import { useEffect, useState, type FC } from 'react';
-import {
-  Badge,
-  Button,
-  Card,
-  Checkbox,
-  Col,
-  Form,
-  Input,
-  Radio,
-  RadioChangeEvent,
-  Row,
-  Select,
-  Table,
-  Tag,
-} from 'antd';
-import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { Button, Card, Col, Radio, RadioChangeEvent, Row, Select, Tag } from 'antd';
+import { useSelector } from 'react-redux';
 
 import { suppliers } from '@/constants/data';
 import { IOrderStatus, orderStatuses } from './orderStatus';
@@ -26,10 +12,14 @@ import { ColumnsType } from 'antd/lib/table';
 import Price from '@/components/core/price';
 import { SearchOutlined } from '@ant-design/icons';
 import OrderDetailDialog from './components/ghn/order-detail';
+import { commingSoon } from '@/utils/common';
 
 const { Option } = Select;
 
 const OrdersPage = () => {
+  const { session } = useSelector(state => state.user);
+  const isAdmin = session.roles.includes('ADMIN');
+  
   const [selectedSupplier, setSelectedSupplier] = useState<string>('');
   const [orderStatusSection, setOrderStatusSection] = useState<IOrderStatus[]>();
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>();
@@ -60,112 +50,221 @@ const OrdersPage = () => {
     }
   };
 
-  const columns: ColumnsType<IOrderDto> = [
-    {
-      title: 'No',
-      dataIndex: 'no',
-      key: 'no',
-      width: 50,
-      align: 'center' as const,
-    },
-    {
-      title: 'Mã đơn',
-      dataIndex: 'clientOrderCode',
-      key: 'clientOrderCode',
-      width: 120,
-      render: (value: string, record: IOrderDto) => {
-        return (
-          <Button type="link" onClick={() => handleViewOrderDetail(record.id)}>
-            {value} <SearchOutlined />
-          </Button>
-        );
-      },
-    },
-    {
-      title: 'Địa chỉ gửi',
-      dataIndex: 'fromAddress',
-      key: 'fromAddress',
-    },
-    {
-      title: 'Địa chỉ đến',
-      dataIndex: 'toAddress',
-      key: 'toAddress',
-    },
-    {
-      title: 'Trọng lượng',
-      dataIndex: 'weight',
-      key: 'weight',
-      width: 'auto',
-      align: 'right',
-    },
-    {
-      title: 'COD',
-      dataIndex: 'codAmount',
-      key: 'codAmount',
-      align: 'right',
-      render: (value: number) => {
-        return <Price value={value} type="success" />;
-      },
-    },
-    {
-      title: 'InsuranceValue',
-      dataIndex: 'insuranceValue',
-      key: 'insuranceValue',
-      align: 'right',
-      render: (value: number) => {
-        return <Price value={value} />;
-      },
-    },
-    {
-      title: 'Phí vận chuyển',
-      dataIndex: 'deliveryFee',
-      key: 'deliveryFee',
-      align: 'right',
-      render: (value: number) => {
-        return <Price value={value} type="warning" />;
-      },
-    },
-    {
-      title: 'Trạng thái',
-      align: 'center',
-      render: (_: any, record: IOrderDto) => {
-        const text = record.isPublished ? 'Công khai' : 'Nháp';
-        return <Tag color={record['isPublished'] === true ? 'green' : 'gray'}>{text}</Tag>;
-      },
-    },
-    {
-      title: 'Thao tác',
-      key: 'action',
-      width: 150,
-      align: 'center' as const,
-      render: (_: any, record: IOrderDto) => {
-        if (record.isPublished) {
-          return (
-            <div key={record.id}>
-              <Button className="table-btn-action" size="small" onClick={() => {}}>
-                Hủy đơn
+  const columns: ColumnsType<IOrderDto> = isAdmin
+    ? [
+        {
+          title: 'No',
+          dataIndex: 'no',
+          key: 'no',
+          width: 50,
+          align: 'center' as const,
+        },
+        {
+          title: 'Tên cửa hàng',
+          dataIndex: 'shopName',
+          key: 'shopName',
+          width: 100,
+          align: 'center' as const,
+        },
+        {
+          title: 'Mã đơn',
+          dataIndex: 'clientOrderCode',
+          key: 'clientOrderCode',
+          width: 120,
+          render: (value: string, record: IOrderDto) => {
+            return (
+              <Button type="link" onClick={() => handleViewOrderDetail(record.id)}>
+                {value} <SearchOutlined />
               </Button>
-            </div>
-          );
-        }
-        return (
-          <div key={record.id}>
-            <Button className="table-btn-action" size="small" onClick={() => {}}>
-              Công khai
-            </Button>
-            <Button className="table-btn-action" size="small" onClick={() => {}}>
-              Xóa
-            </Button>
-          </div>
-        );
-      },
-    },
-  ];
+            );
+          },
+        },
+        {
+          title: 'Địa chỉ gửi',
+          dataIndex: 'fromAddress',
+          key: 'fromAddress',
+        },
+        {
+          title: 'Địa chỉ đến',
+          dataIndex: 'toAddress',
+          key: 'toAddress',
+        },
+        {
+          title: 'Trọng lượng',
+          dataIndex: 'weight',
+          key: 'weight',
+          width: 'auto',
+          align: 'right',
+        },
+        {
+          title: 'COD',
+          dataIndex: 'codAmount',
+          key: 'codAmount',
+          align: 'right',
+          render: (value: number) => {
+            return <Price value={value} type="success" />;
+          },
+        },
+        {
+          title: 'InsuranceValue',
+          dataIndex: 'insuranceValue',
+          key: 'insuranceValue',
+          align: 'right',
+          render: (value: number) => {
+            return <Price value={value} />;
+          },
+        },
+        {
+          title: 'Phí vận chuyển',
+          dataIndex: 'deliveryFee',
+          key: 'deliveryFee',
+          align: 'right',
+          render: (value: number) => {
+            return <Price value={value} type="warning" />;
+          },
+        },
+        {
+          title: 'Trạng thái',
+          align: 'center',
+          render: (_: any, record: IOrderDto) => {
+            const text = record.isPublished ? 'Công khai' : 'Nháp';
+            return <Tag color={record['isPublished'] === true ? 'green' : 'gray'}>{text}</Tag>;
+          },
+        },
+        {
+          title: 'Thao tác',
+          key: 'action',
+          width: 150,
+          align: 'center' as const,
+          render: (_: any, record: IOrderDto) => {
+            if (record.isPublished) {
+              return (
+                <div key={record.id}>
+                  <Button className="table-btn-action" size="small" onClick={commingSoon}>
+                    Hủy đơn
+                  </Button>
+                </div>
+              );
+            }
+            return (
+              <div key={record.id}>
+                <Button className="table-btn-action" size="small" onClick={commingSoon}>
+                  Công khai
+                </Button>
+                <Button className="table-btn-action" size="small" onClick={commingSoon}>
+                  Xóa
+                </Button>
+              </div>
+            );
+          },
+        },
+      ]
+    : [
+        {
+          title: 'No',
+          dataIndex: 'no',
+          key: 'no',
+          width: 50,
+          align: 'center' as const,
+        },
+        {
+          title: 'Mã đơn',
+          dataIndex: 'clientOrderCode',
+          key: 'clientOrderCode',
+          width: 120,
+          render: (value: string, record: IOrderDto) => {
+            return (
+              <Button type="link" onClick={() => handleViewOrderDetail(record.id)}>
+                {value} <SearchOutlined />
+              </Button>
+            );
+          },
+        },
+        {
+          title: 'Địa chỉ gửi',
+          dataIndex: 'fromAddress',
+          key: 'fromAddress',
+        },
+        {
+          title: 'Địa chỉ đến',
+          dataIndex: 'toAddress',
+          key: 'toAddress',
+        },
+        {
+          title: 'Trọng lượng',
+          dataIndex: 'weight',
+          key: 'weight',
+          width: 'auto',
+          align: 'right',
+        },
+        {
+          title: 'COD',
+          dataIndex: 'codAmount',
+          key: 'codAmount',
+          align: 'right',
+          render: (value: number) => {
+            return <Price value={value} type="success" />;
+          },
+        },
+        {
+          title: 'InsuranceValue',
+          dataIndex: 'insuranceValue',
+          key: 'insuranceValue',
+          align: 'right',
+          render: (value: number) => {
+            return <Price value={value} />;
+          },
+        },
+        {
+          title: 'Phí vận chuyển',
+          dataIndex: 'deliveryFee',
+          key: 'deliveryFee',
+          align: 'right',
+          render: (value: number) => {
+            return <Price value={value} type="warning" />;
+          },
+        },
+        {
+          title: 'Trạng thái',
+          align: 'center',
+          render: (_: any, record: IOrderDto) => {
+            const text = record.isPublished ? 'Công khai' : 'Nháp';
+            return <Tag color={record['isPublished'] === true ? 'green' : 'gray'}>{text}</Tag>;
+          },
+        },
+        {
+          title: 'Thao tác',
+          key: 'action',
+          width: 150,
+          align: 'center' as const,
+          render: (_: any, record: IOrderDto) => {
+            if (record.isPublished) {
+              return (
+                <div key={record.id}>
+                  <Button className="table-btn-action" size="small" onClick={commingSoon}>
+                    Hủy đơn
+                  </Button>
+                </div>
+              );
+            }
+            return (
+              <div key={record.id}>
+                <Button className="table-btn-action" size="small" onClick={commingSoon}>
+                  Công khai
+                </Button>
+                <Button className="table-btn-action" size="small" onClick={commingSoon}>
+                  Xóa
+                </Button>
+              </div>
+            );
+          },
+        },
+      ];
 
   const handleViewOrderDetail = async (orderId: string) => {
     const response = await apiGetOrderDetail(orderId);
-    if(response.success) {
-      setOrderDetail(response.data)
+    if (response.success) {
+      setOrderDetail(response.data);
     }
   };
 
@@ -226,7 +325,7 @@ const OrdersPage = () => {
           <Datatable columns={columns} dataSource={orderPagination} onChange={handleChangeTable} />
         </Col>
       </Row>
-      <OrderDetailDialog data={orderDetail}/>
+      <OrderDetailDialog data={orderDetail} />
     </Card>
   );
 };

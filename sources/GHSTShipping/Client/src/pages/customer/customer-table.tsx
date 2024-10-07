@@ -1,9 +1,12 @@
 import { useEffect, useState, type FC } from 'react';
-import { Button, Table, TablePaginationConfig, Tag } from 'antd';
+import { Button, Row, Table, TablePaginationConfig, Tag } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
-import { apiActiveShops, apiGetShops } from '@/api/user.api';
 import { PaginationResponse } from '@/interface/business';
 import { FilterValue } from 'antd/es/table/interface';
+import CustomerDetail from './customer-detail';
+import { IShopViewDetailDto } from '@/interface/shop';
+import { SearchOutlined } from '@ant-design/icons';
+import { apiActiveShops, apiChangeAllowPublishOrder, apiGetShopDetail, apiGetShops } from '@/api/business.api';
 
 interface ShopDatatableDto {
   key: string;
@@ -12,6 +15,7 @@ interface ShopDatatableDto {
   registerDate: string;
   shopName: string;
   fullName: string;
+  email: string;
   avgMonthlyCapacity: number;
   status: string;
   isVerified: boolean;
@@ -22,18 +26,9 @@ const CustomerTable: FC = () => {
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
   const [reloadTable, setReloadTable] = useState<Boolean>(false);
+  const [customerDetail, setCustomerDetail] = useState<IShopViewDetailDto>();
 
-  // const getShops = async () => {
-  //   const { success, data } = await apiGetShops();
-  //   if (success) {
-  //     setPaginationResponse(data);
-  //   }
-  // };
-
-  const fetchShops = async (
-    pageNumber: number | undefined = 1,
-    pageSize: number | undefined = 10,
-  ) => {
+  const fetchShops = async (pageNumber: number | undefined = 1, pageSize: number | undefined = 10) => {
     const { success, data } = await apiGetShops(pageNumber, pageSize);
     if (success) {
       setPaginationResponse(data);
@@ -53,6 +48,13 @@ const CustomerTable: FC = () => {
       dataIndex: 'shopUniqueCode',
       key: 'code',
       width: 120,
+      render: (value: string, record: ShopDatatableDto) => {
+        return (
+          <Button type="link" onClick={() => handleViewDetail(record.id)}>
+            {value} <SearchOutlined />
+          </Button>
+        );
+      },
     },
     {
       title: 'Ngày đăng ký',
@@ -69,6 +71,12 @@ const CustomerTable: FC = () => {
       title: 'Tên khách hàng',
       dataIndex: 'fullName',
       key: 'fullName',
+      width: 'auto',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
       width: 'auto',
     },
     {
@@ -127,6 +135,20 @@ const CustomerTable: FC = () => {
     fetchShops(current, pageSize);
   };
 
+  const handleViewDetail = async (id: string) => {
+    const response = await apiGetShopDetail(id);
+    if (response.success) {
+      setCustomerDetail(response.data);
+    }
+  };
+
+  const handleChangeAllowPublishOrder = async (id: string) => {
+    const response = await apiChangeAllowPublishOrder(id);
+    if (response.success) {
+      setCustomerDetail(response.data);
+    }
+  };
+
   useEffect(() => {
     let _pageNumber: number | undefined = -1,
       _pageSize: number | undefined = -1,
@@ -146,25 +168,27 @@ const CustomerTable: FC = () => {
     }
   }, [tablePaginationConfig, tableFilters, reloadTable]);
 
-
   useEffect(() => {
     fetchShops();
   }, []);
 
   return (
-    <Table
-      style={{ width: '100%' }}
-      columns={columns}
-      dataSource={paginationResponse?.data as ShopDatatableDto[]}
-      rowKey="key" // Unique key for rows
-      scroll={{ x: 'max-content' }} // Enable horizontal scrolling for wide tables
-      pagination={{
-        pageSize: paginationResponse?.pageSize,
-        current: paginationResponse?.pageNumber,
-        total: paginationResponse?.count,
-      }}
-      onChange={handleChangeTable}
-    />
+    <Row>
+      <Table
+        style={{ width: '100%' }}
+        columns={columns}
+        dataSource={paginationResponse?.data as ShopDatatableDto[]}
+        rowKey="key" // Unique key for rows
+        scroll={{ x: 'max-content' }} // Enable horizontal scrolling for wide tables
+        pagination={{
+          pageSize: paginationResponse?.pageSize,
+          current: paginationResponse?.pageNumber,
+          total: paginationResponse?.count,
+        }}
+        onChange={handleChangeTable}
+      />
+      <CustomerDetail data={customerDetail} onChange={handleChangeAllowPublishOrder} />
+    </Row>
   );
 };
 

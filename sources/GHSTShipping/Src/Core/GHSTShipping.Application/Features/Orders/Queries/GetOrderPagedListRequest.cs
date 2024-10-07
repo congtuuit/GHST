@@ -5,6 +5,7 @@ using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Parameters;
 using GHSTShipping.Application.Wrappers;
 using GHSTShipping.Domain.DTOs;
+using GHSTShipping.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -29,16 +30,28 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         public async Task<BaseResult<PaginationResponseDto<OrderDto>>> Handle(GetOrderPagedListRequest request, CancellationToken cancellationToken)
         {
             var userId = authenticatedUser.UId;
-            var shop = await shopRepository.Where(i => i.AccountId == userId)
-            .Select(i => new
-            {
-                ShopId = i.Id,
-                i.UniqueCode,
-                i.AllowPublishOrder,
-            })
-           .FirstOrDefaultAsync(cancellationToken);
+            var isAdmin = authenticatedUser.Type == AccountTypeConstants.ADMIN;
 
-            var query = unitOfWork.Orders.All().Where(o => o.ShopId == shop.ShopId);
+            var query = unitOfWork.Orders.All();
+            if (!isAdmin)
+            {
+                var shop = await shopRepository.Where(i => i.AccountId == userId)
+                  .Select(i => new
+                  {
+                      ShopId = i.Id,
+                      i.UniqueCode,
+                      i.AllowPublishOrder,
+                  })
+                 .FirstOrDefaultAsync(cancellationToken);
+
+                if (shop == null)
+                {
+                    return BaseResult<PaginationResponseDto<OrderDto>>.Ok(new PaginationResponseDto<OrderDto>(new System.Collections.Generic.List<OrderDto>(), 0, request.PageNumber, request.PageSize));
+                }
+
+                query = query.Where(o => o.ShopId == shop.ShopId);
+            }
+
             if (!string.IsNullOrWhiteSpace(request.OrderCode))
             {
                 query = query.Where(o => o.ClientOrderCode.Contains(request.OrderCode) || request.OrderCode.Contains(o.ClientOrderCode));
@@ -65,6 +78,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     PublishDate = i.PublishDate,
                     DeliveryFee = i.DeliveryFee,
                     PrivateOrderCode = i.private_order_code,
+                    ShopName = i.Shop.Name,
                     //PrivateTotalFee = i.private_total_fee,
                 })
                 .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);

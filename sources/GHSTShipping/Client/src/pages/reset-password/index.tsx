@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
-import { apiResetPassword } from '@/api/user.api';
+import { apiResetPassword } from '@/api/auth.api';
 import { IResetPasswordDto } from '@/interface/user/login';
 
 const ResetPasswordPage: React.FC = () => {

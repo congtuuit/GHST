@@ -1,4 +1,4 @@
-using GHSTShipping.Infrastructure.Identity.Enums;
+using GHSTShipping.Domain.Enums;
 using GHSTShipping.Infrastructure.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

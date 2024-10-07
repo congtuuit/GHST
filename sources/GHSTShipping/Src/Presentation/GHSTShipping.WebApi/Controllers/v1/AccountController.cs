@@ -15,8 +15,7 @@ namespace GHSTShipping.WebApi.Controllers.v1
         [HttpPost]
         public async Task<BaseResult<AuthenticationResponse>> AuthenticateAsync(AuthenticationRequest request)
         {
-
-            return await accountServices.Authenticate(request);
+            return await Mediator.Send(request);
         }
 
         [HttpPost]

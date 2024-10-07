@@ -10,6 +10,7 @@ namespace GHSTShipping.WebApi.Infrastructure.Services
         public string UserId { get; } = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         public string UserName { get; } = httpContextAccessor.HttpContext?.User.Identity?.Name;
         public string DisplayName { get; } = httpContextAccessor.HttpContext?.User.FindFirstValue("DisplayName");
+        public string Type { get; } = httpContextAccessor.HttpContext?.User.FindFirstValue("Type");
         public Guid? ShopId
         {
             get

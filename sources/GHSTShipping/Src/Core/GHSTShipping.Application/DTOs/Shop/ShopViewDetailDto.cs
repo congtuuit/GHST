@@ -1,11 +1,10 @@
 ﻿using GHSTShipping.Domain.Enums;
 using System;
 
-namespace GHSTShipping.Application.DTOs.User
+namespace GHSTShipping.Application.DTOs.Shop
 {
-    public class ShopDto
+    public class ShopViewDetailDto
     {
-        public int No { get; set; }
         public Guid Id { get; set; }
         public string ShopUniqueCode { get; set; }
         public DateTime? RegisterDate { get; set; }
@@ -14,9 +13,13 @@ namespace GHSTShipping.Application.DTOs.User
         public string Email { get; set; }
         public decimal AvgMonthlyCapacity { get; set; }
         public bool IsVerified { get; set; }
-
         public Guid AccountId { get; set; }
         public string PhoneNumber { get; set; }
+        public string BankName { get; set; }
+        public string BankAccountNumber { get; set; }
+        public string BankAccountHolder { get; set; }
+        public string BankAddress { get; set; }
+        public bool AllowPublishOrder { get; set; }
 
         public string Status
         {

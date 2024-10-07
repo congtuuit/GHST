@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { Button, Card, Col, Form, Input, message, Row } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { formatSearch } from '@/utils/formatSearch';
-import { apiForgotPassword } from '@/api/user.api';
+import { apiForgotPassword } from '@/api/auth.api';
 import './index.less';
 
 const ForgotPassword: FC = () => {

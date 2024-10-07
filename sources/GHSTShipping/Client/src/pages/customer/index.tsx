@@ -3,7 +3,7 @@ import { lazy, type FC } from 'react';
 import { Card, Row, Typography } from 'antd';
 
 import { LocaleFormatter } from '@/locales';
-import "./index.css"
+import './index.css';
 
 const { Title, Paragraph } = Typography;
 
@@ -11,9 +11,9 @@ const CustomerTable = lazy(() => import(/* webpackChunkName: "table'"*/ '@/pages
 
 const CustomerPage: FC = () => {
   return (
-    <Row>
+    <Card>
       <CustomerTable />
-    </Row>
+    </Card>
   );
 };
 

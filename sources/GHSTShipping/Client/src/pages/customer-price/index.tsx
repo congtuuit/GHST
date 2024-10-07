@@ -1,9 +1,8 @@
 import { useState, type FC, useEffect } from 'react';
 import { Card, Row, Select, Col, Button, message } from 'antd';
-import { apiGetShops } from '@/api/user.api';
 import { ReloadOutlined } from '@ant-design/icons';
 import PriceConfigurationForm from './PriceConfigurationForm';
-import { apiCreateShopPricePlan } from '@/api/business.api';
+import { apiCreateShopPricePlan, apiGetShops } from '@/api/business.api';
 import { ShopPricePlanDto } from '@/interface/business';
 import PriceTable from './price-table';
 import './index.css';

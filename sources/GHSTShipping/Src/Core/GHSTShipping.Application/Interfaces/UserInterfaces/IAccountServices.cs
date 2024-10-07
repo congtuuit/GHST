@@ -2,6 +2,7 @@ using GHSTShipping.Application.DTOs.Account.Requests;
 using GHSTShipping.Application.DTOs.Account.Responses;
 using GHSTShipping.Application.Wrappers;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.Application.Interfaces.UserInterfaces
@@ -35,5 +36,7 @@ namespace GHSTShipping.Application.Interfaces.UserInterfaces
         Task<BaseResult> HandleSendEmailForgotPasswordAsync(ForgotPasswordRequest request);
 
         Task<BaseResult> ResetPasswordAsync(string token, string email, string newPassword);
+
+        IQueryable<UserDto> GetAllUsers();
     }
 }

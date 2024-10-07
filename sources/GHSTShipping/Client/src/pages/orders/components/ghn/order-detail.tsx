@@ -33,8 +33,6 @@ const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data }) => {
   }, [data]);
 
   useEffect(() => {
-    console.log('orderDetail ', orderDetail);
-
     if (Boolean(orderDetail)) {
       showModal();
     }

@@ -23,6 +23,8 @@ namespace GHSTShipping.Application.Interfaces
 
         string DisplayName { get; }
 
+        string Type { get; }
+
         Guid? ShopId { get; }
     }
 }

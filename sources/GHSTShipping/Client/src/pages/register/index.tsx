@@ -3,7 +3,7 @@ import { Form, Input, Button, Row, Col, message, Typography, Card } from 'antd';
 import { RuleObject } from 'antd/lib/form';
 import { StoreValue } from 'antd/lib/form/interface';
 import { useNavigate } from 'react-router-dom';
-import { apiRegisterShop } from '@/api/user.api';
+import { apiRegisterShop } from '@/api/auth.api';
 
 export interface IRegisterFormValues {
   fullName: string;

@@ -1,4 +1,4 @@
-﻿namespace GHSTShipping.Infrastructure.Identity.Enums
+﻿namespace GHSTShipping.Domain.Enums
 {
     public enum EnumAccountType
     {

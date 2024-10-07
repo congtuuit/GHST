@@ -6,7 +6,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { formatSearch } from '@/utils/formatSearch';
 import { loginAsync } from '../../stores/user.action';
 import './index.less';
-import CommonDialog from '@/components/core/CommonDialog';
 
 const initialValues: LoginParams = {
   username: 'congtuuit@gmail.com',
@@ -24,7 +23,6 @@ const LoginForm: FC = () => {
     if (!!res) {
       const search = formatSearch(location.search);
       const from = search.from || { pathname: '/' };
-
       navigate(from);
     }
   };

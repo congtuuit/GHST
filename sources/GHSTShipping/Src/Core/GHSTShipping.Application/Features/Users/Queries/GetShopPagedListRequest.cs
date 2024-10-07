@@ -3,9 +3,11 @@ using GHSTShipping.Application.DTOs.User;
 using GHSTShipping.Application.Extensions;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
+using GHSTShipping.Application.Interfaces.UserInterfaces;
 using GHSTShipping.Application.Parameters;
 using GHSTShipping.Application.Wrappers;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading;
@@ -20,7 +22,8 @@ namespace GHSTShipping.Application.Features.Users.Queries
     public class GetShopPagedListRequestHandler(
         IUnitOfWork unitOfWork,
         IAuthenticatedUserService authenticatedUser,
-        IShopRepository shopRepository
+        IShopRepository shopRepository,
+        IAccountServices accountServices
         ) : IRequestHandler<GetShopPagedListRequest, BaseResult<PaginationResponseDto<ShopDto>>>
     {
         public async Task<BaseResult<PaginationResponseDto<ShopDto>>> Handle(GetShopPagedListRequest request, CancellationToken cancellationToken)
@@ -40,14 +43,26 @@ namespace GHSTShipping.Application.Features.Users.Queries
                     FullName = authenticatedUser.DisplayName,
                     AvgMonthlyCapacity = i.AvgMonthlyYield,
                     IsVerified = i.IsVerified,
+                    AccountId = i.AccountId
                 })
                 .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);
+
+            var accountIds = pagingResult.Data.Select(i => i.AccountId).ToList();
+            var accounts = await accountServices.GetAllUsers()
+                .Where(i => accountIds.Contains(i.Id))
+                .ToListAsync(cancellationToken);
 
             int index = 0;
             foreach (var item in pagingResult.Data)
             {
                 item.No = skipCount + index + 1;
                 index++;
+                var account = accounts.FirstOrDefault(i => i.Id == item.AccountId);
+                if (account != null)
+                {
+                    item.PhoneNumber = account.PhoneNumber;
+                    item.Email = account.Email;
+                }
             }
 
             return BaseResult<PaginationResponseDto<ShopDto>>.Ok(pagingResult);

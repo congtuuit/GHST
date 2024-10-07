@@ -1,12 +1,10 @@
 import type { FC } from 'react';
 import type { RouteProps } from 'react-router';
-
 import { Button, Result } from 'antd';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
-
 import { useLocale } from '@/locales';
 
 const PrivateRoute: FC<RouteProps> = props => {
@@ -14,10 +12,6 @@ const PrivateRoute: FC<RouteProps> = props => {
   const navigate = useNavigate();
   const { formatMessage } = useLocale();
   const location = useLocation();
-
-  // TODO check token
-  console.log('logged ', logged);
-  console.log('session ', Boolean(session));
 
   if (!logged && !Boolean(session)) {
     return <Navigate to="/login" />;

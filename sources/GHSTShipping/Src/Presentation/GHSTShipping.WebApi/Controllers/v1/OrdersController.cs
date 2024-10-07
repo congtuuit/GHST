@@ -15,7 +15,7 @@ namespace GHSTShipping.WebApi.Controllers.v1
     public class OrdersController() : BaseApiController
     {
         [HttpGet]
-        [Route("ghn/list")]
+        [Route("list")]
         public async Task<BaseResult<PaginationResponseDto<OrderDto>>> GetOrders([FromQuery] GetOrderPagedListRequest request)
         {
             return await Mediator.Send(request);

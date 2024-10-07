@@ -4,8 +4,8 @@ using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.UserInterfaces;
 using GHSTShipping.Application.Wrappers;
+using GHSTShipping.Domain.Enums;
 using GHSTShipping.Infrastructure.Identity.Contexts;
-using GHSTShipping.Infrastructure.Identity.Enums;
 using GHSTShipping.Infrastructure.Identity.Models;
 using GHSTShipping.Infrastructure.Identity.Settings;
 using Microsoft.AspNetCore.Identity;
@@ -271,6 +271,18 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             }
         }
 
+
+        public IQueryable<UserDto> GetAllUsers()
+        {
+            return userManager.Users.Select(i => new UserDto
+            {
+                Id = i.Id,
+                Name = i.Name,
+                Email = i.Email,
+                PhoneNumber = i.PhoneNumber,
+            }).AsQueryable();
+        }
+
         private static string GeneratePassword(int length)
         {
             const string lowerCase = "abcdefghijklmnopqrstuvwxyz";
@@ -314,7 +326,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 Email = user.Email,
                 UserName = user.UserName,
                 Roles = rolesList,
-                IsVerified = user.EmailConfirmed,
+                //IsVerified = user.EmailConfirmed,
                 FullName = user.Name,
                 PhoneNumber = user.PhoneNumber,
             };
@@ -326,7 +338,8 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 var claimsPrincipal = await signInManager.ClaimsFactory.CreateAsync(user);
                 var claims = new List<Claim>
                 {
-                    new Claim("DisplayName", user.Name) // Add your custom claim
+                    new Claim("DisplayName", user.Name), // Add your custom claim
+                    new Claim("Type", user.Type), // Add your custom claim
                 };
 
                 claims.AddRange(claimsPrincipal.Claims);
