@@ -22,6 +22,7 @@ namespace GHSTShipping.Application.Features.Users.Commands
         IAuthenticatedUserService authenticatedUser,
         IShopRepository shopRepository,
         IAccountServices accountServices,
+        IOrderCodeSequenceService orderCodeSequenceService,
         IUnitOfWork unitOfWork,
         ILogger<ActiveShopCommandHandler> logger
         ) : IRequestHandler<ActiveShopCommand, BaseResult>
@@ -34,6 +35,7 @@ namespace GHSTShipping.Application.Features.Users.Commands
             {
                 Id = i.Id,
                 IsVerified = i.IsVerified,
+                UniqueCode = i.UniqueCode,
             })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -45,6 +47,8 @@ namespace GHSTShipping.Application.Features.Users.Commands
                     shop.IsVerified = true;
                     shopRepository.ModifyProperty(shop, i => i.IsVerified);
                     await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    await orderCodeSequenceService.CreateOrderCodeSequenceAsync(shop.Id, shop.UniqueCode, uidGuid);
 
                     await transaction.CommitAsync(cancellationToken);
                 }

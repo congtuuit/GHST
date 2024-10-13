@@ -18,6 +18,9 @@ namespace GHSTShipping.Application
 
 
             services.AddScoped<IPartnerConfigService, PartnerConfigService>();
+            services.AddScoped<IOrderCodeSequenceService, OrderCodeSequenceService>();
+
+            
 
             return services;
         }

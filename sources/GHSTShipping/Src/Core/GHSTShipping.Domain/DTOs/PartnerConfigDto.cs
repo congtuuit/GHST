@@ -15,6 +15,8 @@ namespace GHSTShipping.Domain.DTOs
 
         public string ProdEnv { get; set; }
 
+        public bool IsActivated { get; set; }
+
         public EnumDeliveryPartner DeliveryPartner { get; set; }
 
         public string DeliveryPartnerName

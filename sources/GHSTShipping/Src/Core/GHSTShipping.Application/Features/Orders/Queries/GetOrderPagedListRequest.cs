@@ -79,6 +79,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     DeliveryFee = i.DeliveryFee,
                     PrivateOrderCode = i.private_order_code,
                     ShopName = i.Shop.Name,
+                    OrderCode = i.private_order_code
                     //PrivateTotalFee = i.private_total_fee,
                 })
                 .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);

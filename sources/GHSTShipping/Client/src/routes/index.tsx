@@ -16,6 +16,7 @@ import CreateOrderPage from '@/pages/orders/create';
 import WrapperRouteComponent from './config';
 import RegisterPage from '@/pages/register';
 import ResetPasswordPage from '@/pages/reset-password';
+import DeliveryConfigPage from '@/pages/delivery-config';
 
 const NotFound = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/404'));
 const Documentation = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/doucumentation'));
@@ -81,6 +82,12 @@ const routeList: RouteObject[] = [
         path: 'order/create',
         element: <WrapperRouteComponent element={<CreateOrderPage />} titleId="title.createOrder" />,
       },
+      {
+        path: 'settings',
+        element: <WrapperRouteComponent element={<DeliveryConfigPage />} titleId="title.deliveryConfig" />,
+      },
+
+      
 
       {
         path: 'documentation',

@@ -7,6 +7,8 @@ import CustomerDetail from './customer-detail';
 import { IShopViewDetailDto } from '@/interface/shop';
 import { SearchOutlined } from '@ant-design/icons';
 import { apiActiveShops, apiChangeAllowPublishOrder, apiGetShopDetail, apiGetShops } from '@/api/business.api';
+import { dateFormatMap, revertDateFormatMap } from '@/components/core/table-column/type';
+import dayjs from 'dayjs';
 
 interface ShopDatatableDto {
   key: string;
@@ -61,6 +63,10 @@ const CustomerTable: FC = () => {
       dataIndex: 'registerDate',
       key: 'registerDate',
       width: 150,
+      render: (value: string, record: ShopDatatableDto) => {
+        const dateFormatted = dayjs(value).format(revertDateFormatMap["day"]);
+       return <span>{dateFormatted}</span>;
+      },
     },
     {
       title: 'Tên cửa hàng',

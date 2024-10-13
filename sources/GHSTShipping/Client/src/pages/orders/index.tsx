@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, Col, Radio, RadioChangeEvent, Row, Select, Tag } from 'antd';
+import { Button, Card, Col, message, Radio, RadioChangeEvent, Row, Select, Tag } from 'antd';
 import { useSelector } from 'react-redux';
 
 import { suppliers } from '@/constants/data';
 import { IOrderStatus, orderStatuses } from './orderStatus';
 import { IOrderDetail, IOrderDto } from '@/interface/order/order.interface';
-import { apiGetOrderDetail, apiGetOrders } from '@/api/business.api';
+import { apiCancelOrderGhn, apiGetOrderDetail, apiGetOrders } from '@/api/business.api';
 import { IOrderPagedParameter, IPaginationResponse } from '@/interface/business';
 import Datatable from '@/components/core/datatable';
 import { ColumnsType } from 'antd/lib/table';
@@ -19,7 +19,7 @@ const { Option } = Select;
 const OrdersPage = () => {
   const { session } = useSelector(state => state.user);
   const isAdmin = session.roles.includes('ADMIN');
-  
+
   const [selectedSupplier, setSelectedSupplier] = useState<string>('');
   const [orderStatusSection, setOrderStatusSection] = useState<IOrderStatus[]>();
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>();
@@ -47,6 +47,14 @@ const OrdersPage = () => {
     const response = await apiGetOrders(params);
     if (response.success) {
       setOrderPagination(response.data);
+    }
+  };
+
+  const handleCancelOrder = async (orderCode: string | undefined) => {
+    if (!Boolean(orderCode)) return;
+    const response = await apiCancelOrderGhn([orderCode as string]);
+    if (response.success) {
+      message.success('Hủy đơn thành công!');
     }
   };
 
@@ -140,7 +148,7 @@ const OrdersPage = () => {
             if (record.isPublished) {
               return (
                 <div key={record.id}>
-                  <Button className="table-btn-action" size="small" onClick={commingSoon}>
+                  <Button className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.orderCode)}>
                     Hủy đơn
                   </Button>
                 </div>

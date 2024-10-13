@@ -11,6 +11,7 @@ export interface IOrderDto {
     codAmount: number;
     publishDate: string;
     privateOrderCode: string;
+    orderCode: string;
 }
 
 export interface IOrderDetail {

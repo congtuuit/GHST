@@ -77,5 +77,15 @@ namespace GHSTShipping.Domain.Entities
         public string private_operation_partner { get; set; }
 
         #endregion
+
+        public void GenerateOrderCode(long sequenceCode, string prefix)
+        {
+            int length = 5;
+            string sequenceCodeFormatted =  $"{sequenceCode}".PadLeft(length, '0');
+            string uniqueCode = prefix + sequenceCodeFormatted;
+
+            this.UniqueCode = uniqueCode;
+            this.ClientOrderCode = uniqueCode;
+        }
     }
 }

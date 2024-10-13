@@ -9,5 +9,6 @@ namespace GHSTShipping.Domain.DTOs
         public string PrivateOrderCode { get; set; }
 
         public string ShopName { get; set; }
+        public string OrderCode { get; set; }
     }
 }

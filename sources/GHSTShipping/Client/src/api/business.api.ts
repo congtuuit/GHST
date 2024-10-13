@@ -12,6 +12,7 @@ import { request } from './base/request';
 import { IOrderDetail, IOrderDto } from '@/interface/order/order.interface';
 import { buildQueryString } from '@/utils/queryEncode';
 import { IShopViewDetailDto } from '@/interface/shop';
+import { IDeliveryConfigDto } from '@/pages/delivery-config';
 
 export const apiGetProvinces = () => request<any[]>('get', '/metadata/provinces');
 export const apiGetDictricts = () => request<any[]>('get', '/metadata/dictricts');
@@ -46,6 +47,9 @@ export const apiGetOrders = (params: IOrderPagedParameter) => {
 export const apiGetOrderDetail = (orderId: string | undefined) => {
  return request<IOrderDetail>('get', `/orders/ghn/detail/${orderId}`);
 };
+export const apiCancelOrderGhn = (orderCodes: string[]) => {
+  return request<IOrderDetail>('put', `/orders/ghn/cancel`, orderCodes);
+ };
 export const apiGetShops = (pageNumber: number | undefined = 1, pageSize: number | undefined = 10) => {
   return request<PaginationResponse>('get', `/users/shops?pageNumber=${pageNumber}&pageSize=${pageSize}`);
 };
@@ -53,3 +57,7 @@ export const apiActiveShops = (shopId: string) => request<PaginationResponse>('p
 
 export const apiGetShopDetail = (shopId: string) => request<IShopViewDetailDto>('get', `/shops/detail/${shopId}`);
 export const apiChangeAllowPublishOrder = (shopId: string) => request<IShopViewDetailDto>('put', `/shops/allowPublishOrder/${shopId}`);
+
+export const apiGetDeliveryConfigs = () => request<IDeliveryConfigDto[]>('get', `/configs/delivery`);
+export const apiUpdateDeliveryConfigs = (payload: IDeliveryConfigDto[]) => request('put', `/configs/delivery`, payload);
+

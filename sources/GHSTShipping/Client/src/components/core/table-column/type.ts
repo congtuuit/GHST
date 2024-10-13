@@ -29,6 +29,12 @@ export const dateFormatMap: DateFormatMap = {
   day: 'YYYY-MM-DD',
 };
 
+export const revertDateFormatMap: DateFormatMap = {
+  year: 'YYYY',
+  month: 'MM/YYYY',
+  day: 'DD/MM/YYYY',
+};
+
 type TimeFormatMap = {
   [x in TimeType]: string;
 };
