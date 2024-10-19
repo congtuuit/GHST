@@ -24,6 +24,11 @@ namespace GHSTShipping.WebApi.Controllers.v1
         public async Task<BaseResult<ShopViewDetailDto>> AllowPublishOrder([FromRoute] Guid? shopId)
           => await Mediator.Send(new AllowPublishOrderRequest() { ShopId = shopId });
 
+        [HttpPut, Authorize]
+        [Route("{shopId}")]
+        public async Task<BaseResult<ShopViewDetailDto>> GhnShopId([FromRoute] Guid? shopId, [FromBody] UpdateGhnShopIdrRequest request)
+          => await Mediator.Send(request);
+
         [HttpGet, Authorize]
         public async Task<BaseResult<PaginationResponseDto<ShopPricePlanDto>>> Prices([FromQuery] GetShopPriceRequest request)
             => await Mediator.Send(request);

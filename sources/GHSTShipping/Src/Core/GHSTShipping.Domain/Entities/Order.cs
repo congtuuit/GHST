@@ -87,5 +87,6 @@ namespace GHSTShipping.Domain.Entities
             this.UniqueCode = uniqueCode;
             this.ClientOrderCode = uniqueCode;
         }
+
     }
 }

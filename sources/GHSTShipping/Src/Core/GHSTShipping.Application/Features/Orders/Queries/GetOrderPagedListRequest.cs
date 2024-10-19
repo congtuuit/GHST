@@ -19,6 +19,11 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         public string DeliveryPartner { get; set; }
 
         public string OrderCode { get; set; }
+
+        /// <summary>
+        /// DRAFT | WAIT_CONFIRM | DELIVERING | RETURN | WAIT_CONFIRM_DELIVERY | COMPLETED | CANCEL | LOST
+        /// </summary>
+        public string Status { get; set; }
     }
 
     public class GetOrderPagedListRequestHandler(
@@ -52,14 +57,29 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 query = query.Where(o => o.ShopId == shop.ShopId);
             }
 
+            // Filter by code
             if (!string.IsNullOrWhiteSpace(request.OrderCode))
             {
                 query = query.Where(o => o.ClientOrderCode.Contains(request.OrderCode) || request.OrderCode.Contains(o.ClientOrderCode));
             }
 
+            // Filter by delivery partner
             if (!string.IsNullOrWhiteSpace(request.DeliveryPartner))
             {
                 query = query.Where(o => o.DeliveryPartner.Contains(request.DeliveryPartner));
+            }
+
+            // Filter by status
+            if (!string.IsNullOrWhiteSpace(request.Status))
+            {
+                if (request.Status == EnumOrderStatusConstants.DRAFT)
+                {
+                    query = query.Where(o => o.IsPublished == false);
+                }
+                else
+                {
+                    query = query.Where(o => o.IsPublished == true);
+                }
             }
 
             int skipCount = (request.PageNumber - 1) * request.PageSize;

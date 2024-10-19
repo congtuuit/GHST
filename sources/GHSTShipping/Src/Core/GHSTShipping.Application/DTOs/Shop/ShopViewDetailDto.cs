@@ -1,5 +1,6 @@
 ﻿using GHSTShipping.Domain.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace GHSTShipping.Application.DTOs.Shop
 {
@@ -21,6 +22,8 @@ namespace GHSTShipping.Application.DTOs.Shop
         public string BankAddress { get; set; }
         public bool AllowPublishOrder { get; set; }
 
+        public int? GhnShopId { get; set; }
+
         public string Status
         {
             get
@@ -28,5 +31,14 @@ namespace GHSTShipping.Application.DTOs.Shop
                 return this.IsVerified ? EnumShopStatus.Activated.GetName() : EnumShopStatus.WaitingForActive.GetName();
             }
         }
+
+        public IEnumerable<GhnShopDetailDto> GhnShopDetails { get; set; }
+    }
+
+    public class GhnShopDetailDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string DisplayName { get { return $"{this.Id} - {this.Name}"; } }
     }
 }
