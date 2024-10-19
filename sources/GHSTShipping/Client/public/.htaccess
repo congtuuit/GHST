@@ -1,0 +1,21 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Redirect all requests to index.html except for real files and directories
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+
+  # Optional: Set cache expiration for static assets
+  <IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/html "access 1 day"
+    ExpiresByType image/jpg "access 1 month"
+    ExpiresByType image/png "access 1 month"
+    ExpiresByType text/css "access 1 month"
+    ExpiresByType text/javascript "access 1 month"
+    ExpiresByType application/javascript "access 1 month"
+  </IfModule>
+
+</IfModule>
