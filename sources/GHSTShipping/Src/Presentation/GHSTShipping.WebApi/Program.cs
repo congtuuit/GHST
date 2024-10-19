@@ -21,6 +21,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Delivery.GHN;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +49,7 @@ builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Confi
 
 var app = builder.Build();
 
+#if DEBUG
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -63,6 +66,7 @@ using (var scope = app.Services.CreateScope())
     await DefaultBasicUser.SeedAsync(services.GetRequiredService<UserManager<ApplicationUser>>());
     await DeliveryPartnerConfig.SeedAsync(services.GetRequiredService<ApplicationDbContext>());
 }
+#endif
 
 app.UseCustomLocalization();
 app.UseAnyCors();
@@ -74,6 +78,19 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHealthChecks("/health");
 app.MapControllers();
 app.UseSerilogRequestLogging();
+
+app.UseDefaultFiles(); // Serve the index.html file by default
+string currentDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(currentDir),
+    RequestPath = ""
+});
+
+app.MapFallbackToController("Index", "Fallback"); // Fallback controller mapping
+
+/*app.UseHttpsRedirection();
+app.UseSpaStaticFiles();*/
 
 app.Run();
 

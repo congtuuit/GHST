@@ -7,3 +7,4 @@
 **/bin
 **/.vs
 **/logs
+/sources/GHSTShipping/Src/Presentation/GHSTShipping.WebApi/wwwroot

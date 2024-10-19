@@ -35,4 +35,20 @@
 		<ProjectReference Include="..\..\Infrastructure\GHSTShipping.Infrastructure.Resources\GHSTShipping.Infrastructure.Resources.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update=".dockerignore">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="deploy-run.bat">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="deploy.dockerfile">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\" />
+	</ItemGroup>
+
 </Project>
