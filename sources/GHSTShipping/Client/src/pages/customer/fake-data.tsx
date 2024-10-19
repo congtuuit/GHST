@@ -11,6 +11,7 @@ interface ColumnType {
 // Helper function to generate random dates
 function getRandomDate(start: Date, end: Date): string {
   const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+
   return date.toISOString().split('T')[0]; // Return date in 'YYYY-MM-DD' format
 }
 

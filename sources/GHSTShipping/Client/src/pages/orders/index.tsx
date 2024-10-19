@@ -1,18 +1,20 @@
-import { useEffect, useState } from 'react';
-import { Button, Card, Col, message, Radio, RadioChangeEvent, Row, Select, Tag } from 'antd';
-import { useSelector } from 'react-redux';
-
-import { suppliers } from '@/constants/data';
-import { IOrderStatus, orderStatuses } from './orderStatus';
-import { IOrderDetail, IOrderDto } from '@/interface/order/order.interface';
-import { apiCancelOrderGhn, apiGetOrderDetail, apiGetOrders } from '@/api/business.api';
-import { IOrderPagedParameter, IPaginationResponse } from '@/interface/business';
-import Datatable from '@/components/core/datatable';
-import { ColumnsType } from 'antd/lib/table';
-import Price from '@/components/core/price';
+import type { IOrderStatus } from './orderStatus';
+import type { IOrderPagedParameter, IPaginationResponse } from '@/interface/business';
+import type { IOrderDetail, IOrderDto } from '@/interface/order/order.interface';
+import type { RadioChangeEvent, TablePaginationConfig } from 'antd';
+import type { FilterValue } from 'antd/es/table/interface';
+import type { ColumnsType } from 'antd/lib/table';
 import { SearchOutlined } from '@ant-design/icons';
-import OrderDetailDialog from './components/ghn/order-detail';
+import { Button, Card, Col, message, Radio, Row, Select, Tag } from 'antd';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { apiCancelOrderGhn, apiGetOrderDetail, apiGetOrders } from '@/api/business.api';
+import Datatable from '@/components/core/datatable';
+import Price from '@/components/core/price';
+import { suppliers } from '@/constants/data';
 import { commingSoon } from '@/utils/common';
+import OrderDetailDialog from './components/ghn/order-detail';
+import { orderStatuses } from './orderStatus';
 
 const { Option } = Select;
 
@@ -23,8 +25,12 @@ const OrdersPage = () => {
   const [selectedSupplier, setSelectedSupplier] = useState<string>('');
   const [orderStatusSection, setOrderStatusSection] = useState<IOrderStatus[]>();
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>();
+
   const [orderPagination, setOrderPagination] = useState<IPaginationResponse<IOrderDto> | null>(null);
   const [orderDetail, setOrderDetail] = useState<IOrderDetail | undefined>();
+
+  const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
+  const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
 
   const handleChange = (value: string) => {
     setSelectedSupplier(value);
@@ -39,12 +45,14 @@ const OrdersPage = () => {
       params = {
         deliveryPartner: '',
         orderCode: '',
+        status: '',
         pageNumber: 1,
         pageSize: 10,
       };
     }
 
     const response = await apiGetOrders(params);
+
     if (response.success) {
       setOrderPagination(response.data);
     }
@@ -53,6 +61,7 @@ const OrdersPage = () => {
   const handleCancelOrder = async (orderCode: string | undefined) => {
     if (!Boolean(orderCode)) return;
     const response = await apiCancelOrderGhn([orderCode as string]);
+
     if (response.success) {
       message.success('Hủy đơn thành công!');
     }
@@ -136,13 +145,14 @@ const OrdersPage = () => {
           align: 'center',
           render: (_: any, record: IOrderDto) => {
             const text = record.isPublished ? 'Công khai' : 'Nháp';
+
             return <Tag color={record['isPublished'] === true ? 'green' : 'gray'}>{text}</Tag>;
           },
         },
         {
           title: 'Thao tác',
           key: 'action',
-          width: 150,
+          width: 180,
           align: 'center' as const,
           render: (_: any, record: IOrderDto) => {
             if (record.isPublished) {
@@ -154,12 +164,13 @@ const OrdersPage = () => {
                 </div>
               );
             }
+
             return (
               <div key={record.id}>
-                <Button className="table-btn-action" size="small" onClick={commingSoon}>
+                <Button type="dashed" className="table-btn-action" size="middle" onClick={commingSoon}>
                   Công khai
                 </Button>
-                <Button className="table-btn-action" size="small" onClick={commingSoon}>
+                <Button danger className="table-btn-action" size="small" onClick={commingSoon}>
                   Xóa
                 </Button>
               </div>
@@ -237,6 +248,7 @@ const OrdersPage = () => {
           align: 'center',
           render: (_: any, record: IOrderDto) => {
             const text = record.isPublished ? 'Công khai' : 'Nháp';
+
             return <Tag color={record['isPublished'] === true ? 'green' : 'gray'}>{text}</Tag>;
           },
         },
@@ -255,6 +267,7 @@ const OrdersPage = () => {
                 </div>
               );
             }
+
             return (
               <div key={record.id}>
                 <Button className="table-btn-action" size="small" onClick={commingSoon}>
@@ -271,12 +284,16 @@ const OrdersPage = () => {
 
   const handleViewOrderDetail = async (orderId: string) => {
     const response = await apiGetOrderDetail(orderId);
+
     if (response.success) {
       setOrderDetail(response.data);
     }
   };
 
-  const handleChangeTable = (pagination: any, filters: any, sorter: any) => {};
+  const handleChangeTable = (config: TablePaginationConfig, filters: Record<string, FilterValue | null>) => {
+    setTablePaginationConfig(config);
+    setTableFilters(filters);
+  };
 
   useEffect(() => {
     if (Boolean(selectedSupplier) && Boolean(orderStatuses[selectedSupplier])) {
@@ -285,10 +302,16 @@ const OrdersPage = () => {
       setOrderStatusSection([]);
     }
 
-    fetchOrders({
+    const params: IOrderPagedParameter = {
+      pageNumber: tablePaginationConfig?.current as number,
+      pageSize: tablePaginationConfig?.pageSize as number,
       deliveryPartner: selectedSupplier,
-    } as IOrderPagedParameter);
-  }, [selectedSupplier]);
+      orderCode: '',
+      status: orderStatusFilter,
+    };
+
+    fetchOrders(params);
+  }, [selectedSupplier, tablePaginationConfig, orderStatusFilter]);
 
   useEffect(() => {
     fetchOrders(null);

@@ -54,11 +54,7 @@ const HeaderNoticeComponent: FC = () => {
               dataSource={noticeListFilter('notification')}
               renderItem={item => (
                 <List.Item>
-                  <List.Item.Meta
-                    avatar={<Avatar src={item.avatar} />}
-                    title={<a href={item.title}>{item.title}</a>}
-                    description={item.datetime}
-                  />
+                  <List.Item.Meta avatar={<Avatar src={item.avatar} />} title={<a href={item.title}>{item.title}</a>} description={item.datetime} />
                 </List.Item>
               )}
             />

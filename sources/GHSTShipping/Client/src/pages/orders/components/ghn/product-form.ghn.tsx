@@ -1,6 +1,7 @@
+import { DeleteOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Form, Input, InputNumber, message, Row, Upload } from 'antd';
 import React, { useState } from 'react';
-import { Form, Input, Button, Row, Col, Upload, Card, message, InputNumber } from 'antd';
-import { PlusOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
+
 import MyInputNumber from '../MyInputNumber';
 
 interface IProduct {
@@ -19,6 +20,7 @@ const ProductForm = () => {
 
   const handleInputChange = (index: number, field: keyof IProduct, value: string) => {
     const newProducts: IProduct[] = [...products];
+
     if (newProducts[index]) {
       newProducts[index][field] = value;
     }
@@ -29,10 +31,13 @@ const ProductForm = () => {
   const handleRemoveProduct = (index: number) => {
     if (products.length === 1) {
       message.info('Đơn hàng phải có ít nhất 1 sản phẩm');
+
       return;
     }
+
     products.splice(index, 1);
     const newProducts: IProduct[] = [...products];
+
     setProducts(newProducts);
   };
 
@@ -44,36 +49,42 @@ const ProductForm = () => {
             {/* Product Name */}
             <Col span={4}>
               <Form.Item label={`SP ${index + 1}`} name={['items', index, 'name']}>
-                <Input
-                  placeholder="Nhập tên sản phẩm"
-                  value={product.name}
-                  onChange={e => handleInputChange(index, 'name', e.target.value)}
-                />
+                <Input placeholder="Nhập tên sản phẩm" value={product.name} onChange={e => handleInputChange(index, 'name', e.target.value)} />
               </Form.Item>
             </Col>
 
             {/* Weight */}
             <Col span={4}>
               <Form.Item label="KL (gram)" name={['items', index, 'weight']}>
-                <MyInputNumber value={product.weight} onChange={e => handleInputChange(index, 'weight', e || '')} />
+                <MyInputNumber
+                  value={product.weight}
+                  onChange={e => {
+                    const value: string = e.toString();
+
+                    handleInputChange(index, 'weight', value || '');
+                  }}
+                />
               </Form.Item>
             </Col>
 
             {/* Quantity */}
             <Col span={4}>
               <Form.Item label="Số lượng" name={['items', index, 'quantity']}>
-                <MyInputNumber value={product.quantity} onChange={e => handleInputChange(index, 'quantity', e || '')} />
+                <MyInputNumber
+                  value={product.quantity}
+                  onChange={e => {
+                    const value: string = e.toString();
+
+                    handleInputChange(index, 'quantity', value || '');
+                  }}
+                />
               </Form.Item>
             </Col>
 
             {/* Product Code */}
             <Col span={4}>
               <Form.Item label="Mã sản phẩm" name={['items', index, 'code']}>
-                <Input
-                  placeholder="Nhập mã sản phẩm"
-                  value={product.code}
-                  onChange={e => handleInputChange(index, 'code', e.target.value)}
-                />
+                <Input placeholder="Nhập mã sản phẩm" value={product.code} onChange={e => handleInputChange(index, 'code', e.target.value)} />
               </Form.Item>
             </Col>
 

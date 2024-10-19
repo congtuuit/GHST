@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Button, Modal, Form, Input, InputNumber, Select, message } from 'antd';
+import type { ShopPricePlanDto } from '@/interface/business';
+
 import { PlusOutlined } from '@ant-design/icons';
-import { ShopPricePlanDto } from '@/interface/business';
+import { Button, Form, Input, InputNumber, message, Modal, Select } from 'antd';
+import { useEffect, useState } from 'react';
 
 const { Option } = Select;
 
@@ -46,6 +47,7 @@ const PriceConfigurationForm = (props: PriceConfigurationFormProps) => {
             } else {
               message.error('Thao tác thất bại, vui lòng kiểm tra lại!');
             }
+
             setProcessing(false);
           });
       })
@@ -83,11 +85,7 @@ const PriceConfigurationForm = (props: PriceConfigurationFormProps) => {
           </Form.Item>
 
           {/* Dropdown Nhà cung cấp */}
-          <Form.Item
-            label="Nhà cung cấp"
-            name="supplier"
-            rules={[{ required: true, message: 'Vui lòng chọn nhà cung cấp!' }]}
-          >
+          <Form.Item label="Nhà cung cấp" name="supplier" rules={[{ required: true, message: 'Vui lòng chọn nhà cung cấp!' }]}>
             <Select placeholder="Chọn nhà cung cấp">
               <Option value="GHN">GHN</Option>
               <Option value="SHOPEE EXPRESS">SHOPEE EXPRESS</Option>
@@ -99,29 +97,17 @@ const PriceConfigurationForm = (props: PriceConfigurationFormProps) => {
           </Form.Item>
 
           {/* Giá riêng */}
-          <Form.Item
-            label="Giá riêng"
-            name="privatePrice"
-            rules={[{ required: true, message: 'Vui lòng nhập giá riêng!' }]}
-          >
+          <Form.Item label="Giá riêng" name="privatePrice" rules={[{ required: true, message: 'Vui lòng nhập giá riêng!' }]}>
             <Input placeholder="Nhập giá riêng" type="number" />
           </Form.Item>
 
           {/* Giá công khai */}
-          <Form.Item
-            label="Giá công khai"
-            name="officialPrice"
-            rules={[{ required: true, message: 'Vui lòng nhập giá công khai!' }]}
-          >
+          <Form.Item label="Giá công khai" name="officialPrice" rules={[{ required: true, message: 'Vui lòng nhập giá công khai!' }]}>
             <Input placeholder="Nhập giá công khai" type="number" />
           </Form.Item>
 
           {/* Sức chứa */}
-          <Form.Item
-            label="Khối lượng"
-            name="capacity"
-            rules={[{ required: true, message: 'Vui lòng nhập khối lượng!' }]}
-          >
+          <Form.Item label="Khối lượng" name="capacity" rules={[{ required: true, message: 'Vui lòng nhập khối lượng!' }]}>
             <InputNumber placeholder="Nhập khối lượng" min={0} style={{ width: '100%' }} step="0.01" type="number" />
           </Form.Item>
         </Form>

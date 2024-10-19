@@ -1,10 +1,13 @@
+import type { IPaginationResponse } from '@/interface/business';
+import type { FilterValue } from 'antd/es/table/interface';
+import type { TablePaginationConfig } from 'antd/lib/table';
+
 import { Table } from 'antd';
-import { IPaginationResponse } from '@/interface/business';
 
 interface DatatableProps<T> {
   columns: any[];
   dataSource: IPaginationResponse<T> | null;
-  onChange: (pagination: any, filters: any, sorter: any) => void; // Ensure proper typing for onChange
+  onChange: (pagination: TablePaginationConfig, filters: Record<string, FilterValue | null>, sorter: any) => void; // Ensure proper typing for onChange
 }
 
 const Datatable = <T extends object>({ columns, dataSource, onChange }: DatatableProps<T>) => {
@@ -13,7 +16,7 @@ const Datatable = <T extends object>({ columns, dataSource, onChange }: Datatabl
       style={{ width: '100%' }}
       columns={columns}
       dataSource={dataSource?.data}
-      rowKey={(record) => (record as any).id || (record as any).key} // Replace with the correct key field from your data
+      rowKey={record => (record as any).id || (record as any).key} // Replace with the correct key field from your data
       scroll={{ x: 'max-content' }}
       pagination={{
         pageSize: dataSource?.pageSize || 10, // Default value if undefined

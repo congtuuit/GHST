@@ -7,9 +7,9 @@ import type { FC } from 'react';
 
 import { Space, Tag } from 'antd';
 
-import { getBusinessUserList } from '@/api/business';
 import MyButton from '@/components/basic/button';
 import MyPage from '@/components/business/page';
+import { getBusinessUserList } from '@/api/business.api';
 
 const { Item: SearchItem } = MyPage.MySearch;
 
@@ -113,7 +113,6 @@ const BusinessWithTabsPage: FC = () => {
           <SearchItem label="FirstName" name="firstName10" type="input" />
         </>
       }
-      tableOptions={tableColums}
     ></MyPage>
   );
 };

@@ -1,10 +1,14 @@
-import { useEffect, useState, type FC } from 'react';
-import { Button, Row, Table, TablePaginationConfig, Tag, Typography, Modal } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import type { PaginationResponse, ShopPricePlanDto } from '@/interface/business';
+import type { TablePaginationConfig } from 'antd';
+import type { FilterValue } from 'antd/es/table/interface';
+
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Modal, Row, Table, Tag, Typography } from 'antd';
+import { type FC, useEffect, useState } from 'react';
+
 import { apiDeleteShopPricePlan, apiGetShopPricePlanes } from '@/api/business.api';
-import { PaginationResponse, ShopPricePlanDto } from '@/interface/business';
 import { suppliers } from '@/constants/data';
-import { FilterValue } from 'antd/es/table/interface';
+
 const { confirm } = Modal;
 
 interface ShopPricePlanDatatable {
@@ -27,7 +31,7 @@ interface PriceTableProps {
 
 const PriceTable = (props: PriceTableProps) => {
   const { selectedShop, refreshTable, onEdit } = props;
-  const [reloadTable, setReloadTable] = useState<Boolean>(refreshTable);
+  const [reloadTable, setReloadTable] = useState<boolean>(refreshTable);
   const [pagination, setPagination] = useState<PaginationResponse>();
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
@@ -43,11 +47,13 @@ const PriceTable = (props: PriceTableProps) => {
     }
 
     let supplierQuery = '';
+
     if (Boolean(supplier)) {
       supplierQuery = supplier?.length > 0 ? supplier.join(',') : ''; // join the array into a comma-separated string
     }
 
     const { success, data } = await apiGetShopPricePlanes(shopId, supplierQuery, pageNumber, pageSize);
+
     if (success) {
       setPagination(data);
     }
@@ -183,6 +189,7 @@ const PriceTable = (props: PriceTableProps) => {
 
   const handleDelete = async (record: ShopPricePlanDatatable) => {
     const { id } = record;
+
     await apiDeleteShopPricePlan(id);
 
     setReloadTable(!reloadTable);
@@ -197,24 +204,23 @@ const PriceTable = (props: PriceTableProps) => {
     if (!Boolean(selectedShop)) {
       return;
     }
+
     let _pageNumber: number | undefined = -1,
       _pageSize: number | undefined = -1,
       _supplierFilter: FilterValue | null = null;
+
     if (tablePaginationConfig) {
       const { current, pageSize } = tablePaginationConfig;
+
       _pageNumber = current;
       _pageSize = pageSize;
     }
+
     if (tableFilters) {
       _supplierFilter = tableFilters?.supplier;
     }
-    if (
-      Boolean(_pageSize) &&
-      (_pageSize as number) > 0 &&
-      Boolean(_pageNumber) &&
-      (_pageNumber as number) > 0 &&
-      Boolean(_supplierFilter)
-    ) {
+
+    if (Boolean(_pageSize) && (_pageSize as number) > 0 && Boolean(_pageNumber) && (_pageNumber as number) > 0 && Boolean(_supplierFilter)) {
       fetchPricePlanes(selectedShop, _supplierFilter, _pageNumber, _pageSize);
     } else if (Boolean(_pageSize) && (_pageSize as number) > 0 && Boolean(_pageNumber) && (_pageNumber as number) > 0) {
       fetchPricePlanes(selectedShop, '', _pageNumber, _pageSize);

@@ -1,23 +1,17 @@
 import 'dayjs/locale/zh-cn';
-
+import './main.css';
 import { ConfigProvider, Spin, theme as antdTheme } from 'antd';
 import enUS from 'antd/es/locale/en_US';
 import viVN from 'antd/es/locale/vi_VN';
-
-import localeVi from 'dayjs/locale/vi'; // Import Vietnamese locale
-
 import dayjs from 'dayjs';
+import localeVi from 'dayjs/locale/vi'; // Import Vietnamese locale
 import { Suspense, useEffect } from 'react';
 import { IntlProvider } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
-
-import { HistoryRouter, history } from '@/routes/history';
-
-import { LocaleFormatter, localeConfig } from './locales';
+import { history, HistoryRouter } from '@/routes/history';
+import { localeConfig, LocaleFormatter } from './locales';
 import RenderRouter from './routes';
 import { setGlobalState } from './stores/global.store';
-import './main.css';
-// import 'antd/dist/antd.css';
 
 const App: React.FC = () => {
   const { locale } = useSelector(state => state.user);

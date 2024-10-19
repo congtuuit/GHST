@@ -5,18 +5,19 @@ import { lazy } from 'react';
 import { Navigate } from 'react-router';
 import { useRoutes } from 'react-router-dom';
 
-import Dashboard from '@/pages/dashboard';
-import LayoutPage from '@/pages/layout';
-import LoginPage from '@/pages/login';
-import ForgotPasswordPage from '@/pages/forgot-password';
 import CustomerPage from '@/pages/customer';
 import CustomerPricePage from '@/pages/customer-price';
+import Dashboard from '@/pages/dashboard';
+import DeliveryConfigPage from '@/pages/delivery-config';
+import ForgotPasswordPage from '@/pages/forgot-password';
+import LayoutPage from '@/pages/layout';
+import LoginPage from '@/pages/login';
 import OrdersPage from '@/pages/orders';
 import CreateOrderPage from '@/pages/orders/create';
-import WrapperRouteComponent from './config';
 import RegisterPage from '@/pages/register';
 import ResetPasswordPage from '@/pages/reset-password';
-import DeliveryConfigPage from '@/pages/delivery-config';
+
+import WrapperRouteComponent from './config';
 
 const NotFound = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/404'));
 const Documentation = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/doucumentation'));
@@ -86,8 +87,6 @@ const routeList: RouteObject[] = [
         path: 'settings',
         element: <WrapperRouteComponent element={<DeliveryConfigPage />} titleId="title.deliveryConfig" />,
       },
-
-      
 
       {
         path: 'documentation',

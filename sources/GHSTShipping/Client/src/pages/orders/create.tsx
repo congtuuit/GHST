@@ -1,18 +1,20 @@
-import { useEffect, useState, type FC } from 'react';
 import { Button, Card, Checkbox, Col, Form, Input, Radio, RadioChangeEvent, Row, Select, Table } from 'antd';
+import { type FC, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { supplierKeys, suppliers } from '@/constants/data';
 import { LocaleFormatter, useLocale } from '@/locales';
 import { formatSearch } from '@/utils/formatSearch';
-import { supplierKeys, suppliers } from '@/constants/data';
-import { IOrderStatus, orderStatuses } from './orderStatus';
+
 import FormOrderGhn from './components/ghn/form-order.ghn';
+import { IOrderStatus, orderStatuses } from './orderStatus';
 
 const { Option } = Select;
 
 const CreateOrderPage = () => {
   const [selectedSupplier, setSelectedSupplier] = useState<string>(supplierKeys.GHN);
+
   const handleChange = (value: string) => {
     setSelectedSupplier(value);
   };

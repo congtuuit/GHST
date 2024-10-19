@@ -48,7 +48,8 @@ const tableColums: MyPageTableOptions<BuniesssUser> = [
 ];
 
 const BusinessBasicPage: FC = () => {
-  return <MyPage pageApi={getBusinessUserList} tableOptions={[]}></MyPage>;
+  return <></>;
+  //return <MyPage pageApi={getBusinessUserList} tableOptions={[]}></MyPage>;
 };
 
 export default BusinessBasicPage;

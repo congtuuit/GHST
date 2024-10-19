@@ -4,8 +4,8 @@ import type { MessageDescriptor } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import en_US from './en-US';
-import zh_CN from './zh-CN';
 import vi_VN from './vi_VN';
+import zh_CN from './zh-CN';
 
 export const localeConfig = {
   vi_VN: vi_VN,

@@ -2,11 +2,11 @@ import type { AxiosError, AxiosRequestConfig, AxiosResponse, Method } from 'axio
 
 import { message as $message, message } from 'antd';
 import axios from 'axios';
+// import { history } from '@/routes/history';
+import { useNavigate } from 'react-router-dom'; // v6 navigation
 
 import store from '@/stores';
 import { setGlobalState } from '@/stores/global.store';
-// import { history } from '@/routes/history';
-import { useNavigate } from 'react-router-dom'; // v6 navigation
 
 const axiosInstance = axios.create({
   timeout: 6000,
@@ -15,6 +15,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   config => {
     const token = localStorage.getItem('t'); // Or get from Redux store using store.getState()
+
     if (token) {
       // Attach the token to the Authorization header
       // Ensure config.headers is defined
@@ -60,6 +61,7 @@ axiosInstance.interceptors.response.use(
     // if needs to navigate to login page when request exception
     // history.replace('/login');
     let errorMessage = 'Xảy ra lỗi';
+
     if (error?.message?.includes('Network Error')) {
       errorMessage = 'Kết nối mạng gặp sự cố, vui lòng kiểm tra lại!';
     } else {
@@ -96,23 +98,22 @@ export type MyResponse<T = any> = Promise<Response<T>>;
  * @param url - request url
  * @param data - request data or params
  */
-export const request = <T = any>(
-  method: Lowercase<Method>,
-  url: string,
-  data?: any,
-  config?: AxiosRequestConfig,
-): MyResponse<T> => {
+export const request = <T = any>(method: Lowercase<Method>, url: string, data?: any, config?: AxiosRequestConfig): MyResponse<T> => {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const endpoint = apiUrl + url;
+  const endpoint = apiUrl + '/api/v1' + url;
+
   if (method === 'post') {
     return axiosInstance.post(endpoint, data, config);
   }
+
   if (method === 'put') {
     return axiosInstance.put(endpoint, data, config);
   }
+
   if (method === 'delete') {
     return axiosInstance.delete(endpoint, config);
   }
+
   return axiosInstance.get(endpoint, {
     params: data,
     ...config,

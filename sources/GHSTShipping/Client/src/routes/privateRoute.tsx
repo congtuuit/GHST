@@ -1,13 +1,14 @@
 import type { FC } from 'react';
-import type { RouteProps } from 'react-router';
+import type { PathRouteProps } from 'react-router';
+
 import { Button, Result } from 'antd';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
-import { useNavigate } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
+
 import { useLocale } from '@/locales';
 
-const PrivateRoute: FC<RouteProps> = props => {
+const PrivateRoute: FC<PathRouteProps> = props => {
   const { logged, session } = useSelector(state => state.user);
   const navigate = useNavigate();
   const { formatMessage } = useLocale();
@@ -25,10 +26,7 @@ const PrivateRoute: FC<RouteProps> = props => {
       title="403"
       subTitle={formatMessage({ id: 'gloabal.tips.unauthorized' })}
       extra={
-        <Button
-          type="primary"
-          onClick={() => navigate(`/login${'?from=' + encodeURIComponent(location.pathname)}`, { replace: true })}
-        >
+        <Button type="primary" onClick={() => navigate(`/login${'?from=' + encodeURIComponent(location.pathname)}`, { replace: true })}>
           {formatMessage({ id: 'gloabal.tips.goToLogin' })}
         </Button>
       }

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Form, Input, Checkbox, InputNumber, Row, Col, Card } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
+import { Card, Checkbox, Col, Form, Input, InputNumber, Row } from 'antd';
+import React, { useState } from 'react';
+
 import MyInputNumber from '../MyInputNumber';
 
 const OrderInfoForm = () => {
@@ -16,24 +17,24 @@ const OrderInfoForm = () => {
         {/* Weight */}
         <Col span={6}>
           <Form.Item label="KL (gram)" name={'weight'}>
-            <MyInputNumber defaultValue="500"/>
+            <MyInputNumber defaultValue="500" />
           </Form.Item>
         </Col>
 
         {/* Dimensions */}
         <Col span={4}>
           <Form.Item label="Dài (cm)" name={'length'}>
-            <MyInputNumber defaultValue="10" max={999999}/>
+            <MyInputNumber defaultValue="10" max={999999} />
           </Form.Item>
         </Col>
         <Col span={4}>
           <Form.Item label="Rộng (cm)" name={'width'}>
-            <MyInputNumber defaultValue="10" max={999999}/>
+            <MyInputNumber defaultValue="10" max={999999} />
           </Form.Item>
         </Col>
         <Col span={4}>
           <Form.Item label="Cao (cm)" name={'height'}>
-            <MyInputNumber defaultValue="10" max={999999}/>
+            <MyInputNumber defaultValue="10" max={999999} />
           </Form.Item>
         </Col>
 
@@ -48,12 +49,8 @@ const OrderInfoForm = () => {
       <Row gutter={16}>
         {/* COD */}
         <Col span={12}>
-          <Form.Item
-            name="cod_amount"
-            label="Tổng tiền thu hộ (COD)"
-            tooltip={{ title: 'Nhập số tiền COD', icon: <InfoCircleOutlined /> }}
-          >
-            <MyInputNumber defaultValue="0" max={99999999}/>
+          <Form.Item name="cod_amount" label="Tổng tiền thu hộ (COD)" tooltip={{ title: 'Nhập số tiền COD', icon: <InfoCircleOutlined /> }}>
+            <MyInputNumber defaultValue="0" max={99999999} />
           </Form.Item>
         </Col>
 
@@ -64,7 +61,7 @@ const OrderInfoForm = () => {
             label="Tổng giá trị hàng hóa"
             tooltip={{ title: 'Nhập tổng giá trị hàng hóa', icon: <InfoCircleOutlined /> }}
           >
-            <MyInputNumber defaultValue="0" max={99999999}/>
+            <MyInputNumber defaultValue="0" max={99999999} />
           </Form.Item>
         </Col>
       </Row>
@@ -81,7 +78,7 @@ const OrderInfoForm = () => {
         {failedDelivery && (
           <Col span={12}>
             <Form.Item name="cod_failed_amount">
-              <MyInputNumber defaultValue="20000" max={99999999}/>
+              <MyInputNumber defaultValue="20000" max={99999999} />
             </Form.Item>
           </Col>
         )}

@@ -1,15 +1,8 @@
-import { lazy, type FC } from 'react';
-
-import { Card, Row, Typography } from 'antd';
-
-import { LocaleFormatter } from '@/locales';
 import './index.css';
-
-const { Title, Paragraph } = Typography;
-
+import { Card } from 'antd';
+import { lazy } from 'react';
 const CustomerTable = lazy(() => import(/* webpackChunkName: "table'"*/ '@/pages/customer/customer-table'));
-
-const CustomerPage: FC = () => {
+const CustomerPage = () => {
   return (
     <Card>
       <CustomerTable />

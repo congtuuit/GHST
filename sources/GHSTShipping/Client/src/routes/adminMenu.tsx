@@ -1,4 +1,4 @@
-import { MenuList } from '@/interface/layout/menu.interface';
+import type { MenuList } from '@/interface/layout/menu.interface';
 
 const adminMenu: MenuList = [
   {
@@ -39,7 +39,7 @@ const adminMenu: MenuList = [
         },
         path: '/customer/price-plan',
       },
-    ]
+    ],
   },
   {
     code: 'order',

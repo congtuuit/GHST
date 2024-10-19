@@ -2,7 +2,7 @@ import type { LoginResult, Role } from './login';
 import type { Device } from '@/interface/layout/index.interface';
 import type { MenuChild } from '@/interface/layout/menu.interface';
 
-export type Locale =  'en_US' | 'vi_VN';
+export type Locale = 'en_US' | 'vi_VN';
 
 export interface UserState {
   userName: string;

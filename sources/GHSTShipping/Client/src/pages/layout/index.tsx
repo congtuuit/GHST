@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useLocation } from 'react-router';
 
 import { getMenuList } from '@/api/layout.api';
+import adminMenu from '@/routes/adminMenu';
+import defaultMenu from '@/routes/defaultMenu';
 import { setUserItem } from '@/stores/user.store';
 import { getFirstPathCode } from '@/utils/getFirstPathCode';
 import { getGlobalState } from '@/utils/getGloabal';
@@ -17,8 +19,6 @@ import { useGuide } from '../guide/useGuide';
 import HeaderComponent from './header';
 import MenuComponent from './menu';
 import TagsView from './tagView';
-import defaultMenu from '@/routes/defaultMenu';
-import adminMenu from '@/routes/adminMenu';
 
 const { Sider, Content } = Layout;
 const WIDTH = 992;
@@ -69,7 +69,8 @@ const LayoutPage: FC = () => {
   const fetchMenuList = useCallback(async () => {
     const roles = session.roles;
     let mockMenuList = defaultMenu;
-    const isAdmin = roles.includes("ADMIN");
+    const isAdmin = roles.includes('ADMIN');
+
     if (isAdmin) {
       mockMenuList = adminMenu;
     }
@@ -128,14 +129,7 @@ const LayoutPage: FC = () => {
             />
           </Sider>
         ) : (
-          <Drawer
-            width="200"
-            placement="left"
-            bodyStyle={{ padding: 0, height: '100%' }}
-            closable={false}
-            onClose={toggle}
-            open={!collapsed}
-          >
+          <Drawer width="200" placement="left" bodyStyle={{ padding: 0, height: '100%' }} closable={false} onClose={toggle} open={!collapsed}>
             <MenuComponent
               menuList={menuList}
               openKey={openKey}

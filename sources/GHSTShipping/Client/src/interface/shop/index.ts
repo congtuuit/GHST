@@ -15,4 +15,12 @@ export interface IShopViewDetailDto {
   bankAddress: string;
   allowPublishOrder: boolean;
   status: string;
+  ghnShopDetails: IGhnShopDetailDto[];
+  ghnShopId?: number;
+}
+
+interface IGhnShopDetailDto {
+  id: number;
+  name: string;
+  displayName: string;
 }

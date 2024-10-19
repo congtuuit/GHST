@@ -1,5 +1,5 @@
+import { Button, Modal } from 'antd';
 import React from 'react';
-import { Modal, Button } from 'antd';
 
 interface CommonDialogProps {
   title: string;
@@ -33,12 +33,7 @@ const CommonDialog: React.FC<CommonDialogProps> = ({
         <Button key="cancel" onClick={onCancel}>
           {cancelText}
         </Button>,
-        <Button
-          key="confirm"
-          type="primary"
-          onClick={onConfirm}
-          loading={confirmLoading}
-        >
+        <Button key="confirm" type="primary" onClick={onConfirm} loading={confirmLoading}>
           {confirmText}
         </Button>,
       ]}

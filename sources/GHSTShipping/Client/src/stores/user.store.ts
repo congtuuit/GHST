@@ -16,7 +16,7 @@ const initialState: UserState = {
   menuList: [],
   userName: localStorage.getItem('userName') || '',
   roles: [],
-  session: (JSON.parse(localStorage.getItem('session') ?? "null") || null) as LoginResult,
+  session: (JSON.parse(localStorage.getItem('session') ?? 'null') || null) as LoginResult,
 };
 
 const userSlice = createSlice({
@@ -25,6 +25,7 @@ const userSlice = createSlice({
   reducers: {
     setUserItem(state, action: PayloadAction<Partial<UserState>>) {
       const { userName } = action.payload;
+
       if (userName !== state.userName) {
         localStorage.setItem('userName', action.payload.userName || '');
       }

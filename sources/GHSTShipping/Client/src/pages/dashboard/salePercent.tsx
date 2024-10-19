@@ -100,14 +100,7 @@ const SalePercent: FC<{ loading: boolean }> = ({ loading }) => {
                   return null;
                 }}
               />
-              <Pie
-                strokeOpacity={0}
-                data={data[dataType]}
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={5}
-                dataKey="value"
-              >
+              <Pie strokeOpacity={0} data={data[dataType]} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
                 {data[dataType].map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index]} />
                 ))}

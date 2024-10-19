@@ -3,7 +3,7 @@ export interface Locales<T = any> {
   zh_CN: T;
   /** English */
   en_US: T;
-  
+
   vi_VN: T;
 }
 

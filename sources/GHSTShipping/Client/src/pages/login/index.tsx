@@ -1,11 +1,15 @@
 import type { LoginParams } from '@/interface/user/login';
 import type { FC } from 'react';
+
+import './index.less';
+
 import { Button, Card, Col, Form, Input, Row, Typography } from 'antd';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+
 import { formatSearch } from '@/utils/formatSearch';
+
 import { loginAsync } from '../../stores/user.action';
-import './index.less';
 
 const initialValues: LoginParams = {
   username: 'congtuuit@gmail.com',
@@ -20,9 +24,11 @@ const LoginForm: FC = () => {
 
   const onFinished = async (form: LoginParams) => {
     const res = await dispatch(loginAsync(form));
+
     if (!!res) {
       const search = formatSearch(location.search);
       const from = search.from || { pathname: '/' };
+
       navigate(from);
     }
   };
@@ -66,8 +72,7 @@ const LoginForm: FC = () => {
             </Form.Item>
             <Row align="middle" justify="center">
               <Typography.Text style={{ margin: 'auto', color: '#d6d6d6' }}>
-                Bạn chưa có tài khoản{' '}
-                <Typography.Link onClick={() => navigate('/register')}>Đăng ký ngay</Typography.Link>{' '}
+                Bạn chưa có tài khoản <Typography.Link onClick={() => navigate('/register')}>Đăng ký ngay</Typography.Link>{' '}
               </Typography.Text>
             </Row>
           </Form>

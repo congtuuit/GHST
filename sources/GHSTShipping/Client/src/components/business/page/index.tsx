@@ -1,7 +1,7 @@
 import type { MyAsideProps } from '../aside';
 import type { MyRadioCardssOption } from '../radio-cards';
 import type { MyTabsOption } from '../tabs';
-import type { MyResponse } from '@/api/request';
+import type { MyResponse } from '@/api/base/request';
 import type { PageData } from '@/interface';
 import type { ColumnsType } from 'antd/es/table/interface';
 
@@ -89,9 +89,9 @@ const BasePage = <S extends SearchApi>(props: PageProps<S>, ref: React.Ref<RefPa
         };
         const res = await pageApi(obj);
 
-        if (res.status) {
-          setPageData({ total: res.result.total, data: res.result.data });
-        }
+        // if (res.status) {
+        //   setPageData({ total: res.result.total, data: res.result.data });
+        // }
       }
     },
     [pageApi, pageParams, pageData.pageSize, pageData.pageNum, asideKey, asideCheckedKey],
@@ -140,15 +140,13 @@ const BasePage = <S extends SearchApi>(props: PageProps<S>, ref: React.Ref<RefPa
               {searchRender}
             </MySearch>
           )}
-          {radioCardsData && (
-            <MyRadioCards options={radioCardsData} defaultValue={radioCardsValue || radioCardsData[0].value} />
-          )}
+          {radioCardsData && <MyRadioCards options={radioCardsData} defaultValue={radioCardsValue || radioCardsData[0].value} />}
           {tableOptions && (
             <div className="table">
               <MyTable
                 height="100%"
-                dataSource={pageData.data}
-                columns={tableOptions}
+                //dataSource={pageData.data}
+                //columns={tableOptions}
                 pagination={{
                   current: pageData.pageNum,
                   pageSize: pageData.pageSize,
@@ -156,7 +154,7 @@ const BasePage = <S extends SearchApi>(props: PageProps<S>, ref: React.Ref<RefPa
                   onChange: onPageChange,
                 }}
               >
-                {tableRender?.(pageData.data)}
+                {/* {tableRender?.(pageData.data)} */}
               </MyTable>
             </div>
           )}
@@ -166,9 +164,7 @@ const BasePage = <S extends SearchApi>(props: PageProps<S>, ref: React.Ref<RefPa
   );
 };
 
-const BasePageRef = forwardRef(BasePage) as <S extends SearchApi>(
-  props: PageProps<S> & { ref?: React.Ref<RefPageProps> },
-) => React.ReactElement;
+const BasePageRef = forwardRef(BasePage) as <S extends SearchApi>(props: PageProps<S> & { ref?: React.Ref<RefPageProps> }) => React.ReactElement;
 
 type BasePageType = typeof BasePageRef;
 

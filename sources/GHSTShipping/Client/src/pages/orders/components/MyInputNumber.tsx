@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import { Input, message } from 'antd';
+import React, { useEffect, useState } from 'react';
 
 interface MyInputNumberProps {
   allowDecimal?: boolean; // Option to allow decimal numbers
@@ -29,6 +29,7 @@ const MyInputNumber: React.FC<MyInputNumberProps> = ({
   useEffect(() => {
     if (inputValue) {
       const $value: number = parseInt(inputValue, 10);
+
       if ($value > 20000) {
         message.error('Đơn hàng không vượt quá 20kg');
       }
@@ -39,6 +40,7 @@ const MyInputNumber: React.FC<MyInputNumberProps> = ({
   const formatNumberWithCommas = (value: string) => {
     const [integerPart, decimalPart] = value.split('.'); // Split on decimal point
     const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
     return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
   };
 
@@ -57,13 +59,12 @@ const MyInputNumber: React.FC<MyInputNumberProps> = ({
     const regex = allowDecimal ? /^[0-9]*\.?[0-9]*$/ : /^[0-9]*$/;
 
     if (regex.test(numericValueWithoutCommas) || newValue === '') {
-      const numericValue = allowDecimal
-        ? parseFloat(numericValueWithoutCommas)
-        : parseInt(numericValueWithoutCommas, 10);
+      const numericValue = allowDecimal ? parseFloat(numericValueWithoutCommas) : parseInt(numericValueWithoutCommas, 10);
 
       // Check if the number exceeds the max value
       if (!max || numericValue <= max || newValue === '') {
         const formattedValue = formatNumberWithCommas(numericValueWithoutCommas);
+
         setInputValue(formattedValue);
 
         // Call onChange with the raw number (without commas)

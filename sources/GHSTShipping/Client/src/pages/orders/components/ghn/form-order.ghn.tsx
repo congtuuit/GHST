@@ -1,17 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Input, Row, Select, Typography } from 'antd';
-import SenderAddressForm, { ISenderAddress } from './sender-address.form';
-import { PhoneOutlined } from '@ant-design/icons';
-import AddressComponent from '../address.component';
-import ProductForm from './product-form.ghn';
-import OrderInfoForm from './order-info-form.ghn';
-import NoteForm from './note-form.ghn';
-import { apiCreateDeliveryOrder, apiGetPickShifts } from '@/api/business.api';
+import type { ISenderAddress } from './sender-address.form';
+import type { ICreateDeliveryOrderRequest } from '@/interface/business';
+import type { LoginResult } from '@/interface/user/login';
+
 import './style.css';
-import { ICreateDeliveryOrderRequest } from '@/interface/business';
+
+import { PhoneOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Form, Input, Row, Select, Typography } from 'antd';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { LoginResult } from '@/interface/user/login';
+
+import { apiCreateDeliveryOrder, apiGetPickShifts } from '@/api/business.api';
+
+import AddressComponent from '../address.component';
 import { createOrderFakeData } from './create-fake-data';
+import NoteForm from './note-form.ghn';
+import OrderInfoForm from './order-info-form.ghn';
+import ProductForm from './product-form.ghn';
+import SenderAddressForm from './sender-address.form';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -27,9 +32,7 @@ const FormOrderGhn = () => {
   const session = useSelector(state => state?.user?.session as LoginResult);
   const [pickShifts, setPickShifts] = useState<IPickShift[]>([]);
   const [openSenderAddressForm, setOpenSenderAddressForm] = useState(false);
-  const [senderAddress, setSenderAddress] = useState<ISenderAddress>(
-    JSON.parse(localStorage.getItem('senderAddress') ?? '{}') as ISenderAddress,
-  );
+  const [senderAddress, setSenderAddress] = useState<ISenderAddress>(JSON.parse(localStorage.getItem('senderAddress') ?? '{}') as ISenderAddress);
   const [form] = Form.useForm();
 
   const handleChangeSenderAddress = (values: ISenderAddress) => {
@@ -40,6 +43,7 @@ const FormOrderGhn = () => {
 
   const fetchPickShifts = async () => {
     const result = await apiGetPickShifts();
+
     setPickShifts(result.data);
   };
 
@@ -50,8 +54,8 @@ const FormOrderGhn = () => {
       const payload = {
         ...values,
         pick_shift: [values.pick_shift],
-        
       };
+
       console.log('payload ', payload);
       await apiCreateDeliveryOrder(payload as ICreateDeliveryOrderRequest);
     });
@@ -70,6 +74,7 @@ const FormOrderGhn = () => {
 
   useEffect(() => {
     let mySenderAddress: ISenderAddress = senderAddress ?? {};
+
     if (session && session?.phoneNumber) {
       form.setFieldValue('from_phone', session?.phoneNumber);
       mySenderAddress = {
@@ -77,6 +82,7 @@ const FormOrderGhn = () => {
         phone: session?.phoneNumber,
       };
     }
+
     if (session && session?.fullName) {
       form.setFieldValue('from_name', session?.fullName);
       mySenderAddress = {
@@ -165,11 +171,7 @@ const FormOrderGhn = () => {
             </Col>
 
             <Col span={12}>
-              <Form.Item
-                label="Số điện thoại"
-                name="to_phone"
-                rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
-              >
+              <Form.Item label="Số điện thoại" name="to_phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
                 <Input placeholder="Nhập số điện thoại" />
               </Form.Item>
 
@@ -179,12 +181,7 @@ const FormOrderGhn = () => {
             </Col>
 
             <Col span={12}>
-              <AddressComponent
-                form={form}
-                addressField="to_address"
-                districtField="to_district_id"
-                wardField="to_ward_code"
-              />
+              <AddressComponent form={form} addressField="to_address" districtField="to_district_id" wardField="to_ward_code" />
             </Col>
           </Row>
         </Card>
@@ -206,11 +203,7 @@ const FormOrderGhn = () => {
         </Col>
       </Form>
 
-      <SenderAddressForm
-        open={openSenderAddressForm}
-        onCancel={() => setOpenSenderAddressForm(false)}
-        onSubmit={handleChangeSenderAddress}
-      />
+      <SenderAddressForm open={openSenderAddressForm} onCancel={() => setOpenSenderAddressForm(false)} onSubmit={handleChangeSenderAddress} />
     </div>
   );
 };

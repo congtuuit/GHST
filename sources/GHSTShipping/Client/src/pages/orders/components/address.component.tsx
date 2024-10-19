@@ -1,6 +1,9 @@
-import { apiGetDictricts, apiGetWards } from '@/api/business.api';
-import { Form, FormInstance, Input, Select } from 'antd';
+import type { FormInstance } from 'antd';
+
+import { Form, Input, Select } from 'antd';
 import { useEffect, useState } from 'react';
+
+import { apiGetDictricts, apiGetWards } from '@/api/business.api';
 
 interface IAddressComponentProps {
   form: FormInstance;
@@ -20,13 +23,16 @@ const AddressComponent = (props: IAddressComponentProps) => {
     if (districts.length > 0) {
       return;
     }
+
     const result = await apiGetDictricts();
+
     localStorage.setItem('dictricts', JSON.stringify(result.data));
     setDistricts(result.data);
   };
 
   const fetchWards = async (districtId: number) => {
     const result = await apiGetWards(districtId);
+
     localStorage.setItem('wards', JSON.stringify(result.data));
     setWards(result.data);
   };
@@ -34,6 +40,7 @@ const AddressComponent = (props: IAddressComponentProps) => {
   const handleChangeDistrict = (districtId: number) => {
     setDistrictId(districtId);
     const district = districts.find(i => i.districtID === districtId);
+
     if (district) {
       form.setFieldValue('districtName', district.districtName);
       form.setFieldValue('provinceName', district.provinceName);
@@ -42,6 +49,7 @@ const AddressComponent = (props: IAddressComponentProps) => {
 
   const handleChangeWard = (wardCode: number) => {
     const ward = wards.find(i => i.wardCode === wardCode);
+
     if (ward) {
       form.setFieldValue('wardName', ward.wardName);
     }

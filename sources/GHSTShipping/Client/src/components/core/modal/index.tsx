@@ -6,7 +6,7 @@ import { useForm } from 'antd/es/form/Form';
 
 import MyForm from '../form';
 
-interface FilteredModalProps extends Omit<ModalProps, 'onOk' | 'onCancel'> {}
+interface FilteredModalProps extends Omit<ModalProps, 'onOk' | 'onCancel' | 'onClose'> {}
 
 interface MyModalProps<FormValues> extends FilteredModalProps {
   form?: FormValues;

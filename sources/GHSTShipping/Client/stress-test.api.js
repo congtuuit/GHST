@@ -10,13 +10,13 @@ const agent = new https.Agent({
 async function sendRequest() {
   let data = JSON.stringify({
     from_name: 'Văn Tú',
-    from_phone: '0974255412',
+    from_phone: '0984255412',
     from_address: '60 Trường Sơn',
     from_ward_name: 'Phường 10',
     from_district_name: 'Quận Tân Bình',
     from_province_name: 'Hồ Chí Minh',
     pick_shift: [5],
-    to_phone: '0968890960',
+    to_phone: '0988890960',
     to_name: 'Tú Tú',
     wardName: 'Phường Phước Bình',
     districtName: 'Thành Phố Thủ Đức',
@@ -58,7 +58,7 @@ async function sendRequest() {
     const response = await axios.request(config);
     //console.log(JSON.stringify(response.data.success));
   } catch (error) {
-   // console.log(error.message);
+    // console.log(error.message);
   }
 }
 
@@ -66,8 +66,7 @@ async function spamAddresses() {
   let data = JSON.stringify({
     name: 'Home',
     address: '84 Đường Hùng Vương, Phường 9 (Quận 5), Quận 5, Hồ Chí Minh',
-    addressDetail:
-      '84 Đường Hùng Vương, Phường 9 (Quận 5), Quận 5, Hồ Chí Minh84 Đường Hùng Vương, Phường 9 (Quận 5), Q',
+    addressDetail: '84 Đường Hùng Vương, Phường 9 (Quận 5), Quận 5, Hồ Chí Minh84 Đường Hùng Vương, Phường 9 (Quận 5), Q',
     note: '84 Đường Hùng Vương, Phường 9 (Quận 5), Quận 5, Hồ Chí Minh84 Đường Hùng Vương, Phường 9 (Quận 5), Q',
     accountId: '4607e1fe-bb60-43be-9156-08dce901c289',
     customerAddressTypeId: 0,
@@ -94,8 +93,7 @@ async function spamAddresses() {
       'Sec-Fetch-Dest': 'empty',
       'Sec-Fetch-Mode': 'cors',
       'Sec-Fetch-Site': 'same-site',
-      'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0',
       'X-STORE-ID': '824280ce-43e9-4235-2570-08dce101b936',
       'X-TIMEZONE-OFFSET': '-420',
       'platform-id': '6C626154-5065-616C-7466-6F7200000004',
@@ -120,9 +118,11 @@ async function spamAddresses() {
 async function stressTest(concurrentRequests, iterations) {
   for (let i = 0; i < iterations; i++) {
     const requests = [];
+
     for (let j = 0; j < concurrentRequests; j++) {
       requests.push(sendRequest());
     }
+
     await Promise.all(requests);
     console.log(`Iteration ${i + 1} completed`);
   }

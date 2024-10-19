@@ -46,13 +46,11 @@ export const enUS_account = {
   'app.settings.binding.dingding-description': 'Currently unbound DingTalk account',
   'app.settings.binding.bind': 'Bind',
   'app.settings.notification.password': 'Account Password',
-  'app.settings.notification.password-description':
-    'Messages from other users will be notified in the form of a station letter',
+  'app.settings.notification.password-description': 'Messages from other users will be notified in the form of a station letter',
   'app.settings.notification.messages': 'System Messages',
   'app.settings.notification.messages-description': 'System messages will be notified in the form of a station letter',
   'app.settings.notification.todo': 'To-do Notification',
-  'app.settings.notification.todo-description':
-    'The to-do list will be notified in the form of a letter from the station',
+  'app.settings.notification.todo-description': 'The to-do list will be notified in the form of a letter from the station',
   'app.settings.open': 'Open',
   'app.settings.close': 'Close',
 };

@@ -1,10 +1,13 @@
-import { apiGetDeliveryConfigs, apiUpdateDeliveryConfigs } from '@/api/business.api';
-import { supplierKeys } from '@/constants/data';
+import type { supplierKeys } from '@/constants/data';
+
+import { SaveOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Form, Row } from 'antd';
 import { useEffect, useState } from 'react';
-import PartnerConfig from './PartnerConfig';
-import { SaveOutlined } from '@ant-design/icons';
+
+import { apiGetDeliveryConfigs, apiUpdateDeliveryConfigs } from '@/api/business.api';
 import { debounce } from '@/utils/common';
+
+import PartnerConfig from './PartnerConfig';
 
 export interface IDeliveryConfigDto {
   id: string;
@@ -22,6 +25,7 @@ const DeliveryConfigPage = () => {
 
   const fetchConfigs = async () => {
     const response = await apiGetDeliveryConfigs();
+
     if (response.success) {
       setConfigs(response.data);
     }
@@ -31,6 +35,7 @@ const DeliveryConfigPage = () => {
     const values = form.getFieldsValue();
     const { deliveryConfigs } = values;
     const response = await apiUpdateDeliveryConfigs(deliveryConfigs);
+
     if (response.success) {
       fetchConfigs();
       setFormChanged(false);

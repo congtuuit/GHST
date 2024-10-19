@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Button, Descriptions, Col, Row, Tag, Checkbox } from 'antd';
-import { IShopViewDetailDto } from '@/interface/shop';
+import type { IShopViewDetailDto } from '@/interface/shop';
+import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import { Button, Checkbox, Col, Descriptions, Modal, Row, Select, Tag } from 'antd';
 import moment from 'moment';
-import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import React, { useEffect, useState } from 'react';
+import { apiUpdateGhnShopId } from '@/api/business.api';
 
 interface CustomerDetailProps {
   data: IShopViewDetailDto | undefined;
@@ -23,6 +24,14 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
 
   const handleChangeAllowPublishOrder = (e: CheckboxChangeEvent) => {
     onChange && onChange(detail?.id as string);
+  };
+
+  const handleUpdateGhnShopId = async (ghnShopId: number) => {
+    const response = await apiUpdateGhnShopId(detail?.id as string, ghnShopId);
+
+    if (response.success) {
+      setDetail(response.data);
+    }
   };
 
   useEffect(() => {
@@ -47,7 +56,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
         title={<h3 style={{ fontWeight: 'bold', marginBottom: '0' }}>Thông Tin Cửa Hàng</h3>}
         open={open}
         onCancel={handleClose}
-        width={"80%"}
+        width={'80%'}
         footer={[
           <Button key="close" type="primary" onClick={handleClose}>
             Đóng
@@ -71,9 +80,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
               <Descriptions.Item label="Tên Cửa Hàng">{detail?.shopName}</Descriptions.Item>
               <Descriptions.Item label="Chủ Sở Hữu">{detail?.fullName}</Descriptions.Item>
               <Descriptions.Item label="Email">{detail?.email}</Descriptions.Item>
-              <Descriptions.Item label="Sức Chứa Hàng Tháng">
-                {detail?.avgMonthlyCapacity?.toLocaleString() ?? 'Không có'}
-              </Descriptions.Item>
+              <Descriptions.Item label="Sức Chứa Hàng Tháng">{detail?.avgMonthlyCapacity?.toLocaleString() ?? 'Không có'}</Descriptions.Item>
               <Descriptions.Item label="Số Điện Thoại">{detail?.phoneNumber}</Descriptions.Item>
               <Descriptions.Item label="Tên Ngân Hàng">{detail?.bankName}</Descriptions.Item>
               <Descriptions.Item label="Số Tài Khoản">{detail?.bankAccountNumber}</Descriptions.Item>
@@ -86,6 +93,20 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
               </Descriptions.Item>
               <Descriptions.Item label="Trạng Thái">
                 <Tag color={detail?.isVerified ? 'green' : 'warning'}>{detail?.status}</Tag>
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Liên kết với Shop GHN">
+                <Select
+                  onChange={handleUpdateGhnShopId}
+                  style={{ width: '100%' }}
+                  value={detail?.ghnShopId}
+                  options={detail?.ghnShopDetails?.map(i => {
+                    return {
+                      value: i.id,
+                      label: i.displayName,
+                    };
+                  })}
+                />
               </Descriptions.Item>
             </Descriptions>
           </Col>

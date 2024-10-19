@@ -1,8 +1,10 @@
+import type { IResetPasswordDto } from '@/interface/user/login';
+
+import { Button, Form, Input, message } from 'antd';
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Form, Input, Button, message } from 'antd';
+
 import { apiResetPassword } from '@/api/auth.api';
-import { IResetPasswordDto } from '@/interface/user/login';
 
 const ResetPasswordPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -11,16 +13,18 @@ const ResetPasswordPage: React.FC = () => {
   // Trích xuất token và email từ URL
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const token = searchParams.get('token') || "";
+  const token = searchParams.get('token') || '';
   const email = searchParams.get('email');
 
   const onFinish = async (values: IResetPasswordDto) => {
     if (values.password !== values.confirmPassword) {
       message.error('Mật khẩu không khớp!');
+
       return;
     }
 
     setLoading(true);
+
     try {
       const response = await apiResetPassword({
         ...values,
@@ -46,19 +50,11 @@ const ResetPasswordPage: React.FC = () => {
     <div style={{ maxWidth: 350, margin: 'auto', padding: '20px' }}>
       <h2 style={{ textAlign: 'center' }}>Đặt lại mật khẩu</h2>
       <Form<IResetPasswordDto> onFinish={onFinish} layout="vertical">
-        <Form.Item
-          name="password"
-          label="Mật khẩu mới"
-          rules={[{ required: true, message: 'Vui lòng nhập mật khẩu mới!' }]}
-        >
+        <Form.Item name="password" label="Mật khẩu mới" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu mới!' }]}>
           <Input.Password />
         </Form.Item>
 
-        <Form.Item
-          name="confirmPassword"
-          label="Xác nhận mật khẩu"
-          rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu mới!' }]}
-        >
+        <Form.Item name="confirmPassword" label="Xác nhận mật khẩu" rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu mới!' }]}>
           <Input.Password />
         </Form.Item>
 

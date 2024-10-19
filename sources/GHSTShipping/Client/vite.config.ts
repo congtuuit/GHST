@@ -7,6 +7,9 @@ import svgrPlugin from 'vite-plugin-svgr';
 // https://vitejs.dev/config/
 
 export default defineConfig({
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+  },
   resolve: {
     alias: {
       '@': path.join(__dirname, 'src'),
@@ -31,10 +34,11 @@ export default defineConfig({
     }),
     vitePluginImp({
       libList: [
-        // {
-        //   libName: 'antd',
-        //   style: name => `antd/es/${name}/style/index.css`,
-        // },
+        {
+          libName: 'antd',
+          //style: name => `antd/es/${name}/style/index.js`,
+          style: name => name !== 'theme' && `antd/es/${name}/style`,
+        },
         {
           libName: 'lodash',
           libDirectory: '',

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Card, Form, Input, Select, Tooltip } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Select, Tooltip } from 'antd';
+import React from 'react';
 
 const { Option } = Select;
 const { TextArea } = Input;

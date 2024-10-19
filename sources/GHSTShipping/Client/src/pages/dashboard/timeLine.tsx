@@ -51,11 +51,7 @@ const TimeLine: FC<{ loading: boolean }> = ({ loading }) => {
           <Line type="monotone" dataKey="traffic" stroke="#3F90F7" />
           <Line type="monotone" dataKey="payments" stroke="#61BE82" />
           <Brush dataKey="name" fill="#13c2c2" />
-          <Legend
-            verticalAlign="top"
-            height={40}
-            formatter={value => <LocaleFormatter id={('app.dashboard.timeline.' + value) as any} />}
-          />
+          <Legend verticalAlign="top" height={40} formatter={value => <LocaleFormatter id={('app.dashboard.timeline.' + value) as any} />} />
         </LineChart>
       </ResponsiveContainer>
     </Card>

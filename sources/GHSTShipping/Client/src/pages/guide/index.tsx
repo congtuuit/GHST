@@ -17,13 +17,7 @@ const GuidePage: FC = () => {
       <div className="innerText">
         <Typography className="guide-intro">
           {formatMessage({ id: 'app.guide.guideIntro' })}
-          <Button
-            type="link"
-            className="driverjs-link"
-            href="https://github.com/kamranahmedse/driver.js"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
+          <Button type="link" className="driverjs-link" href="https://github.com/kamranahmedse/driver.js" rel="noopener noreferrer" target="_blank">
             driver.js
           </Button>
           .

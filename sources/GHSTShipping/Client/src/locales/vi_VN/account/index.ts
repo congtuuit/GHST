@@ -29,8 +29,7 @@ export const viVN_account = {
   'app.settings.security.phone': 'Điện thoại bảo mật',
   'app.settings.security.phone-description': 'Điện thoại đã liên kết',
   'app.settings.security.question': 'Câu hỏi bảo mật',
-  'app.settings.security.question-description':
-    'Câu hỏi bảo mật chưa được thiết lập, và chính sách bảo mật có thể bảo vệ tài khoản hiệu quả',
+  'app.settings.security.question-description': 'Câu hỏi bảo mật chưa được thiết lập, và chính sách bảo mật có thể bảo vệ tài khoản hiệu quả',
   'app.settings.security.email': 'Email sao lưu',
   'app.settings.security.email-description': 'Email đã liên kết',
   'app.settings.security.mfa': 'Thiết bị MFA',
@@ -46,13 +45,11 @@ export const viVN_account = {
   'app.settings.binding.dingding-description': 'Hiện chưa liên kết tài khoản DingTalk',
   'app.settings.binding.bind': 'Liên kết',
   'app.settings.notification.password': 'Mật khẩu tài khoản',
-  'app.settings.notification.password-description':
-    'Thông báo từ người dùng khác sẽ được thông báo dưới dạng thư trong trạm',
+  'app.settings.notification.password-description': 'Thông báo từ người dùng khác sẽ được thông báo dưới dạng thư trong trạm',
   'app.settings.notification.messages': 'Tin nhắn hệ thống',
   'app.settings.notification.messages-description': 'Tin nhắn hệ thống sẽ được thông báo dưới dạng thư trong trạm',
   'app.settings.notification.todo': 'Thông báo công việc',
-  'app.settings.notification.todo-description':
-    'Danh sách công việc sẽ được thông báo dưới dạng thư từ trạm',
+  'app.settings.notification.todo-description': 'Danh sách công việc sẽ được thông báo dưới dạng thư từ trạm',
   'app.settings.open': 'Mở',
   'app.settings.close': 'Đóng',
 };

@@ -1,11 +1,16 @@
-import { useState, type FC, useEffect } from 'react';
-import { Card, Row, Select, Col, Button, message } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
-import PriceConfigurationForm from './PriceConfigurationForm';
-import { apiCreateShopPricePlan, apiGetShops } from '@/api/business.api';
-import { ShopPricePlanDto } from '@/interface/business';
-import PriceTable from './price-table';
+import type { ShopPricePlanDto } from '@/interface/business';
+import type { FC } from 'react';
+
 import './index.css';
+
+import { ReloadOutlined } from '@ant-design/icons';
+import { Button, Card, Col, message, Row, Select } from 'antd';
+import { useEffect, useState } from 'react';
+
+import { apiCreateShopPricePlan, apiGetShops } from '@/api/business.api';
+
+import PriceTable from './price-table';
+import PriceConfigurationForm from './PriceConfigurationForm';
 
 const { Option } = Select;
 
@@ -24,6 +29,7 @@ const CustomerPricePage: FC = () => {
 
   const fetchShops = async () => {
     const { success, data } = await apiGetShops();
+
     if (success) {
       // Assuming data contains an array of shops
       setShops(
@@ -48,13 +54,17 @@ const CustomerPricePage: FC = () => {
     if (!Boolean(selectedShop)) {
       message.info('Vui lòng chọn khách hàng muốn cấu hình!');
       callback && callback(false);
+
       return;
     }
+
     const { success } = await apiCreateShopPricePlan({ ...values, shopId: selectedShop });
+
     if (success) {
       message.success('Thành công!');
       setRefreshTable(!refreshTable);
     }
+
     callback && callback(success);
   };
 

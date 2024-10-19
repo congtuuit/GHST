@@ -1,10 +1,13 @@
 import type { IForgotPasswordDto } from '@/interface/user/login';
 import type { FC } from 'react';
+
+import './index.less';
+
 import { Button, Card, Col, Form, Input, message, Row } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { formatSearch } from '@/utils/formatSearch';
+
 import { apiForgotPassword } from '@/api/auth.api';
-import './index.less';
+import { formatSearch } from '@/utils/formatSearch';
 
 const ForgotPassword: FC = () => {
   const navigate = useNavigate();
@@ -12,10 +15,12 @@ const ForgotPassword: FC = () => {
 
   const onFinished = async (form: IForgotPasswordDto) => {
     const response = await apiForgotPassword(form);
-    if(response.success) {
-      message.success("Email đặt lại mật khẩu đã được gửi đến email của bạn!")
+
+    if (response.success) {
+      message.success('Email đặt lại mật khẩu đã được gửi đến email của bạn!');
       const search = formatSearch(location.search);
       const from = search.from || { pathname: '/login' };
+
       navigate(from);
     }
   };
@@ -56,12 +61,7 @@ const ForgotPassword: FC = () => {
               </Button>
             </Form.Item>
 
-            <Button
-              onClick={() => navigate('/login')}
-              htmlType="button"
-              className="login-page-form_button btn-forgot-password"
-              type="ghost"
-            >
+            <Button onClick={() => navigate('/login')} htmlType="button" className="login-page-form_button btn-forgot-password" type="default">
               Đăng nhập
             </Button>
           </Form>

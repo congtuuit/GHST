@@ -1,7 +1,9 @@
-import { PaginationResponse } from '@/interface/business';
 import type { IForgotPasswordDto, IResetPasswordDto, LoginParams, LoginResult, LogoutResult } from '../interface/user/login';
+import type { IRegisterFormValues } from '@/pages/register';
+
+import { PaginationResponse } from '@/interface/business';
+
 import { request } from './base/request';
-import { IRegisterFormValues } from '@/pages/register';
 
 /** 登录接口 */
 export const apiLogin = (data: LoginParams) => request<LoginResult>('post', '/account/authenticate', data);

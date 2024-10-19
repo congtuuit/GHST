@@ -1,8 +1,10 @@
+import type { RuleObject } from 'antd/lib/form';
+import type { StoreValue } from 'antd/lib/form/interface';
+
+import { Button, Card, Col, Form, Input, message, Row, Typography } from 'antd';
 import React from 'react';
-import { Form, Input, Button, Row, Col, message, Typography, Card } from 'antd';
-import { RuleObject } from 'antd/lib/form';
-import { StoreValue } from 'antd/lib/form/interface';
 import { useNavigate } from 'react-router-dom';
+
 import { apiRegisterShop } from '@/api/auth.api';
 
 export interface IRegisterFormValues {
@@ -25,6 +27,7 @@ const RegisterPage: React.FC = () => {
   // Xử lý khi gửi form
   const onFinish = async (values: IRegisterFormValues) => {
     const response = await apiRegisterShop(values);
+
     if (response.success) {
       message.success('Đăng ký thành công');
       navigate('/login');
@@ -39,11 +42,7 @@ const RegisterPage: React.FC = () => {
         <Row gutter={[16, 16]}>
           {/* Phần bên trái */}
           <Col span={12}>
-            <Form.Item
-              label="Họ và Tên"
-              name="fullName"
-              rules={[{ required: true, message: 'Vui lòng nhập họ và tên của bạn' }]}
-            >
+            <Form.Item label="Họ và Tên" name="fullName" rules={[{ required: true, message: 'Vui lòng nhập họ và tên của bạn' }]}>
               <Input placeholder="Nhập họ và tên" />
             </Form.Item>
 
@@ -58,20 +57,11 @@ const RegisterPage: React.FC = () => {
               <Input placeholder="Nhập email" />
             </Form.Item>
 
-            <Form.Item
-              label="Số điện thoại"
-              name="phoneNumber"
-              rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
-            >
+            <Form.Item label="Số điện thoại" name="phoneNumber" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}>
               <Input placeholder="Nhập số điện thoại" />
             </Form.Item>
 
-            <Form.Item
-              label="Mật khẩu"
-              name="password"
-              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
-              hasFeedback
-            >
+            <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]} hasFeedback>
               <Input.Password placeholder="Nhập mật khẩu" />
             </Form.Item>
 
@@ -87,6 +77,7 @@ const RegisterPage: React.FC = () => {
                     if (!value || getFieldValue('password') === value) {
                       return Promise.resolve();
                     }
+
                     return Promise.reject(new Error('Mật khẩu không khớp!'));
                   },
                 }),
@@ -98,11 +89,7 @@ const RegisterPage: React.FC = () => {
 
           {/* Phần bên phải */}
           <Col span={12}>
-            <Form.Item
-              label="Tên cửa hàng"
-              name="shopName"
-              rules={[{ required: true, message: 'Vui lòng nhập tên cửa hàng' }]}
-            >
+            <Form.Item label="Tên cửa hàng" name="shopName" rules={[{ required: true, message: 'Vui lòng nhập tên cửa hàng' }]}>
               <Input placeholder="Nhập tên cửa hàng" />
             </Form.Item>
 
@@ -117,11 +104,7 @@ const RegisterPage: React.FC = () => {
               <Input placeholder="Nhập doanh thu trung bình" type="number" />
             </Form.Item>
 
-            <Form.Item
-              label="Tên ngân hàng"
-              name="bankName"
-              rules={[{ required: true, message: 'Vui lòng nhập tên ngân hàng' }]}
-            >
+            <Form.Item label="Tên ngân hàng" name="bankName" rules={[{ required: true, message: 'Vui lòng nhập tên ngân hàng' }]}>
               <Input placeholder="Nhập tên ngân hàng" />
             </Form.Item>
 
@@ -133,19 +116,11 @@ const RegisterPage: React.FC = () => {
               <Input placeholder="Nhập số tài khoản ngân hàng" />
             </Form.Item>
 
-            <Form.Item
-              label="Chủ tài khoản"
-              name="bankAccountHolder"
-              rules={[{ required: true, message: 'Vui lòng nhập tên chủ tài khoản' }]}
-            >
+            <Form.Item label="Chủ tài khoản" name="bankAccountHolder" rules={[{ required: true, message: 'Vui lòng nhập tên chủ tài khoản' }]}>
               <Input placeholder="Nhập tên chủ tài khoản" />
             </Form.Item>
 
-            <Form.Item
-              label="Địa chỉ ngân hàng"
-              name="bankAddress"
-              rules={[{ required: true, message: 'Vui lòng nhập địa chỉ ngân hàng' }]}
-            >
+            <Form.Item label="Địa chỉ ngân hàng" name="bankAddress" rules={[{ required: true, message: 'Vui lòng nhập địa chỉ ngân hàng' }]}>
               <Input placeholder="Nhập địa chỉ ngân hàng" />
             </Form.Item>
           </Col>

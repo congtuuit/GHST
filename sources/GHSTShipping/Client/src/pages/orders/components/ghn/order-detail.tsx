@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Button } from 'antd';
-import { IOrderDetail } from '@/interface/order/order.interface';
+import type { IOrderDetail } from '@/interface/order/order.interface';
+
+import { Button, Modal } from 'antd';
 import { debug } from 'console';
+import React, { useEffect, useState } from 'react';
 
 interface OrderDialogProps {
   data: IOrderDetail | undefined;

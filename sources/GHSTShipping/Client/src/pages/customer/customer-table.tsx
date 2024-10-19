@@ -1,14 +1,17 @@
-import { useEffect, useState, type FC } from 'react';
-import { Button, Row, Table, TablePaginationConfig, Tag } from 'antd';
-import { CheckCircleOutlined } from '@ant-design/icons';
-import { PaginationResponse } from '@/interface/business';
-import { FilterValue } from 'antd/es/table/interface';
-import CustomerDetail from './customer-detail';
-import { IShopViewDetailDto } from '@/interface/shop';
-import { SearchOutlined } from '@ant-design/icons';
+import type { PaginationResponse } from '@/interface/business';
+import type { IShopViewDetailDto } from '@/interface/shop';
+import type { TablePaginationConfig } from 'antd';
+import type { FilterValue } from 'antd/es/table/interface';
+
+import { CheckCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Row, Table, Tag } from 'antd';
+import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
+
 import { apiActiveShops, apiChangeAllowPublishOrder, apiGetShopDetail, apiGetShops } from '@/api/business.api';
 import { dateFormatMap, revertDateFormatMap } from '@/components/core/table-column/type';
-import dayjs from 'dayjs';
+
+import CustomerDetail from './customer-detail';
 
 interface ShopDatatableDto {
   key: string;
@@ -23,15 +26,16 @@ interface ShopDatatableDto {
   isVerified: boolean;
 }
 
-const CustomerTable: FC = () => {
+const CustomerTable = () => {
   const [paginationResponse, setPaginationResponse] = useState<PaginationResponse>();
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
-  const [reloadTable, setReloadTable] = useState<Boolean>(false);
+  const [reloadTable, setReloadTable] = useState<boolean>(false);
   const [customerDetail, setCustomerDetail] = useState<IShopViewDetailDto>();
 
   const fetchShops = async (pageNumber: number | undefined = 1, pageSize: number | undefined = 10) => {
     const { success, data } = await apiGetShops(pageNumber, pageSize);
+
     if (success) {
       setPaginationResponse(data);
     }
@@ -64,8 +68,9 @@ const CustomerTable: FC = () => {
       key: 'registerDate',
       width: 150,
       render: (value: string, record: ShopDatatableDto) => {
-        const dateFormatted = dayjs(value).format(revertDateFormatMap["day"]);
-       return <span>{dateFormatted}</span>;
+        const dateFormatted = dayjs(value).format(revertDateFormatMap['day']);
+
+        return <span>{dateFormatted}</span>;
       },
     },
     {
@@ -98,9 +103,7 @@ const CustomerTable: FC = () => {
       key: 'status',
       width: 120,
       align: 'center' as const,
-      render: (value: any, record: ShopDatatableDto) => (
-        <Tag color={record['isVerified'] === true ? 'green' : 'orange'}>{value}</Tag>
-      ),
+      render: (value: any, record: ShopDatatableDto) => <Tag color={record['isVerified'] === true ? 'green' : 'orange'}>{value}</Tag>,
     },
     {
       title: 'Thao tác',
@@ -109,9 +112,11 @@ const CustomerTable: FC = () => {
       align: 'center' as const,
       render: (_: any, record: ShopDatatableDto) => {
         const { isVerified } = record;
+
         if (isVerified) {
           return null;
         }
+
         return (
           <div key={record.code}>
             <Button
@@ -136,6 +141,7 @@ const CustomerTable: FC = () => {
 
   const handleChangeTable = (config: TablePaginationConfig, filters: Record<string, FilterValue | null>) => {
     const { current, pageSize } = config;
+
     setTablePaginationConfig(config);
     setTableFilters(filters);
     fetchShops(current, pageSize);
@@ -143,6 +149,7 @@ const CustomerTable: FC = () => {
 
   const handleViewDetail = async (id: string) => {
     const response = await apiGetShopDetail(id);
+
     if (response.success) {
       setCustomerDetail(response.data);
     }
@@ -150,6 +157,7 @@ const CustomerTable: FC = () => {
 
   const handleChangeAllowPublishOrder = async (id: string) => {
     const response = await apiChangeAllowPublishOrder(id);
+
     if (response.success) {
       setCustomerDetail(response.data);
     }
@@ -159,14 +167,18 @@ const CustomerTable: FC = () => {
     let _pageNumber: number | undefined = -1,
       _pageSize: number | undefined = -1,
       _supplierFilter: FilterValue | null = null;
+
     if (tablePaginationConfig) {
       const { current, pageSize } = tablePaginationConfig;
+
       _pageNumber = current;
       _pageSize = pageSize;
     }
+
     if (tableFilters) {
       _supplierFilter = tableFilters?.supplier;
     }
+
     if (Boolean(_pageSize) && (_pageSize as number) > 0 && Boolean(_pageNumber) && (_pageNumber as number) > 0) {
       fetchShops(_pageNumber, _pageSize);
     } else {
