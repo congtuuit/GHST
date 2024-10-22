@@ -55,14 +55,14 @@ const ForgotPassword: FC = () => {
               <Input placeholder={'Số điện thoại'} />
             </Form.Item>
 
-            <Form.Item className="btn-submit mb-0">
+            <Form.Item className="btn-submit">
               <Button htmlType="submit" type="primary" className="login-page-form_button">
                 Cấp lại mật khẩu
               </Button>
             </Form.Item>
 
-            <Button onClick={() => navigate('/login')} htmlType="button" className="login-page-form_button btn-forgot-password" type="default">
-              Đăng nhập
+            <Button onClick={() => navigate('/login')} htmlType="button" className="login-page-form_button btn-forgot-password" type="link">
+              Quay lại trang đăng nhập
             </Button>
           </Form>
         </Card>

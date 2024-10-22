@@ -23,11 +23,22 @@ using Serilog;
 using Delivery.GHN;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using Microsoft.Extensions.Hosting;
+using System;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load appsettings.{Environment}.json based on the current environment
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
 bool useInMemoryDatabase = builder.Configuration.GetValue<bool>("UseInMemoryDatabase");
+
+string env = builder.Configuration.GetValue<string>("Env");
+Console.WriteLine(">>>>>>>>>>>>>>" + env + "<<<<<<<<<<<<<<<<");
 
 builder.Services.AddApplicationLayer();
 builder.Services.AddPersistenceInfrastructure(builder.Configuration, useInMemoryDatabase);
@@ -67,6 +78,19 @@ using (var scope = app.Services.CreateScope())
     await DeliveryPartnerConfig.SeedAsync(services.GetRequiredService<ApplicationDbContext>());
 }
 #endif
+
+// Configure the HTTP request pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    // In production, use exception handler and HSTS
+    app.UseExceptionHandler("/error");
+    app.UseHsts();
+}
 
 app.UseCustomLocalization();
 app.UseAnyCors();

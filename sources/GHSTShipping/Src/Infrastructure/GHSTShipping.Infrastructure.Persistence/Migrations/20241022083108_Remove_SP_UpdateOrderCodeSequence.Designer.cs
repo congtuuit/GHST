@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GHSTShipping.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241009140409_AddCreateOrderCodeSequenceProcedure")]
-    partial class AddCreateOrderCodeSequenceProcedure
+    [Migration("20241022083108_Remove_SP_UpdateOrderCodeSequence")]
+    partial class Remove_SP_UpdateOrderCodeSequence
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,52 +24,6 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("GHSTShipping.Domain.DTOs.SP_OrderCodeResult", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("OrderCodeSequence")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("OrderCodeResults");
-                });
-
-            modelBuilder.Entity("GHSTShipping.Domain.Entities.CodeSequence", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("LastOrderCode")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ShopId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ShopUniqueCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CodeSequence");
-                });
 
             modelBuilder.Entity("GHSTShipping.Domain.Entities.Order", b =>
                 {
@@ -366,6 +320,9 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("GhnShopId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -422,6 +379,9 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                     b.Property<string>("SequenceName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("ShopId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 

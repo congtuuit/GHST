@@ -135,7 +135,7 @@ const RegisterPage: React.FC = () => {
 
         <Row align="middle" justify="center">
           <Typography.Text style={{ margin: 'auto' }}>
-            Bạn đã có tài khoản? <Typography.Link onClick={() => navigate('/login')}>Đăng nhập</Typography.Link>{' '}
+            Bạn đã có tài khoản? <Typography.Link onClick={() => navigate('/login')}>Đăng nhập</Typography.Link>
           </Typography.Text>
         </Row>
       </Form>
