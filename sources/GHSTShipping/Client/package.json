@@ -30,7 +30,8 @@
     "build-dev": "vite build --mode development",
     "build": "tsc && vite build",
     "build-fe": "yarn build && yarn move",
-    "build-be": "cd ../Src/Presentation/GHSTShipping.WebApi && dotnet publish -c Release -o D:/deploy_ghst"
+    "build-be": "cd ../Src/Presentation/GHSTShipping.WebApi && dotnet publish -c Release -r win-x86 --self-contained false -o D:/deploy_ghst",
+    "release": "yarn build-fe && yarn build-be"
   },
   "browserslist": {
     "production": [

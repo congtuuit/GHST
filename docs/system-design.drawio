@@ -1,0 +1,100 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" version="24.8.1">
+  <diagram name="Trang-1" id="xkWlDCQVr2AHFHhtikE3">
+    <mxGraphModel dx="1195" dy="1812" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="g2mFOKtr89nq_R0PJXNz-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="g2mFOKtr89nq_R0PJXNz-1" target="g2mFOKtr89nq_R0PJXNz-2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="g2mFOKtr89nq_R0PJXNz-1" value="Cấu hình kết nối&lt;br&gt;Các đơn vị vận chuyển" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="80" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="g2mFOKtr89nq_R0PJXNz-2" value="Kết nối APIs" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="400" y="80" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="g2mFOKtr89nq_R0PJXNz-4" target="O3a8JP-qRkAgKApTiANw-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="g2mFOKtr89nq_R0PJXNz-4" value="Cấu hình bảng giá&lt;br&gt;đối tác" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="250" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="g2mFOKtr89nq_R0PJXNz-5" target="O3a8JP-qRkAgKApTiANw-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="g2mFOKtr89nq_R0PJXNz-5" value="Quản lý các cửa hàng&lt;br&gt;đối tác" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="190" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="g2mFOKtr89nq_R0PJXNz-6" value="Phân quyền" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;strokeColor=#33001A;glass=0;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="520" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-1" value="Báo cáo" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;strokeColor=#33001A;glass=0;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="580" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="O3a8JP-qRkAgKApTiANw-2" target="O3a8JP-qRkAgKApTiANw-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-2" value="Quản lý đơn hàng" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="320" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="O3a8JP-qRkAgKApTiANw-3" target="O3a8JP-qRkAgKApTiANw-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-3" value="Tạo đơn hàng" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="380" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="O3a8JP-qRkAgKApTiANw-5" target="g2mFOKtr89nq_R0PJXNz-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="90.33333333333337" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-5" value="API&lt;br&gt;Các đơn vị vận chuyển" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" vertex="1" parent="1">
+          <mxGeometry x="540" y="-60" width="80" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="g2mFOKtr89nq_R0PJXNz-2" target="O3a8JP-qRkAgKApTiANw-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-11" value="Tính năng" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+          <mxGeometry x="640" y="160" width="90" height="30" as="geometry">
+            <mxRectangle x="640" y="110" width="330" height="180" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-12" value="Danh sách tài khoản - cửa hàng&amp;nbsp;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="O3a8JP-qRkAgKApTiANw-11">
+          <mxGeometry y="30" width="330" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-13" value="Kích hoạt tài khoản" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="O3a8JP-qRkAgKApTiANw-11">
+          <mxGeometry y="60" width="330" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-14" value="Kết nối tài khoản với cầu hình vận chuyển (đang kích hoạt)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="O3a8JP-qRkAgKApTiANw-11">
+          <mxGeometry y="90" width="330" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-15" value="Xem thông tin chi tiết" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="O3a8JP-qRkAgKApTiANw-11">
+          <mxGeometry y="120" width="330" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-16" value="Cấu hình bảng giá" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="O3a8JP-qRkAgKApTiANw-11">
+          <mxGeometry y="150" width="330" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-26" value="Tính năng" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" collapsed="1" parent="1">
+          <mxGeometry x="800" y="280" width="90" height="30" as="geometry">
+            <mxRectangle x="800" y="280" width="280" height="180" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-27" value="Tạo đơn nháp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="O3a8JP-qRkAgKApTiANw-26">
+          <mxGeometry y="30" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-28" value="Đẩy đơn qua đơn vị vận chuyển" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="O3a8JP-qRkAgKApTiANw-26">
+          <mxGeometry y="60" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-29" value="Chuyển đổi và hiển thị giá" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="O3a8JP-qRkAgKApTiANw-26">
+          <mxGeometry y="90" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-30" value="Danh sách đơn và lọc theo trạng thái đơn" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="O3a8JP-qRkAgKApTiANw-26">
+          <mxGeometry y="120" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="O3a8JP-qRkAgKApTiANw-31" value="Các thao tác trên đơn hàng" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="O3a8JP-qRkAgKApTiANw-26">
+          <mxGeometry y="150" width="280" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

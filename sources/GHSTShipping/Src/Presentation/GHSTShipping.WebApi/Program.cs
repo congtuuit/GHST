@@ -36,7 +36,7 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 bool useInMemoryDatabase = builder.Configuration.GetValue<bool>("UseInMemoryDatabase");
-
+bool enableSwagger = builder.Configuration.GetValue<bool>("EnableSwagger");
 string env = builder.Configuration.GetValue<string>("Env");
 Console.WriteLine(">>>>>>>>>>>>>>" + env + "<<<<<<<<<<<<<<<<");
 
@@ -75,17 +75,19 @@ using (var scope = app.Services.CreateScope())
     //Seed Data
     //await DefaultRoles.SeedAsync(services.GetRequiredService<RoleManager<ApplicationRole>>());
     await DefaultBasicUser.SeedAsync(services.GetRequiredService<UserManager<ApplicationUser>>());
-    await DeliveryPartnerConfig.SeedAsync(services.GetRequiredService<ApplicationDbContext>());
+    //await DeliveryPartnerConfig.SeedAsync(services.GetRequiredService<ApplicationDbContext>());
 }
 #endif
 
+
 // Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || enableSwagger)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-else
+
+if (!app.Environment.IsDevelopment())
 {
     // In production, use exception handler and HSTS
     app.UseExceptionHandler("/error");
