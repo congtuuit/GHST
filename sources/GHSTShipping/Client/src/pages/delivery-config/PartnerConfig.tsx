@@ -19,15 +19,15 @@ const PartnerConfig = (props: PartnerConfigProps) => {
         <Input placeholder="Vui lòng nhập giá trị" />
       </Form.Item>
 
-      <Form.Item label="Họ tên" name="fullName" rules={[{ required: true, message: 'Vui lòng nhập' }]}>
+      <Form.Item initialValue={data?.fullName} label="Họ tên" name="fullName" rules={[{ required: true, message: 'Vui lòng nhập' }]}>
         <Input placeholder="Nhập họ tên" />
       </Form.Item>
 
-      <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Vui lòng nhập' }]}>
+      <Form.Item initialValue={data?.email} label="Email" name="email" rules={[{ required: true, message: 'Vui lòng nhập' }]}>
         <Input placeholder="Nhập email" />
       </Form.Item>
 
-      <Form.Item label="Số điện thoại" name="phoneNumber" rules={[{ required: true, message: 'Vui lòng nhập' }]}>
+      <Form.Item initialValue={data?.phoneNumber} label="Số điện thoại" name="phoneNumber" rules={[{ required: true, message: 'Vui lòng nhập' }]}>
         <Input placeholder="Nhập số điện thoại" />
       </Form.Item>
 

@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.Application.Services
@@ -145,6 +146,10 @@ namespace GHSTShipping.Application.Services
                     PartnerConfigId = i.PartnerConfigId,
                     PartnerShopId = i.PartnerShopId,
                     ClientPhone = i.ClientPhone,
+                    Address = i.Address,
+                    WardName = i.WardName,
+                    DistrictName = i.DistrictName,
+                    ProviceName = i.ProviceName,
                 })
                 .ToListAsync();
 
@@ -169,17 +174,18 @@ namespace GHSTShipping.Application.Services
                         PartnerShopId = request.PartnerShopId,
                         PartnerConfigId = request.DeliveryConfigId,
                         ClientPhone = request.ClientPhone,
+
+                        Address = request.Address,
+                        WardName = request.WardName,
+                        DistrictName = request.DistrictName,
+                        ProviceName = request.ProviceName,
                     };
 
                     await shopPartnerConfigRepository.AddAsync(shopPartnerConfig);
                 }
                 else
                 {
-                    if (request.IsConnect)
-                    {
-                        existedConfig.PartnerShopId = request.PartnerShopId;
-                    }
-                    else
+                    if (request.IsConnect == false)
                     {
                         var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}' AND PartnerConfigId = '{request.DeliveryConfigId}'";
                         await shopPartnerConfigRepository.ExecuteSqlRawAsync(sqlQuery);

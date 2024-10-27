@@ -16,6 +16,9 @@ export interface IDeliveryConfigDto {
   userName: string;
   isActivated: boolean;
   deliveryPartnerName: typeof supplierKeys;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
 }
 
 const DeliveryConfigPage = () => {

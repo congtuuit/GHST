@@ -13,5 +13,13 @@ namespace GHSTShipping.Application.DTOs.PartnerConfig
         public bool IsConnect { get; set; }
 
         public string? ClientPhone { get; set; }
+
+        public string? Address { get; set; }
+
+        public string? WardName { get; set; }
+
+        public string? DistrictName { get; set; }
+
+        public string? ProviceName { get; set; }
     }
 }

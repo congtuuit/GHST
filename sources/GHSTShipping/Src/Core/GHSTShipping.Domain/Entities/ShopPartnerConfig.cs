@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GHSTShipping.Domain.Entities
 {
+    /// <summary>
+    /// Connection between store and delivery partner
+    /// </summary>
     [Table(nameof(ShopPartnerConfig))]
     public class ShopPartnerConfig : AuditableBaseEntity
     {
@@ -18,5 +21,13 @@ namespace GHSTShipping.Domain.Entities
         public string? PartnerShopId { get; set; }
 
         public string? ClientPhone { get; set; }
+
+        public string? Address { get; set; }
+
+        public string? WardName { get; set; }
+
+        public string? DistrictName { get; set; }
+
+        public string? ProviceName { get; set; }
     }
 }
