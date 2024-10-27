@@ -6,7 +6,7 @@ namespace Delivery.GHN.Models
     {
 
         [JsonProperty("WardCode")]
-        public int WardCode { get; set; }
+        public string WardCode { get; set; }
 
         [JsonProperty("DistrictID")]
         public int DistrictId { get; set; }

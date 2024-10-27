@@ -14,7 +14,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.Application.Services
@@ -149,7 +148,7 @@ namespace GHSTShipping.Application.Services
                     Address = i.Address,
                     WardName = i.WardName,
                     DistrictName = i.DistrictName,
-                    ProviceName = i.ProviceName,
+                    ProvinceName = i.ProvinceName,
                 })
                 .ToListAsync();
 
@@ -163,24 +162,86 @@ namespace GHSTShipping.Application.Services
                 .Where(i => i.ShopId == request.ShopId && request.DeliveryConfigId == i.PartnerConfigId)
                 .FirstOrDefaultAsync();
 
+            string address = request.Address;
+            string wardName = request.WardName;
+            string wardId = string.Empty;
+            string districtName = request.DistrictName;
+            string districtId = string.Empty;
+            string provinceName = request.ProviceName;
+            string provinceId = string.Empty;
+
+            if (request.PartnerShopId != null)
+            {
+                var partnerConfig = await partnerConfigRepository.Where(i => i.Id == request.DeliveryConfigId).Select(i => new
+                {
+                    i.DeliveryPartner,
+                    i.ApiKey,
+                    i.ProdEnv,
+                })
+                .FirstOrDefaultAsync();
+
+                if (partnerConfig != null && partnerConfig.DeliveryPartner == EnumDeliveryPartner.GHN)
+                {
+                    var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey);
+                    var shopsResult = await ghnApiClient.GetAllShopsAsync(apiConfig, new GetAllShopsRequest
+                    {
+                        offset = 1,
+                        limit = 200,
+                        client_phone = request.ClientPhone,
+                    });
+
+                    if (shopsResult.Code == 200)
+                    {
+                        var shops = shopsResult.Data.shops;
+                        var targetShop = shops.FirstOrDefault(i => i._id.ToString() == request.PartnerShopId);
+                        if (targetShop != null)
+                        {
+                            address = targetShop.address;
+
+                            var districts = await ghnApiClient.GetDistrictAsync(apiConfig);
+                            var targetDisctrict = districts.FirstOrDefault(i => i.DistrictID == targetShop.district_id);
+                            if (targetDisctrict != null)
+                            {
+                                provinceName = targetDisctrict.ProvinceName;
+                                provinceId = targetDisctrict.ProvinceID.ToString();
+                                districtName = targetDisctrict.DistrictName;
+                                districtId = targetDisctrict.DistrictID.ToString();
+                            }
+
+                            var wards = await ghnApiClient.GetWardAsync(apiConfig, targetDisctrict.DistrictID);
+                            var targetWard = wards.FirstOrDefault(i => i.WardCode == targetShop.ward_code);
+                            if (targetWard != null)
+                            {
+                                wardId = targetWard.WardCode;
+                                wardName = targetWard.WardName;
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            var shopPartnerConfig = new ShopPartnerConfig()
+            {
+                ShopId = request.ShopId,
+                PartnerShopId = request.PartnerShopId,
+                PartnerConfigId = request.DeliveryConfigId,
+                ClientPhone = request.ClientPhone,
+
+                Address = address,
+                WardName = wardName,
+                WardCode = wardId,
+                DistrictName = districtName,
+                DistrictId = districtId,
+                ProvinceName = provinceName,
+                ProvinceId = provinceId,
+            };
+
             using var transaction = await unitOfWork.BeginTransactionAsync();
             try
             {
                 if (existedConfig == null)
                 {
-                    var shopPartnerConfig = new ShopPartnerConfig()
-                    {
-                        ShopId = request.ShopId,
-                        PartnerShopId = request.PartnerShopId,
-                        PartnerConfigId = request.DeliveryConfigId,
-                        ClientPhone = request.ClientPhone,
-
-                        Address = request.Address,
-                        WardName = request.WardName,
-                        DistrictName = request.DistrictName,
-                        ProviceName = request.ProviceName,
-                    };
-
                     await shopPartnerConfigRepository.AddAsync(shopPartnerConfig);
                 }
                 else

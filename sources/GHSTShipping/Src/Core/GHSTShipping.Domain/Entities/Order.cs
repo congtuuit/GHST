@@ -1,6 +1,7 @@
 ﻿using GHSTShipping.Domain.Common;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GHSTShipping.Domain.Entities
@@ -12,8 +13,11 @@ namespace GHSTShipping.Domain.Entities
         public Guid? ShopId { get; set; }
         public virtual Shop Shop { get; set; }
 
+        [MaxLength(200)]
         public string UniqueCode { get; set; }
         public bool IsPublished { get; set; }
+
+        [MaxLength(100)]
         public string? DeliveryPartner {  get; set; }
 
         /// <summary>
@@ -25,27 +29,67 @@ namespace GHSTShipping.Domain.Entities
         #endregion
 
         #region GHN
+        [MaxLength(500)]
         public string? Note { get; set; }
+
+        [MaxLength(100)]
         public string? ReturnPhone { get; set; }
+
+        [MaxLength(500)]
         public string? ReturnAddress { get; set; }
+
+        [MaxLength(100)]
         public string? ReturnDistrictId { get; set; }
+
+        [MaxLength(100)]
         public string? ReturnWardCode { get; set; }
+
+        [MaxLength(200)]
         public string? ClientOrderCode { get; set; }
 
         public int PaymentTypeId { get; set; }
 
+        [MaxLength(500)]
         public string RequiredNote { get; set; } = null!;
+
+        [MaxLength(100)]
         public string FromName { get; set; } = null!;
+
+        [MaxLength(100)]
         public string FromPhone { get; set; } = null!;
+
+        [MaxLength(500)]
         public string FromAddress { get; set; } = null!;
+
+        [MaxLength(100)]
         public string FromWardName { get; set; } = null!;
+
+        [MaxLength(100)]
         public string FromDistrictName { get; set; } = null!;
+
+        [MaxLength(100)]
         public string FromProvinceName { get; set; } = null!;
+
+        [MaxLength(100)]
         public string ToName { get; set; } = null!;
+
+        [MaxLength(100)]
         public string ToPhone { get; set; } = null!;
+
+        [MaxLength(500)]
         public string ToAddress { get; set; } = null!;
+
+        [MaxLength(100)]
         public string ToWardCode { get; set; } = null!;
+
+        [MaxLength(100)]
+        public string ToWardName { get; set; }
+
+        [MaxLength(100)]
         public string ToDistrictId { get; set; } = null!;
+
+        [MaxLength(100)]
+        public string ToDistrictName { get; set; }
 
         public int Weight { get; set; }
         public int Length { get; set; }
@@ -54,6 +98,8 @@ namespace GHSTShipping.Domain.Entities
         public List<OrderItem> Items { get; set; } = new List<OrderItem>();
 
         public int CodAmount { get; set; }
+
+        [MaxLength(500)]
         public string? Content { get; set; }
 
         public int? PickStationId { get; set; }
@@ -63,17 +109,26 @@ namespace GHSTShipping.Domain.Entities
         public int ServiceId { get; set; } = 0;
         public int ServiceTypeId { get; set; } = 2;
 
+        [MaxLength(100)]
         public string? Coupon { get; set; }
         public List<int> PickShift { get; set; } = new List<int>();
         #endregion
 
         #region GHN response
 
+        [MaxLength(100)]
         public string private_order_code { get; set; }
+
+        [MaxLength(100)]
         public string private_sort_code { get; set; }
+
+        [MaxLength(100)]
         public string private_trans_type { get; set; }
+
         public int private_total_fee { get; set; }
         public DateTime private_expected_delivery_time { get; set; }
+
+        [MaxLength(100)]
         public string private_operation_partner { get; set; }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using GHSTShipping.Domain.Common;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GHSTShipping.Domain.Entities
@@ -7,7 +8,10 @@ namespace GHSTShipping.Domain.Entities
     [Table(nameof(OrderItem))]
     public class OrderItem : AuditableBaseEntity
     {
+        [MaxLength(200)]
         public string Name { get; set; } = null!;
+
+        [MaxLength(100)]
         public string Code { get; set; } = null!;
         public int Quantity { get; set; }
         public int Price { get; set; }

@@ -299,8 +299,8 @@ const AdminOrderList = () => {
     }
 
     const params: IOrderPagedParameter = {
-      pageNumber: tablePaginationConfig?.current as number,
-      pageSize: tablePaginationConfig?.pageSize as number,
+      pageNumber: tablePaginationConfig?.current as number ?? 1,
+      pageSize: tablePaginationConfig?.pageSize as number ?? 10,
       deliveryPartner: selectedSupplier,
       orderCode: '',
       status: orderStatusFilter,
@@ -308,10 +308,6 @@ const AdminOrderList = () => {
 
     fetchOrders(params);
   }, [selectedSupplier, tablePaginationConfig, orderStatusFilter]);
-
-  useEffect(() => {
-    fetchOrders(null);
-  }, []);
 
   return (
     <Card>

@@ -18,6 +18,6 @@ namespace GHSTShipping.Application.DTOs.PartnerConfig
 
         public string? DistrictName { get; set; }
 
-        public string? ProviceName { get; set; }
+        public string? ProvinceName { get; set; }
     }
 }

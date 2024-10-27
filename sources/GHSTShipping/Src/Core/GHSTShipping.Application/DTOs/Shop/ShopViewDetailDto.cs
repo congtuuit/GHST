@@ -2,6 +2,7 @@
 using GHSTShipping.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace GHSTShipping.Application.DTOs.Shop
 {

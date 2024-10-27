@@ -46,6 +46,11 @@ export interface IShopConfig {
   partnerConfigId: string;
   partnerShopId?: string;
   clientPhone?: string;
+
+  address?: string;
+  wardName?: string;
+  districtName?: string;
+  proviceName?: string;
 }
 
 export interface IDeliveryParter {
