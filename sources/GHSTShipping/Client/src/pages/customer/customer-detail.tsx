@@ -1,9 +1,9 @@
 import type { IShopViewDetailDto } from '@/interface/shop';
-import type { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { Button, Checkbox, Col, Descriptions, Modal, Row, Select, Tag } from 'antd';
-import moment from 'moment';
+import { Button, Modal, Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { apiUpdateGhnShopId } from '@/api/business.api';
+import ShopInfo from './ShopInfo';
+import { InfoCircleOutlined, SettingOutlined } from '@ant-design/icons';
+import ShopConfig from './ShopConfig';
 
 interface CustomerDetailProps {
   data: IShopViewDetailDto | undefined;
@@ -13,8 +13,11 @@ interface CustomerDetailProps {
 const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
   const [detail, setDetail] = useState<IShopViewDetailDto | undefined>(data);
   const [open, setOpen] = useState(false);
+  const [totalConnected, setTotalConnected] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<string>('SHOP_INFO');
 
   const showModal = () => {
+    setActiveTab('SHOP_INFO');
     setOpen(true);
   };
 
@@ -22,16 +25,8 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
     setOpen(false);
   };
 
-  const handleChangeAllowPublishOrder = (e: CheckboxChangeEvent) => {
-    onChange && onChange(detail?.id as string);
-  };
-
-  const handleUpdateGhnShopId = async (ghnShopId: number) => {
-    const response = await apiUpdateGhnShopId(detail?.id as string, ghnShopId);
-
-    if (response.success) {
-      setDetail(response.data);
-    }
+  const handleTabChange = (tabKey: string) => {
+    setActiveTab(tabKey);
   };
 
   useEffect(() => {
@@ -47,72 +42,55 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
   useEffect(() => {
     if (Boolean(detail)) {
       showModal();
+      setTotalConnected(detail?.shopConfigs?.length ?? 0);
     }
   }, [detail]);
 
   return (
-    <>
-      <Modal
-        title={<h3 style={{ fontWeight: 'bold', marginBottom: '0' }}>Thông Tin Cửa Hàng</h3>}
-        open={open}
-        onCancel={handleClose}
-        width={'80%'}
-        footer={[
-          <Button key="close" type="primary" onClick={handleClose}>
-            Đóng
-          </Button>,
+    <Modal
+      maskClosable={false}
+      title={<h3 style={{ fontWeight: 'bold', marginBottom: '0' }}>Cửa Hàng</h3>}
+      open={open}
+      onCancel={handleClose}
+      width={'80%'}
+      footer={[
+        <Button key="close" type="primary" onClick={handleClose}>
+          Đóng
+        </Button>,
+      ]}
+    >
+      <Tabs
+        defaultActiveKey="SHOP_INFO"
+        activeKey={activeTab}
+        type="card"
+        size={'middle'}
+        style={{ marginBottom: 32 }}
+        items={[
+          {
+            key: 'SHOP_INFO',
+            label: (
+              <span>
+                <InfoCircleOutlined /> Thông tin cửa hàng
+              </span>
+            ),
+            children: <ShopInfo data={detail} onChange={() => onChange && onChange(detail?.id as string)} />,
+          },
+          {
+            disabled: !detail?.isVerified,
+            key: 'SHOP_CONFIG',
+            label: (
+              <span>
+                <SettingOutlined /> Kết nối đơn vị vận chuyển {totalConnected > 0 ? `(${totalConnected})` : ''}
+              </span>
+            ),
+            children: (
+              <ShopConfig shopId={detail?.id} partners={detail?.partners} ghnShopDetails={detail?.ghnShopDetails} shopConfigs={detail?.shopConfigs} />
+            ),
+          },
         ]}
-      >
-        <Row gutter={[16, 16]}>
-          <Col span={24}>
-            <Descriptions
-              bordered
-              size="middle"
-              column={2} // Force single column layout
-              layout="horizontal" // Horizontal layout ensures label left, value right
-              labelStyle={{ width: '30%', fontWeight: 'bold' }} // Customize label styling
-              contentStyle={{ textAlign: 'right' }} // Align values to the right
-            >
-              <Descriptions.Item label="Mã Cửa Hàng">{detail?.shopUniqueCode}</Descriptions.Item>
-              <Descriptions.Item label="Ngày Đăng Ký">
-                {detail?.registerDate ? moment(detail?.registerDate).format('DD/MM/YYYY') : 'Không có'}
-              </Descriptions.Item>
-              <Descriptions.Item label="Tên Cửa Hàng">{detail?.shopName}</Descriptions.Item>
-              <Descriptions.Item label="Chủ Sở Hữu">{detail?.fullName}</Descriptions.Item>
-              <Descriptions.Item label="Email">{detail?.email}</Descriptions.Item>
-              <Descriptions.Item label="Sức Chứa Hàng Tháng">{detail?.avgMonthlyCapacity?.toLocaleString() ?? 'Không có'}</Descriptions.Item>
-              <Descriptions.Item label="Số Điện Thoại">{detail?.phoneNumber}</Descriptions.Item>
-              <Descriptions.Item label="Tên Ngân Hàng">{detail?.bankName}</Descriptions.Item>
-              <Descriptions.Item label="Số Tài Khoản">{detail?.bankAccountNumber}</Descriptions.Item>
-              <Descriptions.Item label="Chủ Tài Khoản Ngân Hàng">{detail?.bankAccountHolder}</Descriptions.Item>
-              <Descriptions.Item label="Địa Chỉ Ngân Hàng">{detail?.bankAddress}</Descriptions.Item>
-              <Descriptions.Item label="Cho Phép Đăng Đơn Hàng (Cho phép shop tạo và đẩy đơn sang đơn vị vận chuyển)">
-                <Checkbox onChange={handleChangeAllowPublishOrder} checked={detail?.allowPublishOrder ?? false}>
-                  Cho phép
-                </Checkbox>
-              </Descriptions.Item>
-              <Descriptions.Item label="Trạng Thái">
-                <Tag color={detail?.isVerified ? 'green' : 'warning'}>{detail?.status}</Tag>
-              </Descriptions.Item>
-
-              <Descriptions.Item label="Liên kết với Shop GHN">
-                <Select
-                  onChange={handleUpdateGhnShopId}
-                  style={{ width: '100%' }}
-                  value={detail?.ghnShopId}
-                  options={detail?.ghnShopDetails?.map(i => {
-                    return {
-                      value: i.id,
-                      label: i.displayName,
-                    };
-                  })}
-                />
-              </Descriptions.Item>
-            </Descriptions>
-          </Col>
-        </Row>
-      </Modal>
-    </>
+        onChange={handleTabChange}
+      />
+    </Modal>
   );
 };
 

@@ -36,7 +36,7 @@ namespace Delivery.GHN
         /// <param name="shopId">The ID of the shop for which to calculate the fee.</param>
         /// <param name="request">The request object containing parameters for fee calculation.</param>
         /// <returns>A task representing the asynchronous operation, with a response containing the calculated fee.</returns>
-        Task<GhnApiResponse<CalcFeeResponse>> GetFeeAsync(ApiConfig config, int shopId, CalcFeeRequest request);
+        Task<GhnApiResponse<CalcFeeResponse>> GetFeeAsync(ApiConfig config, string shopId, CalcFeeRequest request);
 
         /// <summary>
         /// Asynchronously retrieves the SOC (Shipping Order Code) for a delivery order based on the provided API configuration and order code.
@@ -45,7 +45,7 @@ namespace Delivery.GHN
         /// <param name="shopId">The ID of the shop associated with the order.</param>
         /// <param name="orderCode">The order code for which to retrieve the SOC.</param>
         /// <returns>A task representing the asynchronous operation, with a response containing the SOC details.</returns>
-        Task<GhnApiResponse<FeeOrderSocResponse>> GetSocAsync(ApiConfig config, int shopId, string orderCode);
+        Task<GhnApiResponse<FeeOrderSocResponse>> GetSocAsync(ApiConfig config, string shopId, string orderCode);
 
         // Create order methods
 
@@ -56,7 +56,7 @@ namespace Delivery.GHN
         /// <param name="shopId">The ID of the shop creating the delivery order.</param>
         /// <param name="request">The request object containing parameters for creating the delivery order.</param>
         /// <returns>A task representing the asynchronous operation, with a response indicating the result of the order creation.</returns>
-        Task<GhnApiResponse<CreateDeliveryOrderResponse>> CreateDeliveryOrderAsync(ApiConfig config, int shopId, CreateDeliveryOrderRequest request);
+        Task<GhnApiResponse<CreateDeliveryOrderResponse>> CreateDeliveryOrderAsync(ApiConfig config, string shopId, CreateDeliveryOrderRequest request);
 
         /// <summary>
         /// Asynchronously creates a draft delivery order using the provided API configuration and request data.
@@ -65,7 +65,7 @@ namespace Delivery.GHN
         /// <param name="shopId">The ID of the shop creating the draft delivery order.</param>
         /// <param name="request">The request object containing parameters for creating the draft delivery order.</param>
         /// <returns>A task representing the asynchronous operation, with a response indicating the result of the draft order creation.</returns>
-        Task<GhnApiResponse<CreateDeliveryOrderResponse>> CreateDraftDeliveryOrderAsync(ApiConfig config, int shopId, CreateDeliveryOrderRequest request);
+        Task<GhnApiResponse<CreateDeliveryOrderResponse>> CreateDraftDeliveryOrderAsync(ApiConfig config, string shopId, CreateDeliveryOrderRequest request);
 
         // Order detail
 

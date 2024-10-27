@@ -1,15 +1,16 @@
 import type { supplierKeys } from '@/constants/data';
 
-import { SaveOutlined } from '@ant-design/icons';
-import { Button, Card, Col, Form, Row } from 'antd';
+import { Button, Card, Col, Form, Modal, Row } from 'antd';
 import { useEffect, useState } from 'react';
-
 import { apiGetDeliveryConfigs, apiUpdateDeliveryConfigs } from '@/api/business.api';
 import { debounce } from '@/utils/common';
-
 import PartnerConfig from './PartnerConfig';
+import CreatePartnerConfigForm from './CreatePartnerConfigForm';
+import TableDeliveryConfig from './TableDeliveryConfig';
+import { PlusOutlined } from '@ant-design/icons';
 
 export interface IDeliveryConfigDto {
+  no: number;
   id: string;
   apiKey: string;
   userName: string;
@@ -18,64 +19,31 @@ export interface IDeliveryConfigDto {
 }
 
 const DeliveryConfigPage = () => {
-  const [configs, setConfigs] = useState<IDeliveryConfigDto[]>([]);
-  const [form] = Form.useForm();
-  const [formChanged, setFormChanged] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [reloadTable, setReloadTable] = useState<boolean>(false);
+  const [openCreateForm, setOpenCreateForm] = useState<boolean>(false);
 
-  const fetchConfigs = async () => {
-    const response = await apiGetDeliveryConfigs();
-
-    if (response.success) {
-      setConfigs(response.data);
-    }
+  const handleOpenCreateForm = () => {
+    setOpenCreateForm(true);
   };
 
-  const saveConfigs = async () => {
-    const values = form.getFieldsValue();
-    const { deliveryConfigs } = values;
-    const response = await apiUpdateDeliveryConfigs(deliveryConfigs);
-
-    if (response.success) {
-      fetchConfigs();
-      setFormChanged(false);
-    }
+  const handleFinishCreateForm = () => {
+    setOpenCreateForm(false);
+    setReloadTable(!reloadTable);
   };
 
-  const onFinish = async (values: any) => {
-    setIsLoading(true);
-    await saveConfigs();
-  };
-
-  const handleFormChange = async (e: any) => {
-    await saveConfigs();
-  };
-
-  useEffect(() => {
-    fetchConfigs();
-  }, []);
-
-  useEffect(() => {
-    setIsLoading(false);
-  }, [configs]);
+  useEffect(() => {}, []);
 
   return (
-    <Form form={form} onFinish={onFinish} onFieldsChange={debounce(handleFormChange, 1000)}>
-      <Row>
-        <Col span={24}>
-          {/* <Button type="primary" htmlType="submit" disabled={!formChanged} loading={isLoading}>
-            <SaveOutlined /> Lưu
-          </Button> */}
-          {configs?.map((data, index) => {
-            return (
-              <Card title={data.deliveryPartnerName} key={index}>
-                <PartnerConfig data={data} index={index} />
-              </Card>
-            );
-          })}
-        </Col>
-      </Row>
-    </Form>
+    <div>
+      <Button type="primary" style={{ marginBottom: '20px' }} onClick={handleOpenCreateForm}>
+        <PlusOutlined /> Thêm cấu hình
+      </Button>
+      <Modal open={openCreateForm} closeIcon={false} title="Thêm cấu hình" footer={null}>
+        <CreatePartnerConfigForm onFinish={handleFinishCreateForm} />
+      </Modal>
+
+      <TableDeliveryConfig reload={reloadTable} />
+    </div>
   );
 };
 

@@ -40,6 +40,7 @@ namespace GHSTShipping.Domain.Entities
 
         public bool AllowPublishOrder { get; set; }
 
+        [Obsolete]
         public int? GhnShopId { get; set; }
 
         public virtual ICollection<ShopPricePlan> ShopPricePlanes { get; set; } = new List<ShopPricePlan>();
@@ -70,5 +71,7 @@ namespace GHSTShipping.Domain.Entities
             this.RegisterDate = registerDate;
             this.GenUniqueCode();
         }
+
+        public virtual ICollection<ShopPartnerConfig> ShopPartnerConfigs { get; set; } = new HashSet<ShopPartnerConfig>();
     }
 }

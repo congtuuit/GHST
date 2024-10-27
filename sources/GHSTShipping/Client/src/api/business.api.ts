@@ -8,7 +8,7 @@ import type {
   ShopPricePlanDto,
 } from '@/interface/business';
 import type { IOrderDetail, IOrderDto } from '@/interface/order/order.interface';
-import type { IShopViewDetailDto } from '@/interface/shop';
+import type { IOrderMetadata, IShopViewDetailDto, IUpdateShopDeliveryConfigRequest } from '@/interface/shop';
 import type { IDeliveryConfigDto } from '@/pages/delivery-config';
 
 import { buildQueryString } from '@/utils/queryEncode';
@@ -76,3 +76,7 @@ export const apiUpdateGhnShopId = (shopId: string, ghnShopId: number) =>
 
 export const apiGetDeliveryConfigs = () => request<IDeliveryConfigDto[]>('get', `/configs/delivery`);
 export const apiUpdateDeliveryConfigs = (payload: IDeliveryConfigDto[]) => request('put', `/configs/delivery`, payload);
+export const apiCreateDeliveryConfig = (payload: any) => request('post', `/configs/delivery`, payload);
+
+export const apiUpdateShopDeliveryConfig = (payload: IUpdateShopDeliveryConfigRequest) => request('put', `/configs/shop`, payload);
+export const apiGetOrderMetaData = () => request<IOrderMetadata>('get', `/orders/metadata`);

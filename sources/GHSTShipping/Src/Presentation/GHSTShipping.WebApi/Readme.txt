@@ -60,3 +60,28 @@ Project setup
         }
     ]
 }
+
+
+
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=202.92.7.204;Initial Catalog=paatktblhosting_db_ghst;User ID=paatktblhosting_user;Password=Tsw2@k621;MultipleActiveResultSets=True;TrustServerCertificate=True",
+    "IdentityConnection": "Data Source=202.92.7.204;Initial Catalog=paatktblhosting_db_ghst;User ID=paatktblhosting_user;Password=Tsw2@k621;MultipleActiveResultSets=True;TrustServerCertificate=True",
+    "FileManagerConnection": "Data Source=202.92.7.204;Initial Catalog=paatktblhosting_db_ghst;User ID=paatktblhosting_user;Password=Tsw2@k621;MultipleActiveResultSets=True;TrustServerCertificate=True"
+  },
+  "JwtSettings": {
+    "Key": "C1CF4B7DC4C4175B6618DE4F55CA4AAA",
+    "Issuer": "GHST_Identity",
+    "Audience": "GHST_IdentityUser",
+    "DurationInMinutes": 1600
+  },
+  "SmtpSettings": {
+    "ClientHost": "http://localhost:5555",
+    "Server": "smtp.gmail.com",
+    "Port": 587,
+    "User": "mjsshunnjer@gmail.com",
+    "Password": "aszo nvjz ykvl ylst"
+  },
+  "Env": "DEV",
+  "EnableSwagger":  true
+}

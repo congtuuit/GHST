@@ -25,5 +25,7 @@ namespace GHSTShipping.Application.DTOs.User
                 return this.IsVerified ? EnumShopStatus.Activated.GetName() : EnumShopStatus.WaitingForActive.GetName();
             }
         }
+
+        public int TotalDeliveryConnected { get; set; }
     }
 }

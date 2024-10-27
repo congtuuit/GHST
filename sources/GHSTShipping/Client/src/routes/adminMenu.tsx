@@ -16,7 +16,7 @@ const adminMenu: MenuList = [
     label: {
       zh_CN: '',
       en_US: 'Customer',
-      vi_VN: 'Khách hàng', // Vietnamese translation
+      vi_VN: 'Quản lý khách hàng', // Vietnamese translation
     },
     icon: 'customer',
     path: '/customer',
@@ -26,7 +26,7 @@ const adminMenu: MenuList = [
         label: {
           zh_CN: '基本',
           en_US: 'List',
-          vi_VN: 'Danh sách KH', // Vietnamese translation
+          vi_VN: 'Khách hàng', // Vietnamese translation
         },
         path: '/customer/list',
       },
@@ -63,16 +63,16 @@ const adminMenu: MenuList = [
       },
     ],
   },
-  {
-    code: 'operation-report',
-    label: {
-      zh_CN: '',
-      en_US: 'Operation report',
-      vi_VN: 'Báo cáo vận hành', // Vietnamese translation
-    },
-    icon: 'report',
-    path: '/operation-report',
-  },
+  // {
+  //   code: 'operation-report',
+  //   label: {
+  //     zh_CN: '',
+  //     en_US: 'Operation report',
+  //     vi_VN: 'Báo cáo vận hành', // Vietnamese translation
+  //   },
+  //   icon: 'report',
+  //   path: '/operation-report',
+  // },
   {
     code: 'settings',
     label: {
@@ -93,16 +93,16 @@ const adminMenu: MenuList = [
   //   icon: 'documentation',
   //   path: '/documentation',
   // },
-  {
-    code: 'guide',
-    label: {
-      zh_CN: '引导',
-      en_US: 'Guide',
-      vi_VN: 'Hướng dẫn', // Vietnamese translation
-    },
-    icon: 'guide',
-    path: '/guide',
-  },
+  // {
+  //   code: 'guide',
+  //   label: {
+  //     zh_CN: '引导',
+  //     en_US: 'Guide',
+  //     vi_VN: 'Hướng dẫn', // Vietnamese translation
+  //   },
+  //   icon: 'guide',
+  //   path: '/guide',
+  // },
   // {
   //   code: 'permission',
   //   label: {

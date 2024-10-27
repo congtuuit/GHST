@@ -1,11 +1,10 @@
 import type { RuleObject } from 'antd/lib/form';
 import type { StoreValue } from 'antd/lib/form/interface';
-
 import { Button, Card, Col, Form, Input, message, Row, Typography } from 'antd';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { apiRegisterShop } from '@/api/auth.api';
+import VietNameBankSelector from './VietNameBankSelector';
 
 export interface IRegisterFormValues {
   fullName: string;
@@ -32,13 +31,19 @@ const RegisterPage: React.FC = () => {
       message.success('Đăng ký thành công');
       navigate('/login');
     } else {
+      if (response.errors?.length > 0) {
+        const error = response.errors[0];
+        message.error(error.description);
+
+        return;
+      }
       message.error('Xảy ra lỗi, vui lòng kiểm tra lại');
     }
   };
 
   return (
     <Card>
-      <Form<IRegisterFormValues> layout="vertical" onFinish={onFinish} style={{ maxWidth: '500px', margin: 'auto' }}>
+      <Form<IRegisterFormValues> layout="vertical" onFinish={onFinish} style={{ maxWidth: '800px', margin: 'auto' }}>
         <Row gutter={[16, 16]}>
           {/* Phần bên trái */}
           <Col span={12}>
@@ -105,7 +110,7 @@ const RegisterPage: React.FC = () => {
             </Form.Item>
 
             <Form.Item label="Tên ngân hàng" name="bankName" rules={[{ required: true, message: 'Vui lòng nhập tên ngân hàng' }]}>
-              <Input placeholder="Nhập tên ngân hàng" />
+              <VietNameBankSelector />
             </Form.Item>
 
             <Form.Item
@@ -128,7 +133,7 @@ const RegisterPage: React.FC = () => {
 
         {/* Nút Đăng ký */}
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
+          <Button type="primary" htmlType="submit" block style={{minHeight: "25px"}}>
             Đăng ký
           </Button>
         </Form.Item>

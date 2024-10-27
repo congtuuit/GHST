@@ -1,42 +1,48 @@
-import { Button, Card, Checkbox, Col, Form, Input, Radio, RadioChangeEvent, Row, Select, Table } from 'antd';
-import { type FC, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-import { supplierKeys, suppliers } from '@/constants/data';
-import { LocaleFormatter, useLocale } from '@/locales';
-import { formatSearch } from '@/utils/formatSearch';
-
+import { Card, Col } from 'antd';
+import { useEffect, useState } from 'react';
+import { supplierKeys } from '@/constants/data';
 import FormOrderGhn from './components/ghn/form-order.ghn';
-import { IOrderStatus, orderStatuses } from './orderStatus';
-
-const { Option } = Select;
+import { apiGetOrderMetaData } from '@/api/business.api';
+import { IOrderMetadata } from '@/interface/shop';
 
 const CreateOrderPage = () => {
-  const [selectedSupplier, setSelectedSupplier] = useState<string>(supplierKeys.GHN);
+  const [_, setCreateOrderMetadata] = useState<IOrderMetadata>();
+  const [selectedSupplier, setSelectedSupplier] = useState<string>('');
 
   const handleChange = (value: string) => {
     setSelectedSupplier(value);
   };
 
+  const fetchCreateOrderMetadata = async () => {
+    const response = await apiGetOrderMetaData();
+    if (response.success) {
+      setCreateOrderMetadata(response.data);
+
+      const config = response.data.deliveryConfigs[0];
+      const partner = config.deliveryPartnerName;
+      setSelectedSupplier(partner);
+
+      if (partner === supplierKeys.GHN) {
+        const shop = config.shops[0];
+        const values = {
+          name: shop.name,
+          phone: shop.phone,
+          address: shop.address,
+          wardCode: shop.wardCode,
+          districtId: shop.districtId,
+        }
+        
+        localStorage.setItem('senderAddress', JSON.stringify(values));
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchCreateOrderMetadata();
+  }, []);
+
   return (
     <Card>
-      <span>Đơn vị vận chuyển</span>
-      <Col span={12}>
-        <Select
-          value={selectedSupplier}
-          onChange={handleChange}
-          style={{ width: '100%', maxWidth: '300px' }} // Adjust width as needed
-          placeholder="Chọn đơn vị vận chuyển"
-        >
-          {suppliers.map(i => (
-            <Option key={i} value={i}>
-              {i}
-            </Option>
-          ))}
-        </Select>
-      </Col>
-      <hr style={{ marginTop: '20px', borderTop: '1px dashed rgb(217 217 217)' }} />
       <Col span={24}>{selectedSupplier === supplierKeys.GHN && <FormOrderGhn />}</Col>
     </Card>
   );

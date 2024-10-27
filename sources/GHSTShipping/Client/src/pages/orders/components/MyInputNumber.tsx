@@ -38,10 +38,13 @@ const MyInputNumber: React.FC<MyInputNumberProps> = ({
 
   // Function to format number with commas
   const formatNumberWithCommas = (value: string) => {
-    const [integerPart, decimalPart] = value.split('.'); // Split on decimal point
-    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-    return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+    if (Boolean(value)) {
+      const [integerPart, decimalPart] = value.toString().split('.'); // Split on decimal point
+      const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+    } else {
+      return value;
+    }
   };
 
   // Function to remove commas from the formatted number

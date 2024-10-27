@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace GHSTShipping.Application.Interfaces.Repositories
 {
@@ -11,6 +12,7 @@ namespace GHSTShipping.Application.Interfaces.Repositories
         Task<T> GetByIdAsync(long id);
         Task<IReadOnlyList<T>> GetAllAsync();
         Task<T> AddAsync(T entity);
+        Task AddRangeAsync(IEnumerable<T> entities);
         void Update(T entity);
         void Delete(T entity);
 
@@ -22,5 +24,6 @@ namespace GHSTShipping.Application.Interfaces.Repositories
         IQueryable<T> Where(Expression<Func<T, bool>> predicate);
         IQueryable<T> FromSqlRaw(string sql, params object[] parameters);
         IQueryable<T> FromSql(FormattableString sql);
+        Task<int> ExecuteSqlRawAsync(string sql);
     }
 }

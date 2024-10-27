@@ -23,6 +23,11 @@ namespace GHSTShipping.Infrastructure.Persistence.Repositories
             return entity;
         }
 
+        public async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            await dbContext.Set<T>().AddRangeAsync(entities);
+        }
+
         public void Update(T entity)
         {
             dbContext.Entry(entity).State = EntityState.Modified;
@@ -58,6 +63,7 @@ namespace GHSTShipping.Infrastructure.Persistence.Repositories
         }
 
         public IQueryable<T> FromSql(FormattableString sql) => dbContext.Set<T>().FromSql(sql);
+        public async Task<int> ExecuteSqlRawAsync(string sql) => await dbContext.Database.ExecuteSqlRawAsync(sql);
 
         public void Modify(T entities)
         {

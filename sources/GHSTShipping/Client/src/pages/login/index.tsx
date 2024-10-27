@@ -11,11 +11,18 @@ import { formatSearch } from '@/utils/formatSearch';
 
 import { loginAsync } from '../../stores/user.action';
 
+// const initialValues: LoginParams = {
+//   username: 'congtuuit@gmail.com',
+//   password: '123123',
+//   // remember: true
+// };
+
 const initialValues: LoginParams = {
-  username: 'congtuuit@gmail.com',
-  password: '123123',
+  username: '',
+  password: '',
   // remember: true
 };
+
 
 const LoginForm: FC = () => {
   const navigate = useNavigate();
@@ -60,7 +67,7 @@ const LoginForm: FC = () => {
                 },
               ]}
             >
-              <Input type="password" placeholder={'Nhập mật khẩu'} />
+              <Input.Password type="password" placeholder={'Nhập mật khẩu'} />
             </Form.Item>
             <Button onClick={() => navigate('/forgot-password')} className="btn-forgot-password" type="link">
               Quên mật khẩu?

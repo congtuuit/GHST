@@ -24,6 +24,7 @@ interface ShopDatatableDto {
   avgMonthlyCapacity: number;
   status: string;
   isVerified: boolean;
+  totalDeliveryConnected: number;
 }
 
 const CustomerTable = () => {
@@ -57,7 +58,7 @@ const CustomerTable = () => {
       render: (value: string, record: ShopDatatableDto) => {
         return (
           <Button type="link" onClick={() => handleViewDetail(record.id)}>
-            {value} <SearchOutlined />
+            {value}
           </Button>
         );
       },
@@ -98,6 +99,23 @@ const CustomerTable = () => {
       align: 'right' as const,
     },
     {
+      title: 'Kết nối đơn vị vận chuyển',
+      dataIndex: 'totalDeliveryConnected',
+      key: 'totalDeliveryConnected',
+      align: 'right' as const,
+      render: (value: any, record: ShopDatatableDto) => {
+        if (record.isVerified) {
+          return (
+            <Button onClick={() => handleViewDetail(record.id)} type="link">
+              {value}
+            </Button>
+          );
+        } else {
+          return "";
+        }
+      },
+    },
+    {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
@@ -108,11 +126,10 @@ const CustomerTable = () => {
     {
       title: 'Thao tác',
       key: 'action',
-      width: 100,
+      width: 150,
       align: 'center' as const,
       render: (_: any, record: ShopDatatableDto) => {
         const { isVerified } = record;
-
         if (isVerified) {
           return null;
         }

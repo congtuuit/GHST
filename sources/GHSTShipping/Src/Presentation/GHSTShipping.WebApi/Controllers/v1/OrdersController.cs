@@ -22,6 +22,13 @@ namespace GHSTShipping.WebApi.Controllers.v1
         }
 
         [HttpGet]
+        [Route("metadata")]
+        public async Task<BaseResult<GetOrderMetadataResponse>> MetaData([FromQuery] GetOrderMetadataRequest request)
+        {
+            return await Mediator.Send(request);
+        }
+
+        [HttpGet]
         [Route("ghn/detail/{orderId}")]
         public async Task<BaseResult<OrderDetailDto>> GetOrderDetail([FromRoute] Guid orderId)
         {
@@ -41,6 +48,7 @@ namespace GHSTShipping.WebApi.Controllers.v1
         {
             return await Mediator.Send(request);
         }
+
 
 
     }

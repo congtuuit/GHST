@@ -148,8 +148,8 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 return new Error(ErrorCode.Duplicated, "Phone number already existed");
             }
 
-            string password = GeneratePassword(6);
-            await userManager.CreateAsync(user, password);
+            //string password = GeneratePassword(6);
+            await userManager.CreateAsync(user, request.ConfirmPassword);
 
             return new UserDto
             {
@@ -201,10 +201,10 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 return BaseResult.Failure(new Error(ErrorCode.NotFound, "Invalid email"));
             }
 
-            var tokenDecoded = HttpUtility.UrlDecode(token);
+            //var tokenDecoded = HttpUtility.UrlDecode(token);
 
             // Perform password reset
-            var resetPassResult = await userManager.ResetPasswordAsync(user, tokenDecoded, newPassword);
+            var resetPassResult = await userManager.ResetPasswordAsync(user, token, newPassword);
             if (!resetPassResult.Succeeded)
             {
                 var errors = resetPassResult.Errors.Select(e => e.Description);

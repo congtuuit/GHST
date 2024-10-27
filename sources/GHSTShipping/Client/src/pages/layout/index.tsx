@@ -8,7 +8,6 @@ import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useLocation } from 'react-router';
 
-import { getMenuList } from '@/api/layout.api';
 import adminMenu from '@/routes/adminMenu';
 import defaultMenu from '@/routes/defaultMenu';
 import { setUserItem } from '@/stores/user.store';
@@ -109,13 +108,13 @@ const LayoutPage: FC = () => {
   return (
     <Layout className="layout-page">
       <HeaderComponent collapsed={collapsed} toggle={toggle} />
-      <Layout>
+      <Layout className='content-container'>
         {!isMobile ? (
           <Sider
             className="layout-page-sider"
             trigger={null}
             collapsible
-            style={{ backgroundColor: token.token.colorBgContainer }}
+            //style={{ backgroundColor: token.token.colorBgContainer }}
             collapsedWidth={isMobile ? 0 : 80}
             collapsed={collapsed}
             breakpoint="md"

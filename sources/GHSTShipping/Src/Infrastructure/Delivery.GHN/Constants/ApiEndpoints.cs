@@ -2,6 +2,10 @@
 {
     public static class ApiEndpoints
     {
+        public const string PROD_DOMAIN = "https://online-gateway.ghn.vn";
+
+        public const string SANDBOX_DOMAIN = "https://5sao.ghn.dev";
+
         public const string GET_ALL_SHOPS = "/shiip/public-api/v2/shop/all";
 
         public const string REGISTER_SHOP = "/shiip/public-api/v2/shop/register";

@@ -23,6 +23,7 @@ namespace GHSTShipping.Application.Features.Users.Queries
         IUnitOfWork unitOfWork,
         IAuthenticatedUserService authenticatedUser,
         IShopRepository shopRepository,
+        IShopPartnerConfigRepository shopPartnerConfigRepository,
         IAccountServices accountServices
         ) : IRequestHandler<GetShopPagedListRequest, BaseResult<PaginationResponseDto<ShopDto>>>
     {
@@ -52,6 +53,17 @@ namespace GHSTShipping.Application.Features.Users.Queries
                 .Where(i => accountIds.Contains(i.Id))
                 .ToListAsync(cancellationToken);
 
+            var shopIds = pagingResult.Data.Select(i => i.Id);
+
+            var deliveryConfigs = await shopPartnerConfigRepository
+                .Where(i => shopIds.Contains(i.ShopId))
+                .Select(i => new
+                {
+                    i.ShopId,
+                    i.PartnerConfigId,
+                })
+                .ToListAsync();
+
             int index = 0;
             foreach (var item in pagingResult.Data)
             {
@@ -63,6 +75,8 @@ namespace GHSTShipping.Application.Features.Users.Queries
                     item.PhoneNumber = account.PhoneNumber;
                     item.Email = account.Email;
                 }
+
+                item.TotalDeliveryConnected = deliveryConfigs.Count(i => i.ShopId == item.Id);
             }
 
             return BaseResult<PaginationResponseDto<ShopDto>>.Ok(pagingResult);

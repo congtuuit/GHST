@@ -11,16 +11,16 @@ const defaultMenu: MenuList = [
     icon: 'dashboard',
     path: '/dashboard',
   },
-  {
-    code: 'operation-report',
-    label: {
-      zh_CN: '',
-      en_US: 'Operation report',
-      vi_VN: 'Báo cáo vận hành', // Vietnamese translation
-    },
-    icon: 'report',
-    path: '/operation-report',
-  },
+  // {
+  //   code: 'operation-report',
+  //   label: {
+  //     zh_CN: '',
+  //     en_US: 'Operation report',
+  //     vi_VN: 'Báo cáo vận hành', // Vietnamese translation
+  //   },
+  //   icon: 'report',
+  //   path: '/operation-report',
+  // },
   {
     code: 'order',
     label: {
@@ -53,26 +53,26 @@ const defaultMenu: MenuList = [
       },
     ],
   },
-  {
-    code: 'documentation',
-    label: {
-      zh_CN: '文档',
-      en_US: 'Documentation',
-      vi_VN: 'Tài liệu', // Vietnamese translation
-    },
-    icon: 'documentation',
-    path: '/documentation',
-  },
-  {
-    code: 'guide',
-    label: {
-      zh_CN: '引导',
-      en_US: 'Guide',
-      vi_VN: 'Hướng dẫn', // Vietnamese translation
-    },
-    icon: 'guide',
-    path: '/guide',
-  },
+  // {
+  //   code: 'documentation',
+  //   label: {
+  //     zh_CN: '文档',
+  //     en_US: 'Documentation',
+  //     vi_VN: 'Tài liệu', // Vietnamese translation
+  //   },
+  //   icon: 'documentation',
+  //   path: '/documentation',
+  // },
+  // {
+  //   code: 'guide',
+  //   label: {
+  //     zh_CN: '引导',
+  //     en_US: 'Guide',
+  //     vi_VN: 'Hướng dẫn', // Vietnamese translation
+  //   },
+  //   icon: 'guide',
+  //   path: '/guide',
+  // },
 ];
 
 export default defaultMenu;

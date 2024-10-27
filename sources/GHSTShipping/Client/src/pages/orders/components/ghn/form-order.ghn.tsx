@@ -1,22 +1,16 @@
 import type { ISenderAddress } from './sender-address.form';
 import type { ICreateDeliveryOrderRequest } from '@/interface/business';
 import type { LoginResult } from '@/interface/user/login';
-
-import './style.css';
-
-import { PhoneOutlined } from '@ant-design/icons';
-import { Button, Card, Col, Form, Input, Row, Select, Typography } from 'antd';
+import { Button, Card, Col, Form, Input, message, Row, Select, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-
 import { apiCreateDeliveryOrder, apiGetPickShifts } from '@/api/business.api';
-
 import AddressComponent from '../address.component';
-import { createOrderFakeData } from './create-fake-data';
 import NoteForm from './note-form.ghn';
 import OrderInfoForm from './order-info-form.ghn';
 import ProductForm from './product-form.ghn';
 import SenderAddressForm from './sender-address.form';
+import './style.css';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -48,16 +42,35 @@ const FormOrderGhn = () => {
   };
 
   const handleSubmit = () => {
-    console.log('payload ', form.getFieldsValue());
-
     form.validateFields().then(async values => {
       const payload = {
         ...values,
+        to_district_id: values.to_district_id.toString(),
+        to_ward_code: values.to_ward_code.toString(),
+        from_ward_name: values.wardName,
+        from_district_name: values.districtName,
+        from_province_name: values.provinceName,
         pick_shift: [values.pick_shift],
       };
 
-      console.log('payload ', payload);
-      await apiCreateDeliveryOrder(payload as ICreateDeliveryOrderRequest);
+      localStorage.setItem(
+        'senderAddress',
+        JSON.stringify({
+          from_name: payload.from_name,
+          from_phone: payload.from_phone,
+          from_address: payload.from_address,
+          from_ward_name: payload.from_ward_name,
+          from_district_name: payload.from_district_name,
+          from_province_name: payload.from_province_name,
+        }),
+      );
+
+      const response = await apiCreateDeliveryOrder(payload as ICreateDeliveryOrderRequest);
+      if (response.success) {
+        message.success('Tạo đơn thành công');
+      } else {
+        message.error(response.errors[0].description);
+      }
     });
   };
 
@@ -96,7 +109,6 @@ const FormOrderGhn = () => {
 
   useEffect(() => {
     fetchPickShifts();
-
     // form.setFieldsValue({
     //   ...createOrderFakeData,
     // });
@@ -104,40 +116,30 @@ const FormOrderGhn = () => {
 
   return (
     <div>
-      <Button htmlType="button" onClick={handleSubmit} style={{ marginBottom: '10px', marginTop: '10px' }}>
+      <Button htmlType="button" type="primary" onClick={handleSubmit} style={{ marginBottom: '10px', marginTop: '10px' }}>
         Hoàn tất
       </Button>
       <Form layout="vertical" form={form}>
         <Card style={{ marginBottom: '16px' }}>
-          <Row>
-            <div className="border-top-info"></div>
+          <Row gutter={[16, 16]}>
             <Col span={24}>
               <Title style={{ marginTop: '0px' }} level={4}>
                 Bên gửi
               </Title>
             </Col>
-            <Col span={12}>
-              <Col span={24}>
-                <Typography.Text style={{ marginRight: '10px' }} strong>
-                  {senderAddress?.name}
-                </Typography.Text>
-                <Form.Item hidden label="Tên người gửi" name="from_name"></Form.Item>
+            <div className="border-top-info"></div>
+            <Col span={6}>
+              <Form.Item label="Số điện thoại người gửi" name="from_phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
+                <Input placeholder="Nhập số điện thoại người gửi" />
+              </Form.Item>
 
-                <Typography.Text strong>
-                  <PhoneOutlined />
-                  {' ' + senderAddress?.phone}
-                </Typography.Text>
-                <Form.Item hidden label="Số điện thoại" name="from_phone"></Form.Item>
-              </Col>
+              <Form.Item label="Tên người gửi" name="from_name" rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}>
+                <Input placeholder="Nhập tên người gửi" />
+              </Form.Item>
+            </Col>
 
-              <Form.Item hidden name="from_address"></Form.Item>
-              <Form.Item hidden name="from_ward_name"></Form.Item>
-              <Form.Item hidden name="from_district_name"></Form.Item>
-              <Form.Item hidden name="from_province_name"></Form.Item>
-
-              <Button style={{ padding: '0' }} type="link" onClick={() => setOpenSenderAddressForm(true)}>
-                Sửa địa chỉ gửi hàng
-              </Button>
+            <Col span={6}>
+              <AddressComponent form={form} addressField="from_address" districtField="district" wardField="ward" />
             </Col>
 
             <Col span={12}>

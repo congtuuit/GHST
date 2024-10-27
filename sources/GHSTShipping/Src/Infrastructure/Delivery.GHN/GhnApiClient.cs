@@ -144,7 +144,7 @@ namespace Delivery.GHN
         /// <param name="shopId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<GhnApiResponse<CalcFeeResponse>> GetFeeAsync(ApiConfig config, int shopId, CalcFeeRequest request)
+        public async Task<GhnApiResponse<CalcFeeResponse>> GetFeeAsync(ApiConfig config, string shopId, CalcFeeRequest request)
         {
             try
             {
@@ -183,7 +183,7 @@ namespace Delivery.GHN
         /// <param name="shopId"></param>
         /// <param name="orderCode"></param>
         /// <returns></returns>
-        public async Task<GhnApiResponse<FeeOrderSocResponse>> GetSocAsync(ApiConfig config, int shopId, string orderCode)
+        public async Task<GhnApiResponse<FeeOrderSocResponse>> GetSocAsync(ApiConfig config, string shopId, string orderCode)
         {
             try
             {
@@ -223,7 +223,7 @@ namespace Delivery.GHN
         /// <param name="shopId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<GhnApiResponse<CreateDeliveryOrderResponse>> CreateDeliveryOrderAsync(ApiConfig config, int shopId, CreateDeliveryOrderRequest request)
+        public async Task<GhnApiResponse<CreateDeliveryOrderResponse>> CreateDeliveryOrderAsync(ApiConfig config, string shopId, CreateDeliveryOrderRequest request)
         {
             try
             {
@@ -239,10 +239,18 @@ namespace Delivery.GHN
 
                 var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.CREATE_DELIVERY_ORDER, content);
-                response.EnsureSuccessStatusCode();
 
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
+                }
+                else
+                {
+                    return JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
+                }
+
             }
             catch (Exception ex)
             {
@@ -261,7 +269,7 @@ namespace Delivery.GHN
         /// <param name="shopId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<GhnApiResponse<CreateDeliveryOrderResponse>> CreateDraftDeliveryOrderAsync(ApiConfig config, int shopId, CreateDeliveryOrderRequest request)
+        public async Task<GhnApiResponse<CreateDeliveryOrderResponse>> CreateDraftDeliveryOrderAsync(ApiConfig config, string shopId, CreateDeliveryOrderRequest request)
         {
             try
             {
@@ -284,10 +292,17 @@ namespace Delivery.GHN
                 };
 
                 var response = await _httpClient.SendAsync(httpRequest);
-                response.EnsureSuccessStatusCode();
 
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
+
+                if(response.IsSuccessStatusCode)
+                {
+                    return JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
+                } 
+                else
+                {
+                    return JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
+                }
             }
             catch (Exception ex)
             {

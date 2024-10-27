@@ -6,7 +6,6 @@ using GHSTShipping.Application.Wrappers;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,6 +45,8 @@ namespace GHSTShipping.Application.Features.Users.Commands
                     Email = request.Email,
                     FullName = request.FullName,
                     PhoneNumber = request.PhoneNumber,
+                    Password = request.Password,
+                    ConfirmPassword = request.ConfirmPassword,
                 });
 
                 if (createAccount.Success)
@@ -68,12 +69,12 @@ namespace GHSTShipping.Application.Features.Users.Commands
 
                     await createShopTransaction.CommitAsync(cancellationToken);
 
-                    var result = await accountServices.HandleSendEmailToSetPasswrodAsync(createAccount.Data.Email);
+                    /*var result = await accountServices.HandleSendEmailToSetPasswrodAsync(createAccount.Data.Email);
 
                     if (!result.Success)
                     {
                         _logger.LogInformation("Send email failed: {Errors}", result.Errors);
-                    }
+                    }*/
 
                     return shop.Id;
                 }

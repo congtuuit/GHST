@@ -253,6 +253,12 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                     b.Property<int>("DeliveryPartner")
                         .HasColumnType("int");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActivated")
                         .HasColumnType("bit");
 
@@ -264,6 +270,9 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProdEnv")
                         .HasColumnType("nvarchar(max)");
@@ -385,6 +394,48 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                     b.ToTable("ShopOrderCodeSequence");
                 });
 
+            modelBuilder.Entity("GHSTShipping.Domain.Entities.ShopPartnerConfig", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ClientPhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PartnerConfigId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PartnerShopId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ShopId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PartnerConfigId");
+
+                    b.HasIndex("ShopId");
+
+                    b.ToTable("ShopPartnerConfig");
+                });
+
             modelBuilder.Entity("GHSTShipping.Domain.Entities.ShopPricePlan", b =>
                 {
                     b.Property<Guid>("Id")
@@ -452,6 +503,25 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("GHSTShipping.Domain.Entities.ShopPartnerConfig", b =>
+                {
+                    b.HasOne("GHSTShipping.Domain.Entities.PartnerConfig", "PartnerConfig")
+                        .WithMany()
+                        .HasForeignKey("PartnerConfigId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GHSTShipping.Domain.Entities.Shop", "Shop")
+                        .WithMany("ShopPartnerConfigs")
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PartnerConfig");
+
+                    b.Navigation("Shop");
+                });
+
             modelBuilder.Entity("GHSTShipping.Domain.Entities.ShopPricePlan", b =>
                 {
                     b.HasOne("GHSTShipping.Domain.Entities.Shop", "Shop")
@@ -471,6 +541,8 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("GHSTShipping.Domain.Entities.Shop", b =>
                 {
                     b.Navigation("Orders");
+
+                    b.Navigation("ShopPartnerConfigs");
 
                     b.Navigation("ShopPricePlanes");
                 });

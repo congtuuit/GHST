@@ -16,6 +16,12 @@ namespace Delivery.GHN.Models
         [JsonProperty("message_display")]
         public string MessageDisplay { get; set; }
 
+        [JsonProperty("code_message")]
+        public string CodeMessage { get; set; }
+
+        [JsonProperty("code_message_value")]
+        public string CodeMessageValue { get; set; }
+
         public GhnApiResponse(int code, T data, string message)
         {
             Code = code;

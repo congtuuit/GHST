@@ -19,5 +19,9 @@ namespace GHSTShipping.Application.Features.Configs.Commands
         public string UserName { get; set; }
 
         public bool IsActivated { get; set; }
+
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
     }
 }

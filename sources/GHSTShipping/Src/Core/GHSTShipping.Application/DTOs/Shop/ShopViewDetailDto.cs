@@ -1,4 +1,5 @@
-﻿using GHSTShipping.Domain.Enums;
+﻿using GHSTShipping.Application.DTOs.PartnerConfig;
+using GHSTShipping.Domain.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -32,7 +33,11 @@ namespace GHSTShipping.Application.DTOs.Shop
             }
         }
 
-        public IEnumerable<GhnShopDetailDto> GhnShopDetails { get; set; }
+        public IDictionary<Guid, IEnumerable<GhnShopDetailDto>> GhnShopDetails { get; set; }
+
+        public IEnumerable<ShopConfigDto> ShopConfigs { get; set; }
+
+        public IEnumerable<ShopConfigViewDto> Partners { get; set; }
     }
 
     public class GhnShopDetailDto
@@ -40,5 +45,12 @@ namespace GHSTShipping.Application.DTOs.Shop
         public int Id { get; set; }
         public string Name { get; set; }
         public string DisplayName { get { return $"{this.Id} - {this.Name}"; } }
+
+        // Another fields
+        // https://api.ghn.vn/home/docs/detail?id=106
+        public string Phone { get; set; }
+        public string Address { get; set; }
+        public string WardCode { get; set; }
+        public string DistrictId { get; set; }
     }
 }

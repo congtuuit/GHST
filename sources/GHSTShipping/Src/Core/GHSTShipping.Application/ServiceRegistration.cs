@@ -1,5 +1,6 @@
 using FluentValidation;
 using GHSTShipping.Application.Interfaces;
+using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;

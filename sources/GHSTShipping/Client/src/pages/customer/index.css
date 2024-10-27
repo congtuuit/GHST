@@ -1,3 +1,7 @@
 .table-btn-action:hover {
     opacity: 0.7;
 }
+
+.shop-config .connected {
+    background-color: linen;
+}

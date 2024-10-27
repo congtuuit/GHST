@@ -1,10 +1,9 @@
-﻿using Delivery.GHN;
-using Delivery.GHN.Models;
-using GHSTShipping.Application.DTOs.Shop;
+﻿using GHSTShipping.Application.DTOs.Shop;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Interfaces.UserInterfaces;
 using GHSTShipping.Application.Wrappers;
+using GHSTShipping.Domain.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,7 +23,6 @@ namespace GHSTShipping.Application.Features.Shops.Queries
        IUnitOfWork unitOfWork,
        IShopRepository shopRepository,
        IAccountServices accountServices,
-       IGhnApiClient _ghnApiClient,
        IPartnerConfigService _partnerConfigService
        ) : IRequestHandler<GetShopDetailRequest, BaseResult<ShopViewDetailDto>>
     {
@@ -57,38 +55,46 @@ namespace GHSTShipping.Application.Features.Shops.Queries
             shop.Email = account.Email;
             shop.FullName = account.Name;
 
-            shop.GhnShopDetails = await GetGhnShopDetailDtos(shop.PhoneNumber);
+            var parterConfigs = await _partnerConfigService.GetPartnerConfigsAsync(true);
+            if (parterConfigs.Any())
+            {
+                shop.Partners = parterConfigs.Select(i => new DTOs.PartnerConfig.ShopConfigViewDto
+                {
+                    PartnerConfigId = i.Id,
+                    PartnerName = i.DeliveryPartnerName,
+                    PartnerAccountName = i.FullName
+                })
+                .ToList();
+
+                // Fetch ghn shop by configs
+                var ghnShopDetails = new Dictionary<Guid, IEnumerable<GhnShopDetailDto>>();
+                foreach (var parterConfig in parterConfigs)
+                {
+                    if (parterConfig.DeliveryPartner == Domain.Enums.EnumDeliveryPartner.GHN)
+                    {
+                        var _ghnShopDetails = await _partnerConfigService.GetGhnShopDetailDtos(new PartnerConfigDto
+                        {
+                            ProdEnv = parterConfig.ProdEnv,
+                            ApiKey = parterConfig.ApiKey,
+                        });
+
+                        if (_ghnShopDetails.Any())
+                        {
+                            // Mapping config and shops
+                            ghnShopDetails.Add(parterConfig.Id, _ghnShopDetails);
+                        }
+                    }
+                }
+
+                shop.GhnShopDetails = ghnShopDetails;
+
+                var deliveryConfigs = await _partnerConfigService.GetShopConfigsAsync(shop.Id);
+                shop.ShopConfigs = deliveryConfigs.ToList();
+            }
 
             return BaseResult<ShopViewDetailDto>.Ok(shop);
         }
 
-        private async Task<IEnumerable<GhnShopDetailDto>> GetGhnShopDetailDtos(string phoneNumber)
-        {
-            try
-            {
-                var partnerConfig = await _partnerConfigService.GetPartnerConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN);
-                var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey);
-                var response = await _ghnApiClient.GetAllShopsAsync(apiConfig, new GetAllShopsRequest
-                {
-                    //client_phone = phoneNumber,
-                    limit = 20,
-                    offset = 1
-                });
 
-                if (response.Code == 200)
-                {
-                    return response.Data.shops.Select(i => new GhnShopDetailDto
-                    {
-                        Id = i._id,
-                        Name = i.name
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-
-            return Enumerable.Empty<GhnShopDetailDto>();
-        }
     }
 }
