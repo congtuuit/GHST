@@ -30,7 +30,7 @@ namespace GHSTShipping.Infrastructure.Identity
             else
             {
                 services.AddDbContext<IdentityContext>(options =>
-                    options.UseSqlServer(configuration.GetConnectionString("IdentityConnection")));
+                    options.UseSqlServer(configuration.GetConnectionString("IdentityConnection"), o => o.UseCompatibilityLevel(120)));
             }
 
             services.AddTransient<IGetUserServices, GetUserServices>();

@@ -203,10 +203,6 @@ const CustomerTable = () => {
     }
   }, [tablePaginationConfig, tableFilters, reloadTable]);
 
-  useEffect(() => {
-    fetchShops();
-  }, []);
-
   return (
     <Row>
       <Table

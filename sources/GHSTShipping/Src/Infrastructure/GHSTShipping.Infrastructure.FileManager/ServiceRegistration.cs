@@ -19,7 +19,7 @@ namespace GHSTShipping.Infrastructure.FileManager
             else
             {
                 services.AddDbContext<FileManagerDbContext>(options =>
-                    options.UseSqlServer(configuration.GetConnectionString("FileManagerConnection")));
+                    options.UseSqlServer(configuration.GetConnectionString("FileManagerConnection"), o => o.UseCompatibilityLevel(120)));
             }
 
             services.AddScoped<IFileManagerService, FileManagerService>();
