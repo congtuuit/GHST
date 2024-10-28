@@ -76,7 +76,7 @@ const CustomerPricePage: FC = () => {
     <div>
       <Row style={{ flexFlow: 'row-reverse', marginBottom: '10px' }}>
         <Col span={12}>
-          <span>Chọn khách hàng</span>
+          <span>Chọn Shop / Khách hàng</span>
           <Select
             value={selectedShop}
             onChange={handleChange}

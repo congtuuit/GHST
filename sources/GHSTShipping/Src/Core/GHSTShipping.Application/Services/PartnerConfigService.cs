@@ -217,7 +217,6 @@ namespace GHSTShipping.Application.Services
                             }
                         }
                     }
-
                 }
             }
 

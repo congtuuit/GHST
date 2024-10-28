@@ -61,7 +61,7 @@ const PriceTable = (props: PriceTableProps) => {
 
   const columns = [
     {
-      title: 'No',
+      title: 'STT',
       dataIndex: 'no',
       key: 'no',
       width: 50,
@@ -75,7 +75,7 @@ const PriceTable = (props: PriceTableProps) => {
       align: 'left' as const,
     },
     {
-      title: 'Shop Name',
+      title: 'Cửa hàng',
       dataIndex: 'shopName',
       key: 'shopName',
       align: 'left' as const,

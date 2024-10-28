@@ -10,7 +10,6 @@
     "axios": "^0.24.0",
     "driver.js": "^0.9.8",
     "history": "^5.0.1",
-    "lodash": "^4.17.21",
     "mockjs": "^1.1.0",
     "moment": "^2.30.1",
     "query-string": "^7.0.1",

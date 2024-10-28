@@ -98,3 +98,10 @@ interface DeliveryOrderItemDto {
 interface OrderCategoryDto {
   level1: string; // Required level 1 category
 }
+
+export interface IPickShift {
+  id: number;
+  title: string;
+  fromTime: number;
+  toTime: number;
+}

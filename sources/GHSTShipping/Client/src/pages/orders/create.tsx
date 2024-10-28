@@ -7,11 +7,6 @@ import { IOrderMetadata } from '@/interface/shop';
 
 const CreateOrderPage = () => {
   const [_, setCreateOrderMetadata] = useState<IOrderMetadata>();
-  const [selectedSupplier, setSelectedSupplier] = useState<string>('');
-
-  const handleChange = (value: string) => {
-    setSelectedSupplier(value);
-  };
 
   const fetchCreateOrderMetadata = async () => {
     const response = await apiGetOrderMetaData();
@@ -20,7 +15,6 @@ const CreateOrderPage = () => {
 
       const config = response.data.deliveryConfigs[0];
       const partner = config.deliveryPartnerName;
-      setSelectedSupplier(partner);
 
       if (partner === supplierKeys.GHN) {
         const shop = config.shops[0];
@@ -30,8 +24,8 @@ const CreateOrderPage = () => {
           address: shop.address,
           wardCode: shop.wardCode,
           districtId: shop.districtId,
-        }
-        
+        };
+
         localStorage.setItem('senderAddress', JSON.stringify(values));
       }
     }
@@ -43,7 +37,9 @@ const CreateOrderPage = () => {
 
   return (
     <Card>
-      <Col span={24}>{selectedSupplier === supplierKeys.GHN && <FormOrderGhn />}</Col>
+      <Col span={24}>
+        <FormOrderGhn />
+      </Col>
     </Card>
   );
 };

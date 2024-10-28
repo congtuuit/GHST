@@ -4,7 +4,7 @@ import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 
 import { CheckCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Row, Table, Tag } from 'antd';
+import { Button, InputNumber, Row, Table, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 
@@ -12,6 +12,8 @@ import { apiActiveShops, apiChangeAllowPublishOrder, apiGetShopDetail, apiGetSho
 import { dateFormatMap, revertDateFormatMap } from '@/components/core/table-column/type';
 
 import CustomerDetail from './customer-detail';
+import { render } from 'react-dom';
+import CommaDecimalDisplay from '@/components/core/CommaDecimalDisplay';
 
 interface ShopDatatableDto {
   key: string;
@@ -44,7 +46,7 @@ const CustomerTable = () => {
 
   const columns = [
     {
-      title: 'No',
+      title: 'STT',
       dataIndex: 'no',
       key: 'no',
       width: 50,
@@ -97,6 +99,9 @@ const CustomerTable = () => {
       key: 'avgMonthlyCapacity',
       width: 180,
       align: 'right' as const,
+      render: (value: string) => {
+        return <CommaDecimalDisplay value={value} />;
+      },
     },
     {
       title: 'Kết nối đơn vị vận chuyển',
@@ -111,7 +116,7 @@ const CustomerTable = () => {
             </Button>
           );
         } else {
-          return "";
+          return '';
         }
       },
     },

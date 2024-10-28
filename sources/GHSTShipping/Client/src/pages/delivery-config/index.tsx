@@ -1,10 +1,6 @@
 import type { supplierKeys } from '@/constants/data';
-
-import { Button, Card, Col, Form, Modal, Row } from 'antd';
+import { Button, Modal } from 'antd';
 import { useEffect, useState } from 'react';
-import { apiGetDeliveryConfigs, apiUpdateDeliveryConfigs } from '@/api/business.api';
-import { debounce } from '@/utils/common';
-import PartnerConfig from './PartnerConfig';
 import CreatePartnerConfigForm from './CreatePartnerConfigForm';
 import TableDeliveryConfig from './TableDeliveryConfig';
 import { PlusOutlined } from '@ant-design/icons';

@@ -4,6 +4,7 @@ import type {
   ICreateDeliveryOrderRequest,
   IOrderPagedParameter,
   IPaginationResponse,
+  IPickShift,
   PaginationResponse,
   ShopPricePlanDto,
 } from '@/interface/business';
@@ -18,7 +19,7 @@ import { request } from './base/request';
 export const apiGetProvinces = () => request<any[]>('get', '/metadata/provinces');
 export const apiGetDictricts = () => request<any[]>('get', '/metadata/dictricts');
 export const apiGetWards = (districtId: number) => request<any[]>('get', '/metadata/wards?districtId=' + districtId);
-export const apiGetPickShifts = () => request<any[]>('get', '/delivery/pickshifts');
+export const apiGetPickShifts = () => request<IPickShift[]>('get', '/delivery/pickshifts');
 export const getBusinessUserList = (params: any) => request<PageData<BuniesssUser>>('get', '/business/list', params);
 
 export const apiGetShopPricePlanes = (
