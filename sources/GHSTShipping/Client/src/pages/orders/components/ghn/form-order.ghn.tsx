@@ -1,5 +1,5 @@
 import { Button, Card, Col, Form, Input, message, Row, Select, Typography } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { apiCreateDeliveryOrder, apiGetPickShifts } from '@/api/business.api';
 import AddressComponent from '../address.component';
@@ -11,6 +11,9 @@ import { debounce } from '@/utils/common';
 import { getItemWithExpiry, setItemWithExpiry } from '@/utils/common';
 import { IPickShift } from '@/interface/business';
 import './style.css';
+import { fakeOrder } from './create-fake-data';
+import { DeliveredProcedureOutlined } from '@ant-design/icons';
+import OrderBuilder from '@/features/order/order.builder';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -20,6 +23,8 @@ const FormOrderGhn = () => {
   const session = useSelector(state => state?.user?.session);
   const [pickShifts, setPickShifts] = useState<IPickShift[]>([]);
   const [form] = Form.useForm();
+  const fromAddressRef = useRef<any>(null);
+  const toAddressRef = useRef<any>(null);
 
   const fetchPickShifts = async () => {
     try {
@@ -33,6 +38,13 @@ const FormOrderGhn = () => {
         // cache pick shift 10 mins
         setItemWithExpiry('pickShifts', result, 10 * 60 * 1000);
       }
+
+      const _fakeOrder = fakeOrder;
+      setTimeout(() => {
+        form.setFieldsValue(_fakeOrder);
+        fromAddressRef.current?.update(_fakeOrder);
+        toAddressRef.current?.update(_fakeOrder);
+      }, 500);
     } catch (error) {
       message.error('Lỗi khi tải ca lấy hàng');
     }
@@ -41,24 +53,29 @@ const FormOrderGhn = () => {
   const handleFormSubmit = async () => {
     try {
       const values = await form.validateFields();
-      const payload = {
-        ...values,
-        to_district_id: values.to_district_id.toString(),
-        to_ward_code: values.to_ward_code.toString(),
-        pick_shift: [values.pick_shift],
-      };
+
+      const orderBuilder = new OrderBuilder(values);
+      const validate = orderBuilder.validateOrder();
+
+      // service_type_id tự tính để 
+      // Trong đó:  2: Hàng nhẹ, 5: Hàng nặng
+
+      console.log('validate ', validate);
+      console.log('values ', values);
+
+      return;
 
       // Dispatch to Redux
-      dispatch(setOrder(payload));
+      dispatch(setOrder(values));
 
-      const response = await apiCreateDeliveryOrder(payload);
+      const response = await apiCreateDeliveryOrder(values);
       if (response.success) {
         message.success('Tạo đơn thành công');
       } else {
         message.error(response.errors[0]?.description || 'Đã xảy ra lỗi');
       }
     } catch (error) {
-      console.log('Xác thực dữ liệu không thành công');
+      message.info("Thông tin đơn hàng chưa đủ, vui lòng kiểm tra lại!");
     }
   };
 
@@ -72,52 +89,26 @@ const FormOrderGhn = () => {
   }, 300);
 
   useEffect(() => {
-    form.setFieldsValue({
-      from_phone: session?.phoneNumber || '',
-      from_name: session?.fullName || '',
-    });
+    // TODO INIT FORM DATA WITH SESSION DATA
   }, [session]);
 
   useEffect(() => {
     fetchPickShifts();
   }, []);
 
+  const CreateOrderButton = () => {
+    return (
+      <Button htmlType="button" type="primary" onClick={handleFormSubmit} style={{ marginBottom: '10px', marginTop: '10px', float: 'right' }}>
+        <DeliveredProcedureOutlined /> Tạo đơn
+      </Button>
+    );
+  };
+
   return (
     <div>
-      <Button htmlType="button" type="primary" onClick={handleFormSubmit} style={{ marginBottom: '10px', marginTop: '10px' }}>
-        Tạo đơn
-      </Button>
       <Form layout="vertical" form={form} onValuesChange={handleValuesChange}>
         <Card style={{ marginBottom: '16px' }}>
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
-              <Title style={{ marginTop: '0px' }} level={4}>
-                Bên gửi
-              </Title>
-            </Col>
-            <div className="border-top-info"></div>
-            <Col span={6}>
-              <Form.Item label="Số điện thoại người gửi" name="from_phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
-                <Input placeholder="Nhập số điện thoại người gửi" />
-              </Form.Item>
-              <Form.Item label="Tên người gửi" name="from_name" rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}>
-                <Input placeholder="Nhập tên người gửi" />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <AddressComponent
-                form={form}
-                returnField={{
-                  address: 'from_address',
-                  districtId: 'from_district_id',
-                  districtName: 'from_district_name',
-                  wardId: 'from_ward_id',
-                  wardName: 'from_ward_name',
-                  provinceId: 'from_province_id',
-                  provinceName: 'from_province_name',
-                }}
-              />
-            </Col>
+          <Row>
             <Col span={12}>
               <Form.Item label="Ca lấy hàng" name="pick_shift">
                 <Select placeholder="Chọn ca lấy hàng">
@@ -128,6 +119,39 @@ const FormOrderGhn = () => {
                   ))}
                 </Select>
               </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={24}>
+              <Title style={{ marginTop: '0px' }} level={4}>
+                Bên gửi
+              </Title>
+            </Col>
+            <div className="border-top-info"></div>
+            <Col span={12}>
+              <Form.Item label="Số điện thoại người gửi" name="from_phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
+                <Input placeholder="Nhập số điện thoại người gửi" />
+              </Form.Item>
+              <Form.Item label="Tên người gửi" name="from_name" rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}>
+                <Input placeholder="Nhập tên người gửi" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <AddressComponent
+                ref={fromAddressRef}
+                key={'from_address'}
+                form={form}
+                required={true}
+                returnField={{
+                  address: 'from_address',
+                  districtId: 'from_district_id',
+                  districtName: 'from_district_name',
+                  wardId: 'from_ward_id',
+                  wardName: 'from_ward_name',
+                  provinceId: 'from_province_id',
+                  provinceName: 'from_province_name',
+                }}
+              />
             </Col>
           </Row>
           <hr style={{ marginTop: '20px', borderTop: '1px dashed rgb(217 217 217)' }} />
@@ -147,6 +171,9 @@ const FormOrderGhn = () => {
             </Col>
             <Col span={12}>
               <AddressComponent
+                ref={toAddressRef}
+                key={'to_address'}
+                required={true}
                 form={form}
                 returnField={{
                   address: 'to_address',
@@ -169,12 +196,13 @@ const FormOrderGhn = () => {
         <Col span={12} style={{ marginTop: '16px' }}>
           <Form.Item label="Hình thức thanh toán" name="payment_type_id" rules={[{ required: true, message: 'Vui lòng chọn' }]}>
             <Select placeholder="Chọn Hình thức thanh toán">
-              <Option value="1">Người gửi trả phí</Option>
-              <Option value="2">Người nhận trả phí</Option>
+              <Option value={1}>Người gửi trả phí</Option>
+              <Option value={2}>Người nhận trả phí</Option>
             </Select>
           </Form.Item>
         </Col>
       </Form>
+      <CreateOrderButton />
     </div>
   );
 };

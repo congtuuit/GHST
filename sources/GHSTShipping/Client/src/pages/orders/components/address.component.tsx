@@ -1,9 +1,20 @@
 import type { FormInstance } from 'antd';
-
 import { Form, Input, Select } from 'antd';
-import { useEffect, useState } from 'react';
-
+import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { apiGetDictricts, apiGetWards } from '@/api/business.api';
+
+interface District {
+  districtID: number;
+  districtName: string;
+  provinceID: string;
+  provinceName: string;
+  display: string;
+}
+
+interface Ward {
+  wardCode: number;
+  wardName: string;
+}
 
 interface IReturnField {
   address: string;
@@ -18,46 +29,51 @@ interface IReturnField {
 interface IAddressComponentProps {
   form: FormInstance;
   returnField: IReturnField;
+  required: boolean;
 }
 
-const AddressComponent = (props: IAddressComponentProps) => {
-  const { form, returnField } = props;
-  const [districts, setDistricts] = useState<any[]>(JSON.parse(localStorage.getItem('dictricts') || '[]'));
-  const [wards, setWards] = useState<any[]>(JSON.parse(localStorage.getItem('wards') || '[]'));
+const AddressComponent = forwardRef((props: IAddressComponentProps, ref) => {
+  const { form, returnField, required } = props;
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [wards, setWards] = useState<Ward[]>([]);
   const [districtId, setDistrictId] = useState<number | undefined>(undefined);
+  const [isWardsLoading, setIsWardsLoading] = useState(false);
 
   const fetchDistricts = async () => {
-    if (districts.length > 0) {
-      return;
+    const storedDistricts = localStorage.getItem('districts');
+    if (storedDistricts) {
+      setDistricts(JSON.parse(storedDistricts));
+    } else {
+      const result = await apiGetDictricts();
+      localStorage.setItem('districts', JSON.stringify(result.data));
+      setDistricts(result.data);
     }
-
-    const result = await apiGetDictricts();
-    localStorage.setItem('dictricts', JSON.stringify(result.data));
-    setDistricts(result.data);
   };
 
   const fetchWards = async (districtId: number) => {
+    setIsWardsLoading(true);
     const result = await apiGetWards(districtId);
-    localStorage.setItem('wards', JSON.stringify(result.data));
+    localStorage.setItem(`wards_${districtId}`, JSON.stringify(result.data));
     setWards(result.data);
+    setIsWardsLoading(false);
   };
 
-  const handleChangeDistrict = (districtId: number) => {
+  const handleChangeDistrict = async (districtId: number) => {
     setDistrictId(districtId);
-    const district = districts.find(i => i.districtID === districtId);
-
+    const district = districts.find(d => d.districtID === districtId);
     if (district) {
-      form.setFieldValue(returnField.districtName, district.districtName);
-      form.setFieldValue(returnField.provinceName, district.provinceName);
-      form.setFieldValue(returnField.provinceId, district.provinceID);
-
-      form.setFieldValue(returnField.wardId, null);
-      form.setFieldValue(returnField.wardName, null);
+      form.setFields([
+        { name: returnField.districtName, value: district.districtName },
+        { name: returnField.provinceName, value: district.provinceName },
+        { name: returnField.provinceId, value: district.provinceID },
+        { name: returnField.wardId, value: null }, // reset ward
+        { name: returnField.wardName, value: null },
+      ]);
     }
   };
 
   const handleChangeWard = (wardCode: number) => {
-    const ward = wards.find(i => i.wardCode === wardCode);
+    const ward = wards.find(w => w.wardCode === wardCode);
     if (ward) {
       form.setFieldValue(returnField.wardName, ward.wardName);
     }
@@ -68,10 +84,29 @@ const AddressComponent = (props: IAddressComponentProps) => {
   }, []);
 
   useEffect(() => {
-    if (Boolean(districtId)) {
-      fetchWards(districtId || 0);
+    if (districtId) {
+      const storedWards = localStorage.getItem(`wards_${districtId}`);
+      if (storedWards) {
+        setWards(JSON.parse(storedWards));
+      } else {
+        fetchWards(districtId);
+      }
     }
   }, [districtId]);
+
+  // Sử dụng useImperativeHandle để cho phép các component cha truy cập vào phương thức focusAddress
+  useImperativeHandle(ref, () => ({
+    update(values: any) {
+      const distrcitId = form.getFieldValue(returnField.districtId);
+      handleChangeDistrict(distrcitId).then(() => {
+        form.setFields([
+          { name: returnField.wardId, value: values[returnField.wardId] },
+          { name: returnField.wardName, value: values[returnField.wardName] },
+        ]);
+      });
+      
+    },
+  }));
 
   return (
     <>
@@ -82,14 +117,14 @@ const AddressComponent = (props: IAddressComponentProps) => {
         <Input />
       </Form.Item>
 
-      <Form.Item label="Địa chỉ" name={returnField.address} rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}>
+      <Form.Item label="Địa chỉ" name={returnField.address} rules={[{ required, message: 'Vui lòng nhập địa chỉ!' }]}>
         <Input placeholder="Nhập địa chỉ" />
       </Form.Item>
 
-      <Form.Item label="Quận - Huyện" name={returnField.districtId}>
+      <Form.Item label="Quận - Huyện" name={returnField.districtId} rules={[{ required, message: 'Vui lòng chọn!' }]}>
         <Select showSearch placeholder="Chọn quận - huyện" optionFilterProp="children" onChange={handleChangeDistrict}>
-          {districts?.map(district => (
-            <Select.Option key={`${district.districtID}`} value={district.districtID}>
+          {districts.map(district => (
+            <Select.Option key={district.districtID} value={district.districtID}>
               {district.display}
             </Select.Option>
           ))}
@@ -99,10 +134,10 @@ const AddressComponent = (props: IAddressComponentProps) => {
         <Input />
       </Form.Item>
 
-      <Form.Item label="Phường - Xã" name={returnField.wardId}>
-        <Select showSearch placeholder="Chọn phường - xã" optionFilterProp="children" onChange={handleChangeWard}>
-          {wards?.map(ward => (
-            <Select.Option key={`${ward.wardCode}`} value={ward.wardCode}>
+      <Form.Item label="Phường - Xã" name={returnField.wardId} rules={[{ required, message: 'Vui lòng chọn!' }]}>
+        <Select showSearch placeholder="Chọn phường - xã" optionFilterProp="children" loading={isWardsLoading} onChange={handleChangeWard}>
+          {wards.map(ward => (
+            <Select.Option key={ward.wardCode} value={ward.wardCode}>
               {ward.wardName}
             </Select.Option>
           ))}
@@ -113,6 +148,6 @@ const AddressComponent = (props: IAddressComponentProps) => {
       </Form.Item>
     </>
   );
-};
+});
 
 export default AddressComponent;

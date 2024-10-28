@@ -45,7 +45,7 @@ const orderObj = {
   // | Bắt buộc
   required_note: '', // 500 ký tự, CHOTHUHANG | CHOXEMHANGKHONGTHU | KHONGCHOXEMHANG
 
-  pick_shift: [], // Array, Dùng để truyền ca lấy hàng , Sử dụng API Lấy danh sách ca lấy
+  pick_shift: [1], // Array, Dùng để truyền ca lấy hàng , Sử dụng API Lấy danh sách ca lấy
   pickup_time: 0, // Truyền thời gian mong muốn lấy hàng , định dạng UnixtimeStamp.
 
   // | Bắt buộc
