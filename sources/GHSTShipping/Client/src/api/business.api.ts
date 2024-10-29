@@ -15,6 +15,7 @@ import type { IDeliveryConfigDto } from '@/pages/delivery-config';
 import { buildQueryString } from '@/utils/queryEncode';
 
 import { request } from './base/request';
+import { IOrder } from '@/features/order/type';
 
 export const apiGetProvinces = () => request<any[]>('get', '/metadata/provinces');
 export const apiGetDictricts = () => request<any[]>('get', '/metadata/dictricts');
@@ -42,7 +43,8 @@ export const apiDeleteShopPricePlan = (id: string) => {
   return request('delete', `/shops/prices/${id}`);
 };
 
-export const apiCreateDeliveryOrder = (data: ICreateDeliveryOrderRequest) => {
+//ICreateDeliveryOrderRequest
+export const apiCreateDeliveryOrder = (data: IOrder) => {
   return request('post', '/orders/ghn/create', data);
 };
 

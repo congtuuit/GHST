@@ -64,11 +64,17 @@ namespace GHSTShipping.Domain.Entities
         [MaxLength(100)]
         public string FromWardName { get; set; } = null!;
 
+        public int? FromWardId { get; set; }
+
         [MaxLength(100)]
         public string FromDistrictName { get; set; } = null!;
 
+        public int? FromDistrictId { get; set; }
+
         [MaxLength(100)]
         public string FromProvinceName { get; set; } = null!;
+
+        public int? FromProvinceId { get; set; }
 
         [MaxLength(100)]
         public string ToName { get; set; } = null!;
@@ -80,16 +86,19 @@ namespace GHSTShipping.Domain.Entities
         public string ToAddress { get; set; } = null!;
 
         [MaxLength(100)]
-        public string ToWardCode { get; set; } = null!;
+        public string ToWardName { get; set; } = null!;
+
+        public int? ToWardId { get; set; }
 
         [MaxLength(100)]
-        public string ToWardName { get; set; }
+        public string ToDistrictName { get; set; } = null!;
+
+        public int? ToDistrictId { get; set; }
 
         [MaxLength(100)]
-        public string ToDistrictId { get; set; } = null!;
+        public string ToProvinceName { get; set; } = null!;
 
-        [MaxLength(100)]
-        public string ToDistrictName { get; set; }
+        public int? ToProvinceId { get; set; } = null;
 
         public int Weight { get; set; }
         public int Length { get; set; }
@@ -99,7 +108,7 @@ namespace GHSTShipping.Domain.Entities
 
         public int CodAmount { get; set; }
 
-        [MaxLength(500)]
+        [MaxLength(4000)]
         public string? Content { get; set; }
 
         public int? PickStationId { get; set; }

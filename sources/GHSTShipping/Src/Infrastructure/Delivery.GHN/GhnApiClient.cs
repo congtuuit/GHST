@@ -239,7 +239,6 @@ namespace Delivery.GHN
 
                 var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.CREATE_DELIVERY_ORDER, content);
-
                 var jsonResponse = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -284,8 +283,7 @@ namespace Delivery.GHN
                 _httpClient.DefaultRequestHeaders.Add("shop_id", $"{shopId}"); // Add ShopId header
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var payload = JsonConvert.SerializeObject(request);
-                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
                 var httpRequest = new HttpRequestMessage(HttpMethod.Post, ApiEndpoints.CREATE_DRAFT_ORDER)
                 {
                     Content = content

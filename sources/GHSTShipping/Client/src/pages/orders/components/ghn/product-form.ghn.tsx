@@ -55,12 +55,25 @@ const ProductForm = () => {
 
             {/* Weight */}
             <Col span={6}>
-              <Form.Item label="KL (gram)" name={['items', index, 'weight']}>
+              <Form.Item
+                label="KL (gram)"
+                name={['items', index, 'weight']}
+                rules={[
+                  { required: true, message: 'Vui lòng nhập' },
+                  {
+                    type: 'number',
+                    min: 1,
+                    message: 'Khối lượng phải lớn hơn 0',
+                    transform: value => {
+                      return Number(value) || 0;
+                    },
+                  },
+                ]}
+              >
                 <MyInputNumber
                   value={product.weight}
                   onChange={e => {
                     const value: string = e.toString();
-
                     handleInputChange(index, 'weight', value || '');
                   }}
                 />

@@ -28,14 +28,6 @@ const ShopOrderList = () => {
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
 
-  const handleChange = (value: string) => {
-    setSelectedSupplier(value);
-  };
-
-  const handleSelectOrderStatusFilter = (e: RadioChangeEvent) => {
-    setOrderStatusFilter(e.target.value);
-  };
-
   const fetchOrders = async (params: IOrderPagedParameter | null) => {
     if (params == null) {
       params = {
@@ -174,19 +166,15 @@ const ShopOrderList = () => {
     }
 
     const params: IOrderPagedParameter = {
-      pageNumber: tablePaginationConfig?.current as number,
-      pageSize: tablePaginationConfig?.pageSize as number,
+      pageNumber: (tablePaginationConfig?.current as number) ?? 1,
+      pageSize: (tablePaginationConfig?.pageSize as number) ?? 10,
       deliveryPartner: selectedSupplier,
       orderCode: '',
-      status: orderStatusFilter,
+      status: orderStatusFilter ?? '',
     };
 
     fetchOrders(params);
   }, [selectedSupplier, tablePaginationConfig, orderStatusFilter]);
-
-  useEffect(() => {
-    fetchOrders(null);
-  }, []);
 
   return (
     <Card>

@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, message, Row, Select, Typography } from 'antd';
+import { Button, Card, Col, Form, Input, InputNumber, message, Row, Select, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { apiCreateDeliveryOrder, apiGetPickShifts } from '@/api/business.api';
@@ -14,9 +14,15 @@ import './style.css';
 import { fakeOrder } from './create-fake-data';
 import { DeliveredProcedureOutlined } from '@ant-design/icons';
 import OrderBuilder from '@/features/order/order.builder';
+import { IOrder } from '@/features/order/type';
 
 const { Title } = Typography;
 const { Option } = Select;
+
+const serviceType = {
+  HangNhe: 2,
+  HangNang: 5,
+};
 
 const FormOrderGhn = () => {
   const dispatch = useDispatch();
@@ -25,6 +31,7 @@ const FormOrderGhn = () => {
   const [form] = Form.useForm();
   const fromAddressRef = useRef<any>(null);
   const toAddressRef = useRef<any>(null);
+  const [serviceTypeId, setServiceTypeId] = useState<number>(serviceType.HangNhe);
 
   const fetchPickShifts = async () => {
     try {
@@ -52,21 +59,22 @@ const FormOrderGhn = () => {
 
   const handleFormSubmit = async () => {
     try {
-      const values = await form.validateFields();
+      const values: IOrder = await form.validateFields();
+      if (values.weight > 20000) {
+        console.log('Đơn hàng lớn hơn 20kg');
+
+        // Trong đó:  2: Hàng nhẹ, 5: Hàng nặng
+        values.service_type_id = serviceType.HangNang;
+      }
 
       const orderBuilder = new OrderBuilder(values);
       const validate = orderBuilder.validateOrder();
 
-      // service_type_id tự tính để 
-      // Trong đó:  2: Hàng nhẹ, 5: Hàng nặng
-
-      console.log('validate ', validate);
-      console.log('values ', values);
-
-      return;
-
-      // Dispatch to Redux
-      dispatch(setOrder(values));
+      if (!validate.verified) {
+        console.log('validate ', validate);
+        message.error('Thông tin đơn chưa hợp lệ, vui lòng kiểm tra lại!');
+        return;
+      }
 
       const response = await apiCreateDeliveryOrder(values);
       if (response.success) {
@@ -75,7 +83,7 @@ const FormOrderGhn = () => {
         message.error(response.errors[0]?.description || 'Đã xảy ra lỗi');
       }
     } catch (error) {
-      message.info("Thông tin đơn hàng chưa đủ, vui lòng kiểm tra lại!");
+      message.info('Thông tin đơn hàng chưa đủ, vui lòng kiểm tra lại!');
     }
   };
 
@@ -110,7 +118,7 @@ const FormOrderGhn = () => {
         <Card style={{ marginBottom: '16px' }}>
           <Row>
             <Col span={12}>
-              <Form.Item label="Ca lấy hàng" name="pick_shift">
+              <Form.Item label="Ca lấy hàng" name="pick_shift" valuePropName="value" getValueFromEvent={value => [value]}>
                 <Select placeholder="Chọn ca lấy hàng">
                   {pickShifts.map(i => (
                     <Option key={i.id} value={i.id}>
@@ -128,6 +136,9 @@ const FormOrderGhn = () => {
               </Title>
             </Col>
             <div className="border-top-info"></div>
+            <Form.Item hidden name="service_type_id">
+              <InputNumber value={serviceTypeId} />
+            </Form.Item>
             <Col span={12}>
               <Form.Item label="Số điện thoại người gửi" name="from_phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
                 <Input placeholder="Nhập số điện thoại người gửi" />
