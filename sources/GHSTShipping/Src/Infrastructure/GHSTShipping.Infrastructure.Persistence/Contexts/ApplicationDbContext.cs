@@ -20,7 +20,7 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<ShopOrderCodeSequence> ShopOrderCodeSequences { get; set; }
         public DbSet<ShopPartnerConfig> ShopPartnerConfigs { get; set; }
-
+        public DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {

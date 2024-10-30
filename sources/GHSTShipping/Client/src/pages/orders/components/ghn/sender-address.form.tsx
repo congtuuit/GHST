@@ -48,8 +48,6 @@ const SenderAddressForm = (props: SenderAddressFormProps) => {
         <Form.Item label="Họ tên" name="name" rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}>
           <Input placeholder="Nhập họ tên" />
         </Form.Item>
-
-        <AddressComponent form={form} addressField="address" districtField="district" wardField="ward" />
       </Form>
     </Modal>
   );

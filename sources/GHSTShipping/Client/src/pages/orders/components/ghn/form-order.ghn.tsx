@@ -46,12 +46,34 @@ const FormOrderGhn = () => {
         setItemWithExpiry('pickShifts', result, 10 * 60 * 1000);
       }
 
-      const _fakeOrder = fakeOrder;
-      setTimeout(() => {
-        form.setFieldsValue(_fakeOrder);
-        fromAddressRef.current?.update(_fakeOrder);
-        toAddressRef.current?.update(_fakeOrder);
-      }, 500);
+      //// DEBUG MODE
+      // const _fakeOrder = fakeOrder;
+      // setTimeout(() => {
+      //   form.setFieldsValue(_fakeOrder);
+      //   fromAddressRef.current?.update(_fakeOrder);
+      //   toAddressRef.current?.update(_fakeOrder);
+      // }, 500);
+
+      // init sender address
+
+      const senderAddressJson = localStorage.getItem('senderAddress') ?? '';
+      if (Boolean(senderAddressJson)) {
+        const senderAddress = JSON.parse(senderAddressJson);
+        if (Boolean(senderAddress)) {
+          const senderInfo = {
+            from_name: senderAddress['name'],
+            from_phone: senderAddress['phone'],
+            from_address: senderAddress['address'],
+            from_ward_id: senderAddress['wardId'],
+            from_district_id: parseInt(senderAddress['districtId']),
+            from_province_id: parseInt(senderAddress['provinceId']),
+          };
+          setTimeout(() => {
+            form.setFieldsValue(senderInfo);
+            fromAddressRef.current?.update(senderInfo);
+          }, 300);
+        }
+      }
     } catch (error) {
       message.error('Lỗi khi tải ca lấy hàng');
     }
@@ -90,9 +112,6 @@ const FormOrderGhn = () => {
   // Debounced update to Redux
   const handleValuesChange = debounce(changedValues => {
     const currentValues = form.getFieldsValue();
-    console.log(currentValues);
-
-    return;
     dispatch(setOrder({ ...currentValues, ...changedValues }));
   }, 300);
 

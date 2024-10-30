@@ -12,21 +12,11 @@ const CreateOrderPage = () => {
     const response = await apiGetOrderMetaData();
     if (response.success) {
       setCreateOrderMetadata(response.data);
-
       const config = response.data.deliveryConfigs[0];
       const partner = config.deliveryPartnerName;
-
       if (partner === supplierKeys.GHN) {
         const shop = config.shops[0];
-        const values = {
-          name: shop.name,
-          phone: shop.phone,
-          address: shop.address,
-          wardCode: shop.wardCode,
-          districtId: shop.districtId,
-        };
-
-        localStorage.setItem('senderAddress', JSON.stringify(values));
+        localStorage.setItem('senderAddress', JSON.stringify(shop));
       }
     }
   };

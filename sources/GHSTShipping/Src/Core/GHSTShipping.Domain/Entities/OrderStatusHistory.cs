@@ -1,23 +1,35 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.Options;
+﻿using GHSTShipping.Domain.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Channels;
-using System.Threading.Tasks;
-using static System.Formats.Asn1.AsnWriter;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GHSTShipping.Domain.Entities
 {
-    public class OrderStatusHistory
+    [Table(nameof(OrderStatusHistory))]
+    public class OrderStatusHistory : AuditableBaseEntity
     {
-        /*Id UNIQUEIDENTIFIER PRIMARY KEY,
-        OrderId UNIQUEIDENTIFIER NOT NULL,
-        Status NVARCHAR(50) NOT NULL,
-        ChangeDate DATETIME NOT NULL,
-        ChangedBy UNIQUEIDENTIFIER, -- This can store the user who changed the status
-        Notes NVARCHAR(MAX), -- Optional notes for the status change
-        FOREIGN KEY(OrderId) REFERENCES Orders(Id) -- Assuming Orders is your main order table*/
+        public Guid OrderId { get; set; }
+
+        [MaxLength(50)]
+        public string Status { get; set; }
+
+        [MaxLength(200)]
+        public string ChangedBy { get; set; }
+
+        [MaxLength(200)]
+        public string Notes { get; set; }
     }
+
+    /// <summary>
+    /// These order status before send to delivery partner
+    /// </summary>
+    public static class OrderStatus
+    {
+        public const string DRAFT = "draft";
+
+        public const string WAITING_CONFIRM = "waiting_confirm";
+
+        public const string READY_TO_PICK = "ready_to_pick";
+    }
+
 }

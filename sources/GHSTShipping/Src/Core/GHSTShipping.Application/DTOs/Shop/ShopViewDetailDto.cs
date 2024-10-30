@@ -43,7 +43,10 @@ namespace GHSTShipping.Application.DTOs.Shop
 
     public class GhnShopDetailDto
     {
-        public int Id { get; set; }
+        /// <summary>
+        /// GHN Shop Id
+        /// </summary>
+        public string Id { get; set; }
         public string Name { get; set; }
         public string DisplayName { get { return $"{this.Id} - {this.Name}"; } }
 
@@ -51,7 +54,13 @@ namespace GHSTShipping.Application.DTOs.Shop
         // https://api.ghn.vn/home/docs/detail?id=106
         public string Phone { get; set; }
         public string Address { get; set; }
+
+        public string WardId{ get; set; }
+        public string WardName { get; set; }
         public string WardCode { get; set; }
         public string DistrictId { get; set; }
+        public string DistrictName { get; set; }
+        public string ProvinceId { get; set; }
+        public string ProvinceName { get;set; }
     }
 }

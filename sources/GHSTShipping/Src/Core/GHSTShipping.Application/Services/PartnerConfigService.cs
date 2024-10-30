@@ -169,6 +169,7 @@ namespace GHSTShipping.Application.Services
             string districtId = string.Empty;
             string provinceName = request.ProviceName;
             string provinceId = string.Empty;
+            string shopName = string.Empty;
 
             if (request.PartnerShopId != null)
             {
@@ -197,6 +198,7 @@ namespace GHSTShipping.Application.Services
                         if (targetShop != null)
                         {
                             address = targetShop.address;
+                            shopName = targetShop.name;
 
                             var districts = await ghnApiClient.GetDistrictAsync(apiConfig);
                             var targetDisctrict = districts.FirstOrDefault(i => i.DistrictID == targetShop.district_id);
@@ -226,6 +228,7 @@ namespace GHSTShipping.Application.Services
                 PartnerShopId = request.PartnerShopId,
                 PartnerConfigId = request.DeliveryConfigId,
                 ClientPhone = request.ClientPhone,
+                ShopName = shopName,
 
                 Address = address,
                 WardName = wardName,
@@ -287,7 +290,7 @@ namespace GHSTShipping.Application.Services
                 {
                     return response.Data.shops.Select(i => new GhnShopDetailDto
                     {
-                        Id = i._id,
+                        Id = $"{i._id}",
                         Name = i.name,
                         Phone = i.phone,
                         Address = i.address,

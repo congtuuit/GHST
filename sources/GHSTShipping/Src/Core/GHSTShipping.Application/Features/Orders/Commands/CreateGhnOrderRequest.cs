@@ -17,12 +17,16 @@ using System.Threading.Tasks;
 
 namespace GHSTShipping.Application.Features.Orders.Commands
 {
-    public class CreateGhnOrderRequest : CreateDeliveryOrderRequest, IRequest<BaseResult<CreateDeliveryOrderResponse>> { }
+    public class CreateGhnOrderRequest : CreateDeliveryOrderRequest, IRequest<BaseResult<CreateDeliveryOrderResponse>>
+    {
+
+    }
 
     public class CreateGhnOrderRequestHandler : IRequestHandler<CreateGhnOrderRequest, BaseResult<CreateDeliveryOrderResponse>>
     {
         private readonly IShopRepository _shopRepository;
         private readonly IOrderRepository _orderRepository;
+        private readonly IOrderHistoryRepository _orderHistoryRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPartnerConfigService _partnerConfigService;
         private readonly IOrderCodeSequenceService _orderCodeSequenceService;
@@ -35,6 +39,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         public CreateGhnOrderRequestHandler(
             IShopRepository shopRepository,
             IOrderRepository orderRepository,
+            IOrderHistoryRepository orderHistoryRepository,
             IUnitOfWork unitOfWork,
             IPartnerConfigService partnerConfigService,
             IOrderCodeSequenceService orderCodeSequenceService,
@@ -46,6 +51,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         {
             _shopRepository = shopRepository;
             _orderRepository = orderRepository;
+            _orderHistoryRepository = orderHistoryRepository;
             _unitOfWork = unitOfWork;
             _partnerConfigService = partnerConfigService;
             _orderCodeSequenceService = orderCodeSequenceService;
@@ -116,6 +122,14 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             order.GenerateOrderCode(await _orderCodeSequenceService.GenerateOrderCodeAsync(shopId), uniqueShopCode);
 
             await _orderRepository.AddAsync(order);
+            await _orderHistoryRepository.AddAsync(new OrderStatusHistory
+            {
+                OrderId = order.Id,
+                ChangedBy = shopId.ToString(),
+                Status = allowPublishOrder ? OrderStatus.READY_TO_PICK : OrderStatus.WAITING_CONFIRM,
+                Notes = "Order created via API"
+            });
+
             await _unitOfWork.SaveChangesAsync();
 
             return (order.ClientOrderCode, order.Id);
@@ -164,6 +178,16 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             entity.private_total_fee = response.total_fee;
             entity.private_expected_delivery_time = response.expected_delivery_time;
             entity.private_operation_partner = response.operation_partner;
+
+            await _orderHistoryRepository.AddAsync(new OrderStatusHistory
+            {
+                OrderId = entity.Id,
+                ChangedBy = "CreateGhnOrderRequest",
+                Status = OrderStatus.READY_TO_PICK,
+                Notes = "Order send to GHN success"
+            });
+
+            await _unitOfWork.SaveChangesAsync();
 
             await _unitOfWork.SaveChangesAsync();
         }

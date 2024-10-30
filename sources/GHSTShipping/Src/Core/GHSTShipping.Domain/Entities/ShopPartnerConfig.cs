@@ -46,5 +46,9 @@ namespace GHSTShipping.Domain.Entities
 
         [MaxLength(100)]
         public string? ProvinceId { get; set; }
+
+        [MaxLength(100)]
+        public string ShopName { get; set; }
+
     }
 }
