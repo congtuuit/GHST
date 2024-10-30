@@ -1,3 +1,4 @@
+using Delivery.GHN;
 using FluentValidation.AspNetCore;
 using GHSTShipping.Application;
 using GHSTShipping.Application.Interfaces;
@@ -9,22 +10,21 @@ using GHSTShipping.Infrastructure.Identity.Models;
 using GHSTShipping.Infrastructure.Identity.Seeds;
 using GHSTShipping.Infrastructure.Persistence;
 using GHSTShipping.Infrastructure.Persistence.Contexts;
-using GHSTShipping.Infrastructure.Persistence.Seeds;
 using GHSTShipping.Infrastructure.Resources;
 using GHSTShipping.WebApi.Infrastructure.Extensions;
 using GHSTShipping.WebApi.Infrastructure.Middlewares;
 using GHSTShipping.WebApi.Infrastructure.Services;
+using GHSTShipping.WebApi.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using Delivery.GHN;
 using Microsoft.Extensions.FileProviders;
-using System.IO;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using System;
+using System.IO;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -117,6 +117,10 @@ app.MapFallbackToController("Index", "Fallback"); // Fallback controller mapping
 
 /*app.UseHttpsRedirection();
 app.UseSpaStaticFiles();*/
+
+app.UseForwardedHeaders();
+app.UseMiddleware<SessionMiddleware>();
+
 
 app.Run();
 

@@ -26,5 +26,23 @@ namespace GHSTShipping.WebApi.Infrastructure.Services
                 }
             }
         }
+
+        public string DeviceInfo { get; } = httpContextAccessor?.HttpContext?.Request.Headers["User-Agent"].ToString();
+        public string IpAddress { get; } = httpContextAccessor?.HttpContext?.Connection.RemoteIpAddress?.ToString();
+        public Guid? SessionId
+        {
+            get
+            {
+                string value = httpContextAccessor.HttpContext?.User.FindFirstValue("Session_Id");
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return null;
+                }
+                else
+                {
+                    return Guid.Parse(value);
+                }
+            }
+        }
     }
 }

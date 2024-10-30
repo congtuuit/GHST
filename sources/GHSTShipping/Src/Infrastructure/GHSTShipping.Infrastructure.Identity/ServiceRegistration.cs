@@ -5,6 +5,7 @@ using GHSTShipping.Infrastructure.Identity.Models;
 using GHSTShipping.Infrastructure.Identity.Services;
 using GHSTShipping.Infrastructure.Identity.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,7 @@ namespace GHSTShipping.Infrastructure.Identity
 
             services.AddTransient<IGetUserServices, GetUserServices>();
             services.AddTransient<IAccountServices, AccountServices>();
+            services.AddTransient<IUserSessionService, UserSessionService>();
 
             var identitySettings = configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
 
@@ -54,6 +56,16 @@ namespace GHSTShipping.Infrastructure.Identity
                 options.Password.RequireLowercase = identitySettings.PasswordRequireLowercase;
 
             }).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
+
+            services.Configure<SecurityStampValidatorOptions>(options =>
+            {
+                options.ValidationInterval = TimeSpan.FromMinutes(30); // Set a validation interval that suits your app's needs
+            });
+
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+            });
 
             services.AddAuthentication(options =>
             {
@@ -94,14 +106,31 @@ namespace GHSTShipping.Infrastructure.Identity
                             if (claimsIdentity?.Claims.Any() is not true)
                                 context.Fail("This token has no claims.");
 
-                            var securityStamp = claimsIdentity?.FindFirst("AspNet.Identity.SecurityStamp");
-                            if (securityStamp is null)
-                                context.Fail("This token has no security stamp");
+                            var allowMultiDeviceLogin = configuration.GetSection("allowMultiDeviceLogin").Get<bool>();
+                            if (allowMultiDeviceLogin)
+                            {
+                                var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                                var userSessionService = context.HttpContext.RequestServices.GetRequiredService<IUserSessionService>();
 
-                            var signInManager = context.HttpContext.RequestServices.GetRequiredService<SignInManager<ApplicationUser>>();
-                            var validatedUser = await signInManager.ValidateSecurityStampAsync(context.Principal);
-                            if (validatedUser is null)
-                                context.Fail("Token security stamp is not valid.");
+                                // Validate that the session for this token exists
+                                var sessionIsValid = await userSessionService.ValidateUserSessionAsync(Guid.Parse(userId), context.HttpContext.Connection.RemoteIpAddress?.ToString());
+                                if (!sessionIsValid)
+                                {
+                                    context.Fail("Session is not valid.");
+                                }
+                            }
+                            else
+                            {
+                                var securityStamp = claimsIdentity?.FindFirst("AspNet.Identity.SecurityStamp");
+                                if (securityStamp is null)
+                                    context.Fail("This token has no security stamp");
+
+                                var signInManager = context.HttpContext.RequestServices.GetRequiredService<SignInManager<ApplicationUser>>();
+                                var validatedUser = await signInManager.ValidateSecurityStampAsync(context.Principal);
+                                if (validatedUser is null)
+                                    context.Fail("Token security stamp is not valid.");
+                            }
+
                         },
 
                     };
