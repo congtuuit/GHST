@@ -1,6 +1,6 @@
 import type { IOrderStatus } from './orderStatus';
 import type { IOrderPagedParameter, IPaginationResponse } from '@/interface/business';
-import type { IOrderDetail, IOrderDto } from '@/interface/order/order.interface';
+import type { IOrderDetail, IOrderDto, IOrderViewDto } from '@/interface/order/order.interface';
 import type { RadioChangeEvent, TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 import type { ColumnsType } from 'antd/lib/table';
@@ -27,6 +27,7 @@ const ShopOrderList = () => {
   const [orderDetail, setOrderDetail] = useState<IOrderDetail | undefined>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
+  const [refresh, setRefresh] = useState<boolean>(false);
 
   const fetchOrders = async (params: IOrderPagedParameter | null) => {
     if (params == null) {
@@ -46,7 +47,14 @@ const ShopOrderList = () => {
     }
   };
 
-  const columns: ColumnsType<IOrderDto> = [
+  const handleCancelOrder = async (id: string) => {
+    const response = await apiCancelOrderGhn([id]);
+    if (response.success) {
+      setRefresh(!refresh);
+    }
+  };
+
+  const columns: ColumnsType<IOrderViewDto> = [
     {
       title: 'STT',
       dataIndex: 'no',
@@ -59,7 +67,7 @@ const ShopOrderList = () => {
       dataIndex: 'clientOrderCode',
       key: 'clientOrderCode',
       width: 120,
-      render: (value: string, record: IOrderDto) => {
+      render: (value: string, record: IOrderViewDto) => {
         return (
           <Button type="link" onClick={() => handleViewOrderDetail(record.id)}>
             {value} <SearchOutlined />
@@ -68,14 +76,34 @@ const ShopOrderList = () => {
       },
     },
     {
-      title: 'Địa chỉ gửi',
-      dataIndex: 'fromAddress',
-      key: 'fromAddress',
+      title: 'Người nhận',
+      dataIndex: 'toName',
+      key: 'toName',
+      width: '150px',
+      render: (value: string, record: IOrderViewDto) => {
+        return (
+          <div>
+            <div>{value}</div>
+            <div>{record?.toPhone}</div>
+          </div>
+        );
+      },
     },
     {
       title: 'Địa chỉ đến',
       dataIndex: 'toAddress',
       key: 'toAddress',
+      render: (value: string, record: IOrderViewDto) => {
+        return (
+          <div>
+            <div>{value}</div>
+            <div>
+              {record?.toWardName} - {record?.toDistrictName}
+            </div>
+            <div>{record?.toProvinceName}</div>
+          </div>
+        );
+      },
     },
     {
       title: 'Trọng lượng',
@@ -114,7 +142,7 @@ const ShopOrderList = () => {
     {
       title: 'Trạng thái',
       align: 'center',
-      render: (_: any, record: IOrderDto) => {
+      render: (_: any, record: IOrderViewDto) => {
         const text = record.isPublished ? 'Đã giao đơn vị vận chuyển' : 'Chờ xác nhận';
         return <Tag color={record['isPublished'] === true ? 'green' : 'gray'}>{text}</Tag>;
       },
@@ -124,11 +152,11 @@ const ShopOrderList = () => {
       key: 'action',
       width: 150,
       align: 'center' as const,
-      render: (_: any, record: IOrderDto) => {
+      render: (_: any, record: IOrderViewDto) => {
         if (record.isPublished) {
           return (
             <div key={record.id}>
-              <Button className="table-btn-action" size="small" onClick={commingSoon}>
+              <Button className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
                 Hủy đơn
               </Button>
             </div>
@@ -137,7 +165,7 @@ const ShopOrderList = () => {
 
         return (
           <div key={record.id}>
-            <Button className="table-btn-action" size="small" onClick={commingSoon}>
+            <Button className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
               Hủy đơn
             </Button>
           </div>
@@ -174,7 +202,7 @@ const ShopOrderList = () => {
     };
 
     fetchOrders(params);
-  }, [selectedSupplier, tablePaginationConfig, orderStatusFilter]);
+  }, [selectedSupplier, tablePaginationConfig, orderStatusFilter, refresh]);
 
   return (
     <Card>

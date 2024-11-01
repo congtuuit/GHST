@@ -14,11 +14,8 @@ export interface IOrderDto {
   orderCode: string;
 }
 
-export interface IOrderDetail {
-  id: string;
+export interface IOrderDetail extends IOrderViewDto {
   privateOrderCode: string;
-  status: string;
-  clientOrderCode: string;
 }
 
 export interface ShopOrderViewDto {

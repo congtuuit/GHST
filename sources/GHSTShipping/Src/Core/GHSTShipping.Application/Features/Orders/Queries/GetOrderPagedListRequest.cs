@@ -1,4 +1,6 @@
-﻿using GHSTShipping.Application.DTOs;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using GHSTShipping.Application.DTOs;
 using GHSTShipping.Application.Extensions;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
@@ -33,7 +35,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
     public class GetOrderPagedListRequestHandler(
         IUnitOfWork unitOfWork,
         IAuthenticatedUserService authenticatedUser,
-        IShopRepository shopRepository
+        IShopRepository shopRepository,
+        MapperConfiguration mapperConfiguration
         ) : IRequestHandler<GetOrderPagedListRequest, BaseResult<PaginationResponseDto<OrderDto>>>
     {
         public async Task<BaseResult<PaginationResponseDto<OrderDto>>> Handle(GetOrderPagedListRequest request, CancellationToken cancellationToken)
@@ -57,14 +60,12 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 {
                     return BaseResult<PaginationResponseDto<OrderDto>>.Ok(new PaginationResponseDto<OrderDto>(new System.Collections.Generic.List<OrderDto>(), 0, request.PageNumber, request.PageSize));
                 }
-
-                query = query.Where(o => o.ShopId == shop.ShopId);
             }
 
             // Filter by shopId
             if (request.ShopId.HasValue)
             {
-                query = query.Where(i => i.ShopId == request.ShopId);
+                query = query.Where(i => i.ShopId == request.ShopId && i.CurrentStatus != OrderStatus.CANCEL);
             }
 
             // Filter by code
@@ -92,41 +93,11 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 }
             }
 
+            query = query.Where(o => o.CurrentStatus != OrderStatus.CANCEL);
+
             int skipCount = (request.PageNumber - 1) * request.PageSize;
             PaginationResponseDto<OrderDto> pagingResult = await query
-                .Select(i => new OrderDto
-                {
-                    Id = i.Id,
-                    IsPublished = i.IsPublished,
-                    PublishDate = i.PublishDate,
-                    ShopId = i.ShopId,
-                    ShopName = i.Shop.Name,
-                    DeliveryPartner = i.DeliveryPartner,
-                    DeliveryFee = i.DeliveryFee,
-                    ClientOrderCode = i.ClientOrderCode,
-                    FromName = i.FromName,
-                    FromPhone = i.FromPhone,
-                    FromAddress = i.FromAddress,
-                    FromWardName = i.FromWardName,
-                    FromDistrictName = i.FromDistrictName,
-                    FromProvinceName = i.FromProvinceName,
-                    ToName = i.ToName,
-                    ToPhone = i.ToPhone,
-                    ToAddress = i.ToAddress,
-                    ToWardName = i.ToWardName,
-                    ToDistrictName = i.ToDistrictName,
-                    ToProvinceName = i.ToProvinceName,
-                    Weight = i.Weight,
-                    Length = i.Length,
-                    Width = i.Width,
-                    Height = i.Height,
-                    CodAmount = i.CodAmount,
-                    InsuranceValue = i.InsuranceValue,
-                    ServiceTypeId = i.ServiceTypeId,
-                    PaymentTypeId = i.PaymentTypeId,
-
-                    Status = i.CurrentStatus
-                })
+                .ProjectTo<OrderDto>(mapperConfiguration)
                 .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);
 
             int index = 0;

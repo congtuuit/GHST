@@ -1,4 +1,6 @@
-﻿using Delivery.GHN;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Delivery.GHN;
 using Delivery.GHN.Models;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
@@ -23,7 +25,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         IShopRepository shopRepository,
         IGhnApiClient ghnApiClient,
         IPartnerConfigService partnerConfigService,
-        IAuthenticatedUserService authenticatedUserService
+        IAuthenticatedUserService authenticatedUserService,
+        MapperConfiguration mapperConfiguration
         ) : IRequestHandler<GetOrderDetailRequest, BaseResult<OrderDetailDto>>
     {
         public async Task<BaseResult<OrderDetailDto>> Handle(GetOrderDetailRequest request, CancellationToken cancellationToken)
@@ -37,12 +40,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             // Fetch the order details
             var order = await orderRepository
                 .Where(i => i.Id == request.OrderId)
-                .Select(i => new OrderDetailDto
-                {
-                    Id = i.Id,
-                    PrivateOrderCode = i.private_order_code,
-                    ClientOrderCode = i.ClientOrderCode
-                })
+                .ProjectTo<OrderDetailDto>(mapperConfiguration)
                 .FirstOrDefaultAsync(cancellationToken);
 
             // Early return if the order is not found

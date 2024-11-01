@@ -51,7 +51,7 @@ namespace GHSTShipping.WebApi.Controllers.v1
 
         [HttpPut]
         [Route("ghn/cancel")]
-        public async Task<BaseResult<CancelOrderResponse>> CancelGhnAsync([FromBody] CancelOrderGhnRequest request)
+        public async Task<BaseResult> CancelGhnAsync([FromBody] CancelOrderGhnRequest request)
         {
             return await Mediator.Send(request);
         }

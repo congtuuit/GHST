@@ -25,6 +25,8 @@ namespace GHSTShipping.Domain.Entities
     /// </summary>
     public static class OrderStatus
     {
+        public const string CANCEL = "cancel";
+
         public const string DRAFT = "draft";
 
         public const string WAITING_CONFIRM = "waiting_confirm";

@@ -59,8 +59,10 @@ export const apiGetOrderDetail = (orderId: string | undefined) => {
   return request<IOrderDetail>('get', `/orders/ghn/detail/${orderId}`);
 };
 
-export const apiCancelOrderGhn = (orderCodes: string[]) => {
-  return request<IOrderDetail>('put', `/orders/ghn/cancel`, orderCodes);
+export const apiCancelOrderGhn = (orderIds: string[]) => {
+  return request<IOrderDetail>('put', `/orders/ghn/cancel`, {
+    orderIds: orderIds,
+  });
 };
 
 export const apiGetShops = (pageNumber: number | undefined = 1, pageSize: number | undefined = 10) => {
@@ -85,6 +87,5 @@ export const apiUpdateShopDeliveryConfig = (payload: IUpdateShopDeliveryConfigRe
 export const apiGetOrderMetaData = () => request<IOrderMetadata>('get', `/orders/metadata`);
 export const apiGetShopOrders = (params: IPaginationRequestParameter) => {
   const queryString = buildQueryString(params);
-  console.log("queryString ", queryString)
   return request<IPaginationResponse<ShopOrderViewDto>>('get', `/orders/group-by-shops?${queryString}`);
 };
