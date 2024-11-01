@@ -4,10 +4,14 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IOrderState {
   order: ICreateDeliveryOrderRequest | null;
+  orders: any[];
+  shopId: string | null;
 }
 
 const initialState: IOrderState = {
   order: null,
+  orders: [],
+  shopId: null
 };
 
 const orderSlice = createSlice({
@@ -20,8 +24,11 @@ const orderSlice = createSlice({
     clearOrder(state) {
       state.order = null;
     },
+    setShopId(state, action: PayloadAction<string>) {
+      state.shopId = action.payload;
+    }
   },
 });
 
-export const { setOrder, clearOrder } = orderSlice.actions;
+export const { setOrder, clearOrder, setShopId } = orderSlice.actions;
 export default orderSlice.reducer;

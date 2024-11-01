@@ -1,4 +1,4 @@
-import type { PageData } from '@/interface';
+import type { IPaginationRequestParameter, PageData } from '@/interface';
 import type {
   BuniesssUser,
   ICreateDeliveryOrderRequest,
@@ -8,7 +8,7 @@ import type {
   PaginationResponse,
   ShopPricePlanDto,
 } from '@/interface/business';
-import type { IOrderDetail, IOrderDto } from '@/interface/order/order.interface';
+import type { IOrderDetail, IOrderDto, ShopOrderViewDto } from '@/interface/order/order.interface';
 import type { IOrderMetadata, IShopViewDetailDto, IUpdateShopDeliveryConfigRequest } from '@/interface/shop';
 import type { IDeliveryConfigDto } from '@/pages/delivery-config';
 
@@ -83,3 +83,8 @@ export const apiCreateDeliveryConfig = (payload: any) => request('post', `/confi
 
 export const apiUpdateShopDeliveryConfig = (payload: IUpdateShopDeliveryConfigRequest) => request('put', `/configs/shop`, payload);
 export const apiGetOrderMetaData = () => request<IOrderMetadata>('get', `/orders/metadata`);
+export const apiGetShopOrders = (params: IPaginationRequestParameter) => {
+  const queryString = buildQueryString(params);
+  console.log("queryString ", queryString)
+  return request<IPaginationResponse<ShopOrderViewDto>>('get', `/orders/group-by-shops?${queryString}`);
+};

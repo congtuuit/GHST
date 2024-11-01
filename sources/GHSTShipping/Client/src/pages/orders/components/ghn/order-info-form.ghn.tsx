@@ -32,7 +32,7 @@ const OrderInfoForm = () => {
               },
             ]}
           >
-            <MyInputNumber max={50000} />
+            <MyInputNumber max={50000} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
 
@@ -54,7 +54,7 @@ const OrderInfoForm = () => {
               },
             ]}
           >
-            <MyInputNumber max={200} />
+            <MyInputNumber max={200} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
         <Col span={6}>
@@ -74,7 +74,7 @@ const OrderInfoForm = () => {
               },
             ]}
           >
-            <MyInputNumber max={200} />
+            <MyInputNumber max={200} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
         <Col span={6}>
@@ -94,7 +94,7 @@ const OrderInfoForm = () => {
               },
             ]}
           >
-            <MyInputNumber max={200} />
+            <MyInputNumber max={200} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
       </Row>
@@ -103,7 +103,7 @@ const OrderInfoForm = () => {
         {/* COD */}
         <Col span={12}>
           <Form.Item name="cod_amount" label="Tổng tiền thu hộ (COD)" tooltip={{ title: 'Nhập số tiền COD', icon: <InfoCircleOutlined /> }}>
-            <MyInputNumber defaultValue="0" max={50000000} />
+            <MyInputNumber defaultValue="0" max={50000000} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
 
@@ -114,7 +114,7 @@ const OrderInfoForm = () => {
             label="Tổng giá trị hàng hóa"
             tooltip={{ title: 'Nhập tổng giá trị hàng hóa', icon: <InfoCircleOutlined /> }}
           >
-            <MyInputNumber defaultValue="0" max={5000000} />
+            <MyInputNumber defaultValue="0" max={5000000} placeholder="Nhập giá trị"/>
           </Form.Item>
         </Col>
       </Row>
@@ -131,7 +131,7 @@ const OrderInfoForm = () => {
         {failedDelivery && (
           <Col span={12}>
             <Form.Item name="cod_failed_amount">
-              <MyInputNumber defaultValue="" max={99999999} />
+              <MyInputNumber defaultValue="" max={99999999} placeholder="Nhập giá trị"/>
             </Form.Item>
           </Col>
         )}

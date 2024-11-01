@@ -140,6 +140,11 @@ namespace GHSTShipping.Domain.Entities
         [MaxLength(100)]
         public string private_operation_partner { get; set; }
 
+
+        [MaxLength(100)]
+        public string CurrentStatus { get; set; }
+
+
         #endregion
 
         public void GenerateOrderCode(long sequenceCode, string prefix)

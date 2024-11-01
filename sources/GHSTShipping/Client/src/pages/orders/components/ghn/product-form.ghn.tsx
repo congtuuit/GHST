@@ -71,6 +71,7 @@ const ProductForm = () => {
                 ]}
               >
                 <MyInputNumber
+                  placeholder="Nhập giá trị"
                   value={product.weight}
                   onChange={e => {
                     const value: string = e.toString();

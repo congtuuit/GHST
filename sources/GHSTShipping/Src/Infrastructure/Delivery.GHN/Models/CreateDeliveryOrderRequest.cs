@@ -132,6 +132,11 @@ public class CreateDeliveryOrderRequest
     public string? ClientOrderCode { get; set; }
 
     // Optional
+
+    [JsonProperty("return_phone")]
+    [JsonPropertyName("return_phone")]
+    public string? ReturnPhone { get; set; }
+
     [JsonProperty("return_address")]
     [JsonPropertyName("return_address")]
     public string? ReturnAddress { get; set; }

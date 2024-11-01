@@ -139,14 +139,53 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         {
             return new Order
             {
+                ShopId = shopId,
+                UniqueCode = uniqueShopCode,
+                IsPublished = allowPublishOrder ? true : false,
+                DeliveryPartner = EnumSupplierConstants.GHN,
+                DeliveryFee = deliveryFeePlan,
+                PublishDate = allowPublishOrder ? DateTime.UtcNow : null,
+                CurrentStatus = allowPublishOrder ? OrderStatus.READY_TO_PICK : OrderStatus.WAITING_CONFIRM,
                 Note = request.Note,
+                ReturnPhone = request.ReturnPhone,
+                ReturnAddress = request.ReturnAddress,
+                ReturnDistrictId = request.ReturnDistrictName,
+                ReturnWardCode = request.ReturnWardName,
+
+                ClientOrderCode = uniqueShopCode,
                 PaymentTypeId = request.PaymentTypeId,
                 RequiredNote = request.RequiredNote,
+
                 FromName = request.FromName,
                 FromPhone = request.FromPhone,
+                FromAddress = request.FromAddress,
+                FromWardId = request.FromWardId,
+                FromWardName = request.FromWardName,
+                FromDistrictId = request.FromDistrictId,
+                FromDistrictName = request.FromDistrictName,
+                FromProvinceId = request.FromProvinceId,
+                FromProvinceName = request.FromProvinceName,
+
                 ToName = request.ToName,
                 ToPhone = request.ToPhone,
                 ToAddress = request.ToAddress,
+                ToWardId = request.ToWardId,
+                ToWardName = request.ToWardName,
+                ToDistrictId = request.ToDistrictId,
+                ToDistrictName = request.ToDistrictName,
+                ToProvinceId = request.ToProvinceId,
+                ToProvinceName = request.ToProvinceName,
+
+                CodAmount = request.CodAmount,
+                Content = request.Content,
+                PickStationId = request.PickStationId,
+                DeliverStationId = request.DeliverStationId,
+                InsuranceValue = request.InsuranceValue,
+                ServiceId = request.ServiceId,
+                ServiceTypeId = request.ServiceTypeId,
+                Coupon = request.Coupon,
+                PickShift = request.PickShift,
+
                 Weight = request.Weight,
                 Length = request.Length,
                 Width = request.Width,
@@ -156,13 +195,11 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     Name = i.Name,
                     Code = i.Code,
                     Quantity = i.Quantity,
-                    Price = i.Price
+                    Price = i.Price,
+                    Length = i.Length,
+                    Width = i.Width,
+                    Height = i.Height,
                 }).ToList(),
-                CodAmount = request.CodAmount,
-                ShopId = shopId,
-                DeliveryPartner = EnumSupplierConstants.GHN,
-                DeliveryFee = deliveryFeePlan,
-                PublishDate = allowPublishOrder ? DateTime.UtcNow : null,
             };
         }
 

@@ -5,9 +5,11 @@ using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Parameters;
 using GHSTShipping.Application.Wrappers;
 using GHSTShipping.Domain.DTOs;
+using GHSTShipping.Domain.Entities;
 using GHSTShipping.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +26,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         /// DRAFT | WAIT_CONFIRM | DELIVERING | RETURN | WAIT_CONFIRM_DELIVERY | COMPLETED | CANCEL | LOST
         /// </summary>
         public string Status { get; set; }
+
+        public Guid? ShopId { get; set; }
     }
 
     public class GetOrderPagedListRequestHandler(
@@ -57,6 +61,12 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 query = query.Where(o => o.ShopId == shop.ShopId);
             }
 
+            // Filter by shopId
+            if (request.ShopId.HasValue)
+            {
+                query = query.Where(i => i.ShopId == request.ShopId);
+            }
+
             // Filter by code
             if (!string.IsNullOrWhiteSpace(request.OrderCode))
             {
@@ -74,7 +84,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             {
                 if (request.Status == EnumOrderStatusConstants.DRAFT)
                 {
-                    query = query.Where(o => o.IsPublished == false);
+                    query = query.Where(o => o.IsPublished == false || o.CurrentStatus == OrderStatus.WAITING_CONFIRM);
                 }
                 else
                 {
@@ -87,20 +97,35 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 .Select(i => new OrderDto
                 {
                     Id = i.Id,
-                    ClientOrderCode = i.ClientOrderCode,
                     IsPublished = i.IsPublished,
-                    FromAddress = i.FromAddress,
-                    ToAddress = i.ToAddress,
-                    Weight = i.Weight,
-                    PaymentTypeId = i.PaymentTypeId,
-                    InsuranceValue = i.InsuranceValue,
-                    CodAmount = i.CodAmount,
                     PublishDate = i.PublishDate,
-                    DeliveryFee = i.DeliveryFee,
-                    PrivateOrderCode = i.private_order_code,
+                    ShopId = i.ShopId,
                     ShopName = i.Shop.Name,
-                    OrderCode = i.private_order_code
-                    //PrivateTotalFee = i.private_total_fee,
+                    DeliveryPartner = i.DeliveryPartner,
+                    DeliveryFee = i.DeliveryFee,
+                    ClientOrderCode = i.ClientOrderCode,
+                    FromName = i.FromName,
+                    FromPhone = i.FromPhone,
+                    FromAddress = i.FromAddress,
+                    FromWardName = i.FromWardName,
+                    FromDistrictName = i.FromDistrictName,
+                    FromProvinceName = i.FromProvinceName,
+                    ToName = i.ToName,
+                    ToPhone = i.ToPhone,
+                    ToAddress = i.ToAddress,
+                    ToWardName = i.ToWardName,
+                    ToDistrictName = i.ToDistrictName,
+                    ToProvinceName = i.ToProvinceName,
+                    Weight = i.Weight,
+                    Length = i.Length,
+                    Width = i.Width,
+                    Height = i.Height,
+                    CodAmount = i.CodAmount,
+                    InsuranceValue = i.InsuranceValue,
+                    ServiceTypeId = i.ServiceTypeId,
+                    PaymentTypeId = i.PaymentTypeId,
+
+                    Status = i.CurrentStatus
                 })
                 .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);
 

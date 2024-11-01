@@ -24,9 +24,9 @@ export interface IPaginationResponse<T> {
 }
 
 export interface IOrderPagedParameter extends IPaginationRequestParameter {
-  deliveryPartner: string | undefined;
-  orderCode: string | undefined;
-  status: string | undefined;
+  deliveryPartner?: string | undefined;
+  orderCode?: string | undefined;
+  status?: string | undefined;
 }
 
 export interface ShopPricePlanDto {

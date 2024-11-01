@@ -20,3 +20,56 @@ export interface IOrderDetail {
   status: string;
   clientOrderCode: string;
 }
+
+export interface ShopOrderViewDto {
+  id: string;
+  uniqueCode: string;
+  name: string;
+  address: string;
+  totalDraftOrder: number;
+  totalPublishedOrder: number;
+}
+
+export interface IOrderViewDto {
+  no: number;
+  isPublished: boolean;
+  publishDate?: Date;
+
+  id: string;
+  shopId?: string;
+  shopName: string;
+  deliveryPartner: string;
+  deliveryFee: number;
+
+  clientOrderCode: string;
+  fromName: string;
+  fromPhone: string;
+  fromAddress: string;
+  fromWardName: string;
+  fromDistrictName: string;
+  fromProvinceName: string;
+
+  toName: string;
+  toPhone: string;
+  toAddress: string;
+  toWardName: string;
+  toDistrictName: string;
+  toProvinceName: string;
+
+  weight: number;
+  length: number;
+  width: number;
+  height: number;
+
+  codAmount: number;
+  insuranceValue: number;
+
+  serviceTypeId: number;
+  serviceTypeName: string;
+
+  paymentTypeId: number;
+  paymentTypeName: string;
+  status: string;
+  statusName: string;
+}
+

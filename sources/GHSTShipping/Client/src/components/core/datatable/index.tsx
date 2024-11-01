@@ -7,7 +7,7 @@ import { Table } from 'antd';
 interface DatatableProps<T> {
   columns: any[];
   dataSource: IPaginationResponse<T> | null;
-  onChange: (pagination: TablePaginationConfig, filters: Record<string, FilterValue | null>, sorter: any) => void; // Ensure proper typing for onChange
+  onChange?: (pagination: TablePaginationConfig, filters: Record<string, FilterValue | null>, sorter: any) => void; // Ensure proper typing for onChange
 }
 
 const Datatable = <T extends object>({ columns, dataSource, onChange }: DatatableProps<T>) => {

@@ -65,8 +65,11 @@ const FormOrderGhn = () => {
             from_phone: senderAddress['phone'],
             from_address: senderAddress['address'],
             from_ward_id: senderAddress['wardId'],
+            from_ward_name: senderAddress['wardName'],
             from_district_id: parseInt(senderAddress['districtId']),
+            from_district_name: senderAddress['districtName'],
             from_province_id: parseInt(senderAddress['provinceId']),
+            from_province_name: parseInt(senderAddress['provinceName']),
           };
           setTimeout(() => {
             form.setFieldsValue(senderInfo);
@@ -87,6 +90,8 @@ const FormOrderGhn = () => {
 
         // Trong đó:  2: Hàng nhẹ, 5: Hàng nặng
         values.service_type_id = serviceType.HangNang;
+      } else {
+        values.service_type_id = serviceType.HangNhe;
       }
 
       const orderBuilder = new OrderBuilder(values);
@@ -101,6 +106,9 @@ const FormOrderGhn = () => {
       const response = await apiCreateDeliveryOrder(values);
       if (response.success) {
         message.success('Tạo đơn thành công');
+        form.resetFields();
+
+        await fetchPickShifts();
       } else {
         message.error(response.errors[0]?.description || 'Đã xảy ra lỗi');
       }
@@ -155,7 +163,7 @@ const FormOrderGhn = () => {
               </Title>
             </Col>
             <div className="border-top-info"></div>
-            <Form.Item hidden name="service_type_id">
+            <Form.Item hidden name="service_type_id" initialValue={serviceTypeId}>
               <InputNumber value={serviceTypeId} />
             </Form.Item>
             <Col span={12}>

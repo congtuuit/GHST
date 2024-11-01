@@ -22,6 +22,13 @@ namespace GHSTShipping.WebApi.Controllers.v1
         }
 
         [HttpGet]
+        [Route("group-by-shops")]
+        public async Task<BaseResult<PaginationResponseDto<ShopViewReportDto>>> OrdersGroupByShops([FromQuery] GetOrdersGroupByShopRequest request)
+        {
+            return await Mediator.Send(request);
+        }
+
+        [HttpGet]
         [Route("metadata")]
         public async Task<BaseResult<GetOrderMetadataResponse>> MetaData([FromQuery] GetOrderMetadataRequest request)
         {
