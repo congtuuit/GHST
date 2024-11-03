@@ -7,7 +7,7 @@ import { useRoutes } from 'react-router-dom';
 
 import CustomerPage from '@/pages/customer';
 import CustomerPricePage from '@/pages/customer-price';
-import Dashboard from '@/pages/dashboard';
+import Dashboard from '@/pages/dashboard/index';
 import DeliveryConfigPage from '@/pages/delivery-config';
 import ForgotPasswordPage from '@/pages/forgot-password';
 import LayoutPage from '@/pages/layout';
@@ -18,6 +18,7 @@ import RegisterPage from '@/pages/register';
 import ResetPasswordPage from '@/pages/reset-password';
 
 import WrapperRouteComponent from './config';
+import AdminViewShopOrders from '@/pages/orders/AdminViewShopOrders';
 
 const NotFound = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/404'));
 const Documentation = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/doucumentation'));
@@ -78,6 +79,10 @@ const routeList: RouteObject[] = [
       {
         path: 'order/list',
         element: <WrapperRouteComponent element={<OrdersPage />} titleId="title.orderList" />,
+      },
+      {
+        path: 'order/list/:shopId',
+        element: <WrapperRouteComponent element={<AdminViewShopOrders />} titleId="title.orderListByShop" />,
       },
       {
         path: 'order/create',

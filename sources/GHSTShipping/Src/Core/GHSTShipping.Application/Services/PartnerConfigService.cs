@@ -191,8 +191,8 @@ namespace GHSTShipping.Application.Services
         {
             // Get the existing config IDs for the shop
             var existedConfig = await shopPartnerConfigRepository
-                .Where(i => i.ShopId == request.ShopId && request.DeliveryConfigId == i.PartnerConfigId)
-                .FirstOrDefaultAsync();
+                .Where(i => i.ShopId == request.ShopId)
+                .ToListAsync();
 
             string address = request.Address;
             string wardName = request.WardName;
@@ -274,17 +274,17 @@ namespace GHSTShipping.Application.Services
             using var transaction = await unitOfWork.BeginTransactionAsync();
             try
             {
-                if (existedConfig == null)
+                // Remove all configs
+                if (existedConfig.Any())
+                {
+                    var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}'";
+                    //var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}' AND PartnerConfigId = '{request.DeliveryConfigId}'";
+                    await shopPartnerConfigRepository.ExecuteSqlRawAsync(sqlQuery);
+                }
+
+                if (request.IsConnect)
                 {
                     await shopPartnerConfigRepository.AddAsync(shopPartnerConfig);
-                }
-                else
-                {
-                    if (request.IsConnect == false)
-                    {
-                        var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}' AND PartnerConfigId = '{request.DeliveryConfigId}'";
-                        await shopPartnerConfigRepository.ExecuteSqlRawAsync(sqlQuery);
-                    }
                 }
 
                 // Commit changes to the database

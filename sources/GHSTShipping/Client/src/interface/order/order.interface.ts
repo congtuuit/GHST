@@ -70,5 +70,6 @@ export interface IOrderViewDto {
   status: string;
   statusName: string;
   statusColor: string;
+  created: string;
 }
 

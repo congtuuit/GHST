@@ -1,37 +1,33 @@
 import type { IPaginationResponse } from '@/interface/business';
-import type { IOrderDto, ShopOrderViewDto } from '@/interface/order/order.interface';
+import type { ShopOrderViewDto } from '@/interface/order/order.interface';
 import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 import type { ColumnsType } from 'antd/lib/table';
-import { SearchOutlined } from '@ant-design/icons';
 import { Button, Card, message, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { apiCancelOrderGhn, apiGetShopOrders } from '@/api/business.api';
 import Datatable from '@/components/core/datatable';
-import { commingSoon } from '@/utils/common';
 import { IPaginationRequestParameter } from '@/interface';
-import { useDispatch, useSelector } from 'react-redux';
-import { setShopId } from '@/features/order/orderSlice';
-import MyModal from '@/components/core/modal';
-import ShopOrders from './components/ShopOrder';
+import { useDispatch } from 'react-redux';
+import { setShopInfo } from '@/features/order/orderSlice';
+import { useNavigate } from 'react-router-dom';
 
 const AdminOrderList = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [shopOrderPagination, setShopOrderPagination] = useState<IPaginationResponse<ShopOrderViewDto> | null>(null);
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
-  const [openOrders, setOpenOrders] = useState<boolean>(false);
   const [shopSelected, setShopSelected] = useState<ShopOrderViewDto>();
 
   const fetchShopOrders = async (params: IPaginationRequestParameter | null) => {
     if (params == null) {
       params = {
         pageNumber: 1,
-        pageSize: 10,
+        pageSize: 8,
       };
     }
 
     const response = await apiGetShopOrders(params);
-
     if (response.success) {
       setShopOrderPagination(response.data);
     }
@@ -43,6 +39,12 @@ const AdminOrderList = () => {
     if (response.success) {
       message.success('Hủy đơn thành công!');
     }
+  };
+
+  const handleViewShopOrders = (record: ShopOrderViewDto) => {
+    setShopSelected(record);
+    dispatch(setShopInfo(record));
+    navigate(record.id);
   };
 
   const columns: ColumnsType<ShopOrderViewDto> = [
@@ -60,14 +62,7 @@ const AdminOrderList = () => {
       width: 120,
       render: (value: string, record: ShopOrderViewDto) => {
         return (
-          <Button
-            type="link"
-            onClick={() => {
-              setShopSelected(record);
-              setOpenOrders(true);
-              dispatch(setShopId(record.id));
-            }}
-          >
+          <Button type="link" onClick={() => handleViewShopOrders(record)}>
             {value}
           </Button>
         );
@@ -80,14 +75,7 @@ const AdminOrderList = () => {
       align: 'center' as const,
       render: (value: string, record: ShopOrderViewDto) => {
         return (
-          <Button
-            type="link"
-            onClick={() => {
-              setShopSelected(record);
-              setOpenOrders(true);
-              dispatch(setShopId(record.id));
-            }}
-          >
+          <Button type="link" onClick={() => handleViewShopOrders(record)}>
             {value}
           </Button>
         );
@@ -133,16 +121,7 @@ const AdminOrderList = () => {
       render: (_: any, record: ShopOrderViewDto) => {
         return (
           <div key={record.id}>
-            <Button
-              type="link"
-              className="table-btn-action"
-              size="middle"
-              onClick={() => {
-                setShopSelected(record);
-                setOpenOrders(true);
-                dispatch(setShopId(record.id));
-              }}
-            >
+            <Button type="link" className="table-btn-action" size="middle" onClick={() => handleViewShopOrders(record)}>
               Xem đơn hàng
             </Button>
           </div>
@@ -158,7 +137,7 @@ const AdminOrderList = () => {
   useEffect(() => {
     const params: IPaginationRequestParameter = {
       pageNumber: (tablePaginationConfig?.current as number) ?? 1,
-      pageSize: (tablePaginationConfig?.pageSize as number) ?? 10,
+      pageSize: (tablePaginationConfig?.pageSize as number) ?? 8,
     };
 
     fetchShopOrders(params);
@@ -167,22 +146,6 @@ const AdminOrderList = () => {
   return (
     <Card>
       <Datatable columns={columns} dataSource={shopOrderPagination} onChange={handleChangeTable} />
-      <MyModal
-        title={`Đơn hàng - ${shopSelected?.name} (${shopSelected?.uniqueCode})`}
-        open={openOrders}
-        onClose={() => setOpenOrders(false)}
-        maskClosable={false}
-        width={"80%"}
-        height={"100%"}
-        centered
-        footer={[
-          <Button key="ok" type="primary" onClick={() => setOpenOrders(false)}>
-            Đóng
-          </Button>,
-        ]}
-      >
-        <ShopOrders />
-      </MyModal>
     </Card>
   );
 };

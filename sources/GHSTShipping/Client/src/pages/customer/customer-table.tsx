@@ -170,7 +170,6 @@ const CustomerTable = () => {
 
   const handleViewDetail = async (id: string) => {
     const response = await apiGetShopDetail(id);
-
     if (response.success) {
       setCustomerDetail(response.data);
     }

@@ -1,17 +1,18 @@
 // store/orderSlice.ts
 import { ICreateDeliveryOrderRequest } from '@/interface/business';
+import { ShopOrderViewDto } from '@/interface/order/order.interface';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IOrderState {
   order: ICreateDeliveryOrderRequest | null;
   orders: any[];
-  shopId: string | null;
+  shop: ShopOrderViewDto | null;
 }
 
 const initialState: IOrderState = {
   order: null,
   orders: [],
-  shopId: null
+  shop: null
 };
 
 const orderSlice = createSlice({
@@ -24,11 +25,11 @@ const orderSlice = createSlice({
     clearOrder(state) {
       state.order = null;
     },
-    setShopId(state, action: PayloadAction<string>) {
-      state.shopId = action.payload;
+    setShopInfo(state, action: PayloadAction<ShopOrderViewDto>) {
+      state.shop = action.payload;
     }
   },
 });
 
-export const { setOrder, clearOrder, setShopId } = orderSlice.actions;
+export const { setOrder, clearOrder, setShopInfo } = orderSlice.actions;
 export default orderSlice.reducer;

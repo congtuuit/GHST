@@ -57,6 +57,10 @@ export function getItemWithExpiry(key: string) {
 
 dayjs.extend(utc);
 // Function to format UTC to local time with Vietnamese locale
-export const formatUtcToLocalTime = (utcDateTime: string, format: string = revertdatetimeFormatMap['minute']) => {
+export const formatUtcToLocalTime = (utcDateTime: string | undefined, format: string = revertdatetimeFormatMap['minute']) => {
+  if (!Boolean(utcDateTime)) {
+    return utcDateTime;
+  }
+
   return dayjs.utc(utcDateTime).local().format(format);
 };
