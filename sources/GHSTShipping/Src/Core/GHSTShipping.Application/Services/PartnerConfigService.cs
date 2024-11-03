@@ -24,6 +24,23 @@ namespace GHSTShipping.Application.Services
         IGhnApiClient ghnApiClient
         , IUnitOfWork unitOfWork) : IPartnerConfigService
     {
+
+        public async Task<ApiConfig> GetApiConfigAsync(EnumDeliveryPartner enumDeliveryPartner, Guid shopId)
+        {
+            var partnerConfig = await shopPartnerConfigRepository
+                .Where(i => i.ShopId == shopId && i.PartnerConfig.DeliveryPartner == enumDeliveryPartner)
+                .Select(i => new
+                {
+                    i.PartnerConfig.ProdEnv,
+                    i.PartnerConfig.ApiKey
+                })
+                .FirstOrDefaultAsync();
+
+            var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey);
+
+            return apiConfig;
+        }
+
         public async Task<PartnerConfigDto> GetPartnerConfigAsync(EnumDeliveryPartner enumDeliveryPartner)
         {
             var result = await partnerConfigRepository.Where(i => i.DeliveryPartner == enumDeliveryPartner && i.IsActivated)
@@ -58,9 +75,24 @@ namespace GHSTShipping.Application.Services
                 Email = i.Email,
                 PhoneNumber = i.PhoneNumber,
                 FullName = i.FullName,
-                ProdEnv = i.ProdEnv
+                ProdEnv = i.ProdEnv,
             })
             .ToListAsync();
+
+            var configIds = result.Select(c => c.Id);
+            var connects = await shopPartnerConfigRepository.Where(c => configIds.Contains(c.PartnerConfigId))
+                .Select(c => new
+                {
+                    c.PartnerConfigId,
+                    c.ShopName,
+                })
+                .ToListAsync();
+
+            foreach (var config in result)
+            {
+                var shopConnects = connects.Where(c => c.PartnerConfigId == config.Id);
+                config.ShopNames = string.Join(", ", shopConnects.Select(c => c.ShopName));
+            }
 
             return result;
         }

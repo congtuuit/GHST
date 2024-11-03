@@ -108,7 +108,7 @@ const LayoutPage: FC = () => {
   return (
     <Layout className="layout-page">
       <HeaderComponent collapsed={collapsed} toggle={toggle} />
-      <Layout className='content-container'>
+      <Layout className="content-container">
         {!isMobile ? (
           <Sider
             className="layout-page-sider"
@@ -139,7 +139,9 @@ const LayoutPage: FC = () => {
           </Drawer>
         )}
         <Content className="layout-page-content">
-          <TagsView />
+          {/* HIDE TAGS OF TAB VIEW HISTORY */}
+          {/* <TagsView /> */}
+
           <Suspense fallback={null}>
             <Outlet />
           </Suspense>

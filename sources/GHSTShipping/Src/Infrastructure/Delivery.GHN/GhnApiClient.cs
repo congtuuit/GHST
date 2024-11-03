@@ -37,31 +37,36 @@ namespace Delivery.GHN
         {
             try
             {
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
+
+                // Add dynamic headers
+                _httpClient.DefaultRequestHeaders.Remove("Token");
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.GET_ALL_SHOPS, content);
-                response.EnsureSuccessStatusCode();
 
+                // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<GhnApiResponse<GetAllShopsResponse>>(jsonResponse);
 
-                return result;
+                return result ?? throw new InvalidOperationException("Received a null response from the API.");
             }
-            catch (Exception ex)
+            catch (HttpRequestException httpEx) when (_allowLogging)
             {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while fetching shop information.");
-                }
-
-                throw;
+                Log.Error(httpEx, "HTTP request error while fetching shop information.");
+                throw new Exception("Failed to fetch shop information due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while fetching shop information.");
+                throw new Exception("Failed to parse the shop information response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while fetching shop information.");
+                throw; // Rethrow the original exception
             }
         }
 
@@ -75,31 +80,40 @@ namespace Delivery.GHN
         {
             try
             {
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear();
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
+
+                // Add dynamic headers
+                _httpClient.DefaultRequestHeaders.Remove("Token");
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.REGISTER_SHOP, content);
-                response.EnsureSuccessStatusCode();
 
+                // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<GhnApiResponse<RegisterShopResponse>>(jsonResponse);
-            }
-            catch (Exception ex)
-            {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while registering shop.");
-                }
+                var result = JsonConvert.DeserializeObject<GhnApiResponse<RegisterShopResponse>>(jsonResponse);
 
-                throw; // Rethrow the exception
+                // Return the result or throw if it's null
+                return result ?? throw new InvalidOperationException("Received a null response from the API.");
+            }
+            catch (HttpRequestException httpEx) when (_allowLogging)
+            {
+                Log.Error(httpEx, "HTTP request error while registering shop.");
+                throw new Exception("Failed to register shop due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while registering shop.");
+                throw new Exception("Failed to parse the shop registration response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while registering shop.");
+                throw; // Rethrow the original exception
             }
         }
+
 
         /// <summary>
         /// https://api.ghn.vn/home/docs/detail?id=77
@@ -111,31 +125,40 @@ namespace Delivery.GHN
         {
             try
             {
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear();
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
+
+                // Add dynamic headers
+                _httpClient.DefaultRequestHeaders.Remove("Token");
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.GET_FEE_SERVICE, content);
-                response.EnsureSuccessStatusCode();
 
+                // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<GhnApiResponse<List<AvailableServicesResponse>>>(jsonResponse);
-            }
-            catch (Exception ex)
-            {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while getting fee services.");
-                }
+                var result = JsonConvert.DeserializeObject<GhnApiResponse<List<AvailableServicesResponse>>>(jsonResponse);
 
-                throw; // Rethrow the exception
+                // Return the result or throw if it's null
+                return result ?? throw new InvalidOperationException("Received a null response from the API.");
+            }
+            catch (HttpRequestException httpEx) when (_allowLogging)
+            {
+                Log.Error(httpEx, "HTTP request error while getting fee services.");
+                throw new Exception("Failed to get fee services due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while getting fee services.");
+                throw new Exception("Failed to parse the fee services response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while getting fee services.");
+                throw; // Rethrow the original exception
             }
         }
+
 
         /// <summary>
         /// https://api.ghn.vn/home/docs/detail?id=76
@@ -148,33 +171,40 @@ namespace Delivery.GHN
         {
             try
             {
-                // Configure the HttpClient
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Add("ShopId", $"{shopId}"); // Add ShopId header
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
+
+                // Add dynamic headers
+                _httpClient.DefaultRequestHeaders.Remove("ShopId");
+                _httpClient.DefaultRequestHeaders.Add("ShopId", shopId); // Add ShopId header
 
                 var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.CALCULATE_FEE, content);
-                response.EnsureSuccessStatusCode();
 
+                // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<GhnApiResponse<CalcFeeResponse>>(jsonResponse);
-            }
-            catch (Exception ex)
-            {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while getting fee.");
-                }
+                var result = JsonConvert.DeserializeObject<GhnApiResponse<CalcFeeResponse>>(jsonResponse);
 
-                throw; // Rethrow the exception
+                // Return the result or throw if it's null
+                return result ?? throw new InvalidOperationException("Received a null response from the API.");
+            }
+            catch (HttpRequestException httpEx) when (_allowLogging)
+            {
+                Log.Error(httpEx, "HTTP request error while calculating fee for ShopId: {ShopId}", shopId);
+                throw new Exception("Failed to calculate fee due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while calculating fee for ShopId: {ShopId}", shopId);
+                throw new Exception("Failed to parse the fee calculation response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while getting fee for ShopId: {ShopId}", shopId);
+                throw; // Rethrow the original exception
             }
         }
+
 
         /// <summary>
         /// https://api.ghn.vn/home/docs/detail?id=71
@@ -187,33 +217,41 @@ namespace Delivery.GHN
         {
             try
             {
-                // Configure the HttpClient
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Add("ShopId", $"{shopId}"); // Add ShopId header
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
+
+                // Add dynamic headers
+                _httpClient.DefaultRequestHeaders.Remove("ShopId");
+                _httpClient.DefaultRequestHeaders.Add("ShopId", shopId); // Add ShopId header
 
                 var jsonPayload = $@"{{ ""order_code"": ""{orderCode}"" }}";
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.FETCH_FEE_OF_ORDER, content);
-                response.EnsureSuccessStatusCode();
 
+                // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<GhnApiResponse<FeeOrderSocResponse>>(jsonResponse);
+                var result = JsonConvert.DeserializeObject<GhnApiResponse<FeeOrderSocResponse>>(jsonResponse);
+
+                // Return the result or throw if it's null
+                return result ?? throw new InvalidOperationException("Received a null response from the API.");
             }
-            catch (Exception ex)
+            catch (HttpRequestException httpEx) when (_allowLogging)
             {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while getting SOC.");
-                }
-                throw; // Rethrow the exception
+                Log.Error(httpEx, "HTTP request error while fetching SOC for order code: {OrderCode}", orderCode);
+                throw new Exception("Failed to fetch SOC due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while fetching SOC for order code: {OrderCode}", orderCode);
+                throw new Exception("Failed to parse the SOC response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while getting SOC for order code: {OrderCode}", orderCode);
+                throw; // Rethrow the original exception
             }
         }
+
 
         #region Create order
         /// <summary>
@@ -227,37 +265,40 @@ namespace Delivery.GHN
         {
             try
             {
-                // Configure the HttpClient
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear();
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
+
+                // Add dynamic headers
+                _httpClient.DefaultRequestHeaders.Remove("Token");
+                _httpClient.DefaultRequestHeaders.Remove("ShopId");
                 _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Add("ShopId", $"{shopId}"); // Add ShopId header
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _httpClient.DefaultRequestHeaders.Add("ShopId", shopId);
 
+                // Serialize request content
                 var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(ApiEndpoints.CREATE_DELIVERY_ORDER, content);
-                var jsonResponse = await response.Content.ReadAsStringAsync();
+                var apiResponse = await _httpClient.PostAsync(ApiEndpoints.CREATE_DELIVERY_ORDER, content);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
-                }
-                else
-                {
-                    return JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
-                }
+                // Deserialize response content
+                var jsonResponse = await apiResponse.Content.ReadAsStringAsync();
+                var response = JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse)
+                               ?? throw new InvalidOperationException("Received a null response from the API.");
 
+                return response;
             }
-            catch (Exception ex)
+            catch (HttpRequestException httpEx) when (_allowLogging)
             {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while creating delivery order.");
-                }
-                throw; // Rethrow the exception
+                Log.Error(httpEx, "HTTP request error while creating delivery order for ShopId: {ShopId}", shopId);
+                throw new Exception("Failed to create delivery order due to an HTTP request error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error for ShopId: {ShopId}", shopId);
+                throw new Exception("Failed to parse the delivery order response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Unexpected error occurred while creating delivery order for ShopId: {ShopId}", shopId);
+                throw new Exception("Failed to create delivery order.", ex);
             }
         }
 
@@ -272,45 +313,40 @@ namespace Delivery.GHN
         {
             try
             {
-                // Configure the HttpClient
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Add("ShopId", $"{shopId}"); // Add ShopId header
-                _httpClient.DefaultRequestHeaders.Add("shop_id", $"{shopId}"); // Add ShopId header
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
+
+                // Add dynamic headers
+                _httpClient.DefaultRequestHeaders.Remove("ShopId");
+                _httpClient.DefaultRequestHeaders.Add("ShopId", shopId); // Add ShopId header
 
                 var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-                var httpRequest = new HttpRequestMessage(HttpMethod.Post, ApiEndpoints.CREATE_DRAFT_ORDER)
-                {
-                    Content = content
-                };
+                var response = await _httpClient.PostAsync(ApiEndpoints.CREATE_DRAFT_ORDER, content);
 
-                var response = await _httpClient.SendAsync(httpRequest);
-
+                // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
 
-                if(response.IsSuccessStatusCode)
-                {
-                    return JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
-                } 
-                else
-                {
-                    return JsonConvert.DeserializeObject<GhnApiResponse<CreateDeliveryOrderResponse>>(jsonResponse);
-                }
+                // Return the result or throw if it's null
+                return result ?? throw new InvalidOperationException("Received a null response from the API.");
             }
-            catch (Exception ex)
+            catch (HttpRequestException httpEx) when (_allowLogging)
             {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while creating delivery order.");
-                }
-                throw; // Rethrow the exception
+                Log.Error(httpEx, "HTTP request error while creating draft delivery order for ShopId: {ShopId}", shopId);
+                throw new Exception("Failed to create draft delivery order due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while creating draft delivery order for ShopId: {ShopId}", shopId);
+                throw new Exception("Failed to parse draft delivery order response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while creating draft delivery order for ShopId: {ShopId}", shopId);
+                throw; // Rethrow the original exception
             }
         }
+
 
         /// <summary>
         /// https://api.ghn.vn/home/docs/detail?id=66
@@ -322,61 +358,73 @@ namespace Delivery.GHN
         {
             try
             {
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
 
                 var jsonPayload = $@"{{ ""order_code"": ""{orderCode}"" }}";
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.ORDER_DETAIL, content);
-                response.EnsureSuccessStatusCode();
 
+                // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<GhnApiResponse<OrderDetailResponse>>(jsonResponse);
+                var result = JsonConvert.DeserializeObject<GhnApiResponse<OrderDetailResponse>>(jsonResponse);
+
+                // Return the result or throw if it's null
+                return result ?? throw new InvalidOperationException("Received a null response from the API.");
             }
-            catch (Exception ex)
+            catch (HttpRequestException httpEx) when (_allowLogging)
             {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while get order detail.");
-                }
-                throw; // Rethrow the exception
+                Log.Error(httpEx, "HTTP request error while getting order detail for OrderCode: {OrderCode}", orderCode);
+                throw new Exception("Failed to get order detail due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while getting order detail for OrderCode: {OrderCode}", orderCode);
+                throw new Exception("Failed to parse order detail response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while getting order detail for OrderCode: {OrderCode}", orderCode);
+                throw; // Rethrow the original exception
             }
         }
+
 
         public async Task<GhnApiResponse<CancelOrderResponse>> CancelOrderAsync(ApiConfig config, List<string> orderCodes)
         {
             try
             {
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
 
                 string jsonPayload = "{\"order_codes\":[" + string.Join(",", orderCodes.Select(s => "\"" + s + "\"")) + "]}";
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.CANCEL_SHIFT, content);
-                response.EnsureSuccessStatusCode();
 
+                // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<GhnApiResponse<CancelOrderResponse>>(jsonResponse);
+                var result = JsonConvert.DeserializeObject<GhnApiResponse<CancelOrderResponse>>(jsonResponse);
+
+                // Return the result or throw if it's null
+                return result ?? throw new InvalidOperationException("Received a null response from the API.");
             }
-            catch (Exception ex)
+            catch (HttpRequestException httpEx) when (_allowLogging)
             {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while get order detail.");
-                }
-                throw; // Rethrow the exception
+                Log.Error(httpEx, "HTTP request error while canceling orders: {OrderCodes}", string.Join(", ", orderCodes));
+                throw new Exception("Failed to cancel orders due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while canceling orders: {OrderCodes}", string.Join(", ", orderCodes));
+                throw new Exception("Failed to parse cancel order response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while canceling orders: {OrderCodes}", string.Join(", ", orderCodes));
+                throw; // Rethrow the original exception
             }
         }
+
 
         #endregion
 
@@ -384,159 +432,203 @@ namespace Delivery.GHN
         {
             try
             {
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
-                _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
 
                 var response = await _httpClient.GetAsync(ApiEndpoints.GET_PROVINCE);
-                response.EnsureSuccessStatusCode();
 
+                // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<GhnApiResponse<IEnumerable<ProvinceResponse>>>(jsonResponse);
 
+                // Check if the result is valid and contains the expected code
                 if (result != null && result.Code == 200)
                 {
                     return result.Data;
                 }
 
-                return new List<ProvinceResponse>();
+                return Enumerable.Empty<ProvinceResponse>();
             }
-            catch (Exception ex)
+            catch (HttpRequestException httpEx) when (_allowLogging)
             {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while fetching shop information.");
-                }
-
-                return new List<ProvinceResponse>();
+                Log.Error(httpEx, "HTTP request error while fetching provinces.");
+                throw new Exception("Failed to fetch provinces due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while fetching provinces.");
+                throw new Exception("Failed to parse province response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while fetching provinces.");
+                return Enumerable.Empty<ProvinceResponse>();
             }
         }
+
 
         public async Task<IEnumerable<DistrictResponse>> GetDistrictAsync(ApiConfig config)
         {
             try
             {
-                // Set the base address for the HttpClient
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
 
-                _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
-                _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                // Construct the URL with the province ID as a query parameter
-                var requestUrl = $"{ApiEndpoints.GET_DISTRICT}";
+                // Construct the URL for fetching districts
+                var requestUrl = ApiEndpoints.GET_DISTRICT;
 
                 // Send the GET request
                 var response = await _httpClient.GetAsync(requestUrl);
-                response.EnsureSuccessStatusCode(); // Throws an exception if the response status code is not successful
+                response.EnsureSuccessStatusCode();
 
                 // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-
-                // Deserialize the JSON response into GhnApiResponse
                 var result = JsonConvert.DeserializeObject<GhnApiResponse<IEnumerable<DistrictResponse>>>(jsonResponse);
-                if (result != null && result.Code == 200)
-                {
-                    return result.Data;
-                }
 
-                return new List<DistrictResponse>();
+                // Validate the result and return data
+                return result != null && result.Code == 200 ? result.Data : Enumerable.Empty<DistrictResponse>();
             }
-            catch (Exception ex)
+            catch (HttpRequestException httpEx) when (_allowLogging)
             {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while fetching district information.");
-                }
-
-                return new List<DistrictResponse>();
+                Log.Error(httpEx, "HTTP request error while fetching districts.");
+                throw new Exception("Failed to fetch districts due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while fetching districts.");
+                throw new Exception("Failed to parse district response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while fetching district information.");
+                return Enumerable.Empty<DistrictResponse>();
             }
         }
+
 
         public async Task<IEnumerable<WardResponse>> GetWardAsync(ApiConfig config, int districtId)
         {
             try
             {
-                // Set the base address for the HttpClient
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
-                _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
 
-                // Construct the URL with the province ID as a query parameter
+                // Construct the URL for fetching wards with the district ID as a query parameter
                 var requestUrl = $"{ApiEndpoints.GET_WARD}?district_id={districtId}";
 
                 // Send the GET request
                 var response = await _httpClient.GetAsync(requestUrl);
-                response.EnsureSuccessStatusCode(); // Throws an exception if the response status code is not successful
+                response.EnsureSuccessStatusCode();
 
                 // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-
-                // Deserialize the JSON response into GhnApiResponse
                 var result = JsonConvert.DeserializeObject<GhnApiResponse<IEnumerable<WardResponse>>>(jsonResponse);
-                if (result != null && result.Code == 200)
-                {
-                    return result.Data;
-                }
 
-                return new List<WardResponse>();
+                // Validate the result and return data
+                return result != null && result.Code == 200 ? result.Data : Enumerable.Empty<WardResponse>();
             }
-            catch (Exception ex)
+            catch (HttpRequestException httpEx) when (_allowLogging)
             {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while fetching district information.");
-                }
-
-                return new List<WardResponse>();
+                Log.Error(httpEx, "HTTP request error while fetching wards.");
+                throw new Exception("Failed to fetch wards due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while fetching wards.");
+                throw new Exception("Failed to parse ward response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while fetching ward information.");
+                return Enumerable.Empty<WardResponse>();
             }
         }
+
 
         public async Task<IEnumerable<PickShiftResponse>> GetPickShiftAsync(ApiConfig config)
         {
             try
             {
-                if (_httpClient.BaseAddress == null)
-                {
-                    _httpClient.BaseAddress = new Uri(config.BaseUrl);
-                }
-                _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
-                _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
-                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
 
+                // Send the GET request to fetch pick shifts
                 var response = await _httpClient.GetAsync(ApiEndpoints.PICK_SHIFT);
                 response.EnsureSuccessStatusCode();
 
+                // Read and deserialize the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<GhnApiResponse<IEnumerable<PickShiftResponse>>>(jsonResponse);
 
-                if (result != null && result.Code == 200)
-                {
-                    return result.Data;
-                }
-
-                return new List<PickShiftResponse>();
+                // Validate the result and return data
+                return result != null && result.Code == 200 ? result.Data : Enumerable.Empty<PickShiftResponse>();
             }
-            catch (Exception ex)
+            catch (HttpRequestException httpEx) when (_allowLogging)
             {
-                if (_allowLogging)
-                {
-                    Log.Error(ex, "Error occurred while fetching shop information.");
-                }
-
-                return new List<PickShiftResponse>();
+                Log.Error(httpEx, "HTTP request error while fetching pick shifts.");
+                throw new Exception("Failed to fetch pick shifts due to an HTTP error.", httpEx);
             }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                Log.Error(jsonEx, "JSON deserialization error while fetching pick shifts.");
+                throw new Exception("Failed to parse pick shift response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                Log.Error(ex, "Error occurred while fetching pick shift information.");
+                return Enumerable.Empty<PickShiftResponse>();
+            }
+        }
+
+        public async Task<SearchOrderResponse> SearchOrdersAsync(
+            ApiConfig config,
+            string shopId,
+            ShippingOrderSearchRequest request)
+        {
+            try
+            {
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
+
+                _httpClient.DefaultRequestHeaders.Add("referer", "https://khachhang.ghn.vn/");
+                _httpClient.DefaultRequestHeaders.Add("shopid", shopId);
+                _httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
+
+                var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(ApiEndpoints.SEARCH, content);
+
+                // Read the response content
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<GhnApiResponse<SearchOrderResponse>>(jsonResponse);
+
+                // Validate the result and return data
+                return result != null && result.Code == 200 ? result.Data : new SearchOrderResponse();
+            }
+            catch (HttpRequestException httpEx) when (_allowLogging)
+            {
+                throw new Exception("Failed to fetch search due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                throw new Exception("Failed to parse response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                return new SearchOrderResponse();
+            }
+        }
+
+
+        // Helper method for configuring the HttpClient
+        private void ConfigureHttpClient(ApiConfig config)
+        {
+            if (_httpClient.BaseAddress == null)
+            {
+                _httpClient.BaseAddress = new Uri(config.BaseUrl);
+            }
+            _httpClient.DefaultRequestHeaders.Clear(); // Clear any existing headers
+            _httpClient.DefaultRequestHeaders.Add("Token", config.Token);
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
     }
 }

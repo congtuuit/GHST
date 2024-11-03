@@ -44,16 +44,23 @@ namespace GHSTShipping.WebApi.Controllers.v1
 
         [HttpPost]
         [Route("ghn/create")]
-        public async Task<BaseResult<CreateDeliveryOrderResponse>> CreateGhnAsync([FromBody] CreateGhnOrderRequest request)
+        public async Task<BaseResult<CreateDeliveryOrderResponse>> CreateGhnAsync([FromBody] GHN_CreateOrderRequest request)
         {
             return await Mediator.Send(request);
         }
 
         [HttpPut]
         [Route("ghn/cancel")]
-        public async Task<BaseResult> CancelGhnAsync([FromBody] CancelOrderGhnRequest request)
+        public async Task<BaseResult> CancelGhnAsync([FromBody] GHN_CancelOrderRequest request)
         {
             return await Mediator.Send(request);
+        }
+
+        [HttpPut]
+        [Route("ghn/confirm/{orderId}")]
+        public async Task<BaseResult> ConfirmGhnOrderAsync([FromRoute] Guid orderId)
+        {
+            return await Mediator.Send(new GHN_ConfirmOrderRequest() { OrderId = orderId});
         }
 
 

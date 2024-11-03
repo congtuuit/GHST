@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Delivery.GHN;
 using GHSTShipping.Application.DTOs;
 using GHSTShipping.Application.Extensions;
 using GHSTShipping.Application.Interfaces;
@@ -33,6 +34,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
     }
 
     public class GetOrderPagedListRequestHandler(
+        IGhnApiClient ghnApiClient,
         IUnitOfWork unitOfWork,
         IAuthenticatedUserService authenticatedUser,
         IShopRepository shopRepository,
@@ -65,7 +67,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             // Filter by shopId
             if (request.ShopId.HasValue)
             {
-                query = query.Where(i => i.ShopId == request.ShopId && i.CurrentStatus != OrderStatus.CANCEL);
+                query = query.Where(i => i.ShopId == request.ShopId);
             }
 
             // Filter by code
@@ -89,11 +91,11 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 }
                 else
                 {
-                    query = query.Where(o => o.IsPublished == true);
+                    query = query.Where(o => o.IsPublished == true && o.CurrentStatus == request.Status);
                 }
             }
 
-            query = query.Where(o => o.CurrentStatus != OrderStatus.CANCEL);
+            query = query.OrderByDescending(i => i.Created);
 
             int skipCount = (request.PageNumber - 1) * request.PageSize;
             PaginationResponseDto<OrderDto> pagingResult = await query
@@ -108,6 +110,12 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             }
 
             return BaseResult<PaginationResponseDto<OrderDto>>.Ok(pagingResult);
+        }
+
+
+        public async Task FetchOrdersFromGhnAsync()
+        {
+            //var response = await ghnApiClient.
         }
     }
 }

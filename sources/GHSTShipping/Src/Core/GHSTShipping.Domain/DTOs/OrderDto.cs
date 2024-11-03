@@ -9,6 +9,8 @@ namespace GHSTShipping.Domain.DTOs
         public bool IsPublished { get; set; }
         public DateTime? PublishDate { get; set; }
 
+        public DateTime Created {  get; set; }
+
         public Guid Id { get; set; }
         public Guid? ShopId { get; set; }
         public string ShopName { get; set; }
@@ -68,14 +70,14 @@ namespace GHSTShipping.Domain.DTOs
         {
             get
             {
-                if (ServiceTypeId == 1)
+                if (PaymentTypeId == 1)
                 {
-                    return "Người bán/Người gửi";
+                    return "Người gửi trả phí";
                 }
 
-                if (ServiceTypeId == 2)
+                if (PaymentTypeId == 2)
                 {
-                    return "Người mua/Người nhận";
+                    return "Người nhận trả phí";
                 }
 
                 return "";
@@ -100,6 +102,39 @@ namespace GHSTShipping.Domain.DTOs
                 if (Status == OrderStatus.READY_TO_PICK)
                 {
                     return "Chờ lấy hàng";
+                }
+
+                if (Status == OrderStatus.CANCEL)
+                {
+                    return "Đã hủy";
+                }
+
+                return Status;
+            }
+        }
+
+        public string StatusColor
+        {
+            get
+            {
+                if (Status == OrderStatus.DRAFT)
+                {
+                    return "gray";
+                }
+
+                if (Status == OrderStatus.WAITING_CONFIRM)
+                {
+                    return "gray";
+                }
+
+                if (Status == OrderStatus.READY_TO_PICK)
+                {
+                    return "orange";
+                }
+
+                if (Status == OrderStatus.CANCEL)
+                {
+                    return "red";
                 }
 
                 return Status;

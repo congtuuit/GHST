@@ -26,7 +26,7 @@ const CreateOrderPage = () => {
   }, []);
 
   return (
-    <Card>
+    <Card className="my-card-containter" title="Tạo đơn hàng">
       <Col span={24}>
         <FormOrderGhn />
       </Col>

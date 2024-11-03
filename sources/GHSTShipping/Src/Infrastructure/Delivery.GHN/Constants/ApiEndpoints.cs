@@ -32,5 +32,7 @@
 
         public const string CANCEL_SHIFT = "/shiip/public-api/v2/switch-status/cancel";
 
+        public const string SEARCH = "/shiip/public-api/v2/shipping-order/search";
+
     }
 }

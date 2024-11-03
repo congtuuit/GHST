@@ -50,6 +50,11 @@ const TableDeliveryConfig = (props: TableDeliveryConfigProps) => {
       key: 'userName',
     },
     {
+      title: 'Shop kết nối',
+      dataIndex: 'shopNames',
+      key: 'shopNames',
+    },
+    {
       title: 'Trạng thái',
       dataIndex: 'isActivated',
       key: 'isActivated',

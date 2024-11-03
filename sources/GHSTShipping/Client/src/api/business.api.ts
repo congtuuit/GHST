@@ -89,3 +89,4 @@ export const apiGetShopOrders = (params: IPaginationRequestParameter) => {
   const queryString = buildQueryString(params);
   return request<IPaginationResponse<ShopOrderViewDto>>('get', `/orders/group-by-shops?${queryString}`);
 };
+export const apiConfirmOrderGhn = (orderId: string) => request('put', `/orders/ghn/confirm/${orderId}`);

@@ -11,6 +11,38 @@ const defaultMenu: MenuList = [
     icon: 'dashboard',
     path: '/dashboard',
   },
+  {
+    code: 'order_list',
+    label: {
+      zh_CN: '',
+      en_US: 'Order',
+      vi_VN: 'DS đơn hàng', // Vietnamese translation
+    },
+    icon: 'order',
+    path: '/order/list',
+  },
+  {
+    code: 'order_create',
+    label: {
+      zh_CN: '',
+      en_US: 'Create order',
+      vi_VN: 'Tạo đơn hàng', // Vietnamese translation
+    },
+    icon: 'order',
+    path: '/order/create',
+  },
+
+  /// OLD
+  // {
+  //   code: 'dashboard',
+  //   label: {
+  //     zh_CN: '首页',
+  //     en_US: 'Dashboard',
+  //     vi_VN: 'Bảng điều khiển', // Vietnamese translation
+  //   },
+  //   icon: 'dashboard',
+  //   path: '/dashboard',
+  // },
   // {
   //   code: 'operation-report',
   //   label: {
@@ -21,38 +53,38 @@ const defaultMenu: MenuList = [
   //   icon: 'report',
   //   path: '/operation-report',
   // },
-  {
-    code: 'order',
-    label: {
-      zh_CN: '',
-      en_US: 'Order',
-      vi_VN: 'Quản lý đơn hàng', // Vietnamese translation
-    },
-    icon: 'order',
-    path: '/order',
-    children: [
-      {
-        code: 'order_list',
-        label: {
-          zh_CN: '',
-          en_US: 'Order',
-          vi_VN: 'DS đơn hàng', // Vietnamese translation
-        },
-        icon: 'order',
-        path: '/order/list',
-      },
-      {
-        code: 'order_create',
-        label: {
-          zh_CN: '',
-          en_US: 'Create order',
-          vi_VN: 'Tạo đơn hàng', // Vietnamese translation
-        },
-        icon: 'order',
-        path: '/order/create',
-      },
-    ],
-  },
+  // {
+  //   code: 'order',
+  //   label: {
+  //     zh_CN: '',
+  //     en_US: 'Order',
+  //     vi_VN: 'Quản lý đơn hàng', // Vietnamese translation
+  //   },
+  //   icon: 'order',
+  //   path: '/order',
+  //   children: [
+  //     {
+  //       code: 'order_list',
+  //       label: {
+  //         zh_CN: '',
+  //         en_US: 'Order',
+  //         vi_VN: 'DS đơn hàng', // Vietnamese translation
+  //       },
+  //       icon: 'order',
+  //       path: '/order/list',
+  //     },
+  //     {
+  //       code: 'order_create',
+  //       label: {
+  //         zh_CN: '',
+  //         en_US: 'Create order',
+  //         vi_VN: 'Tạo đơn hàng', // Vietnamese translation
+  //       },
+  //       icon: 'order',
+  //       path: '/order/create',
+  //     },
+  //   ],
+  // },
   // {
   //   code: 'documentation',
   //   label: {

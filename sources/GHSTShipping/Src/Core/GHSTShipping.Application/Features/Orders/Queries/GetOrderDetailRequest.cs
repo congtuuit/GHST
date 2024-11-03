@@ -68,8 +68,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 .FirstOrDefaultAsync(cancellationToken);
 
             // Fetch API config for the delivery partner (GHN)
-            var partnerConfig = await partnerConfigService.GetPartnerConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN);
-            var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey);
+            var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, shop.ShopId);
 
             // Fetch the delivery order details from GHN
             var apiResult = await ghnApiClient.DetailDeliveryOrderAsync(apiConfig, order.PrivateOrderCode);
@@ -77,7 +76,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             // Update order status if API call succeeds
             if (apiResult.Code == 200)
             {
-                order.Status = apiResult.Data.status;
+                //order.Status = apiResult.Data.status;
             }
 
             return BaseResult<OrderDetailDto>.Ok(order);

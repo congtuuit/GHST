@@ -3,8 +3,48 @@ using System.Text.Json.Serialization;
 
 namespace Delivery.GHN.Models
 {
-    public class OrderDetailResponse
+    public class SearchOrderResponse
     {
+        [JsonProperty("data")]
+        [JsonPropertyName("data")]
+        public List<OrderDataDto> Data { get; set; }
+
+        [JsonProperty("soc")]
+        [JsonPropertyName("soc")]
+        public List<SocDto> Soc { get; set; }
+
+        [JsonProperty("total")]
+        [JsonPropertyName("total")]
+        public int Total { get; set; }
+
+    }
+
+    public class Category
+    {
+    }
+
+    public class OrderDataDto
+    {
+        [JsonProperty("ahamove_order_code")]
+        [JsonPropertyName("ahamove_order_code")]
+        public string AhamoveOrderCode { get; set; }
+
+        [JsonProperty("ahamove_recipient_address_detail")]
+        [JsonPropertyName("ahamove_recipient_address_detail")]
+        public string AhamoveRecipientAddressDetail { get; set; }
+
+        [JsonProperty("ahamove_seller_address_detail")]
+        [JsonPropertyName("ahamove_seller_address_detail")]
+        public string AhamoveSellerAddressDetail { get; set; }
+
+        [JsonProperty("pd_service_id")]
+        [JsonPropertyName("pd_service_id")]
+        public int PdServiceId { get; set; }
+
+        [JsonProperty("province_id")]
+        [JsonPropertyName("province_id")]
+        public int ProvinceId { get; set; }
+
         [JsonProperty("shop_id")]
         [JsonPropertyName("shop_id")]
         public int ShopId { get; set; }
@@ -15,19 +55,19 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("return_name")]
         [JsonPropertyName("return_name")]
-        public string? ReturnName { get; set; }
+        public string ReturnName { get; set; }
 
         [JsonProperty("return_phone")]
         [JsonPropertyName("return_phone")]
-        public string? ReturnPhone { get; set; }
+        public string ReturnPhone { get; set; }
 
         [JsonProperty("return_address")]
         [JsonPropertyName("return_address")]
-        public string? ReturnAddress { get; set; }
+        public string ReturnAddress { get; set; }
 
         [JsonProperty("return_ward_code")]
         [JsonPropertyName("return_ward_code")]
-        public string? ReturnWardCode { get; set; }
+        public string ReturnWardCode { get; set; }
 
         [JsonProperty("return_district_id")]
         [JsonPropertyName("return_district_id")]
@@ -39,23 +79,23 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("from_name")]
         [JsonPropertyName("from_name")]
-        public string? FromName { get; set; }
+        public string FromName { get; set; }
 
         [JsonProperty("from_phone")]
         [JsonPropertyName("from_phone")]
-        public string? FromPhone { get; set; }
+        public string FromPhone { get; set; }
 
         [JsonProperty("from_hotline")]
         [JsonPropertyName("from_hotline")]
-        public string? FromHotline { get; set; }
+        public string FromHotline { get; set; }
 
         [JsonProperty("from_address")]
         [JsonPropertyName("from_address")]
-        public string? FromAddress { get; set; }
+        public string FromAddress { get; set; }
 
         [JsonProperty("from_ward_code")]
         [JsonPropertyName("from_ward_code")]
-        public string? FromWardCode { get; set; }
+        public string FromWardCode { get; set; }
 
         [JsonProperty("from_district_id")]
         [JsonPropertyName("from_district_id")]
@@ -71,19 +111,19 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("to_name")]
         [JsonPropertyName("to_name")]
-        public string? ToName { get; set; }
+        public string ToName { get; set; }
 
         [JsonProperty("to_phone")]
         [JsonPropertyName("to_phone")]
-        public string? ToPhone { get; set; }
+        public string ToPhone { get; set; }
 
         [JsonProperty("to_address")]
         [JsonPropertyName("to_address")]
-        public string? ToAddress { get; set; }
+        public string ToAddress { get; set; }
 
         [JsonProperty("to_ward_code")]
         [JsonPropertyName("to_ward_code")]
-        public string? ToWardCode { get; set; }
+        public string ToWardCode { get; set; }
 
         [JsonProperty("to_district_id")]
         [JsonPropertyName("to_district_id")]
@@ -143,7 +183,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("sort_code")]
         [JsonPropertyName("sort_code")]
-        public string? SortCode { get; set; }
+        public string SortCode { get; set; }
 
         [JsonProperty("cod_amount")]
         [JsonPropertyName("cod_amount")]
@@ -179,7 +219,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("client_order_code")]
         [JsonPropertyName("client_order_code")]
-        public string? ClientOrderCode { get; set; }
+        public string ClientOrderCode { get; set; }
 
         [JsonProperty("cod_failed_amount")]
         [JsonPropertyName("cod_failed_amount")]
@@ -191,23 +231,23 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("required_note")]
         [JsonPropertyName("required_note")]
-        public string? RequiredNote { get; set; }
+        public string RequiredNote { get; set; }
 
         [JsonProperty("content")]
         [JsonPropertyName("content")]
-        public string? Content { get; set; }
+        public string Content { get; set; }
 
         [JsonProperty("note")]
         [JsonPropertyName("note")]
-        public string? Note { get; set; }
+        public string Note { get; set; }
 
         [JsonProperty("employee_note")]
         [JsonPropertyName("employee_note")]
-        public string? EmployeeNote { get; set; }
+        public string EmployeeNote { get; set; }
 
         [JsonProperty("seal_code")]
         [JsonPropertyName("seal_code")]
-        public string? SealCode { get; set; }
+        public string SealCode { get; set; }
 
         [JsonProperty("pickup_time")]
         [JsonPropertyName("pickup_time")]
@@ -219,7 +259,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("coupon")]
         [JsonPropertyName("coupon")]
-        public string? Coupon { get; set; }
+        public string Coupon { get; set; }
 
         [JsonProperty("coupon_campaign_id")]
         [JsonPropertyName("coupon_campaign_id")]
@@ -227,19 +267,19 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("_id")]
         [JsonPropertyName("_id")]
-        public string? Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty("order_code")]
         [JsonPropertyName("order_code")]
-        public string? OrderCode { get; set; }
+        public string OrderCode { get; set; }
 
         [JsonProperty("version_no")]
         [JsonPropertyName("version_no")]
-        public string? VersionNo { get; set; }
+        public string VersionNo { get; set; }
 
         [JsonProperty("updated_ip")]
         [JsonPropertyName("updated_ip")]
-        public string? UpdatedIp { get; set; }
+        public string UpdatedIp { get; set; }
 
         [JsonProperty("updated_employee")]
         [JsonPropertyName("updated_employee")]
@@ -251,7 +291,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("updated_source")]
         [JsonPropertyName("updated_source")]
-        public string? UpdatedSource { get; set; }
+        public string UpdatedSource { get; set; }
 
         [JsonProperty("updated_date")]
         [JsonPropertyName("updated_date")]
@@ -263,7 +303,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("created_ip")]
         [JsonPropertyName("created_ip")]
-        public string? CreatedIp { get; set; }
+        public string CreatedIp { get; set; }
 
         [JsonProperty("created_employee")]
         [JsonPropertyName("created_employee")]
@@ -275,7 +315,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("created_source")]
         [JsonPropertyName("created_source")]
-        public string? CreatedSource { get; set; }
+        public string CreatedSource { get; set; }
 
         [JsonProperty("created_date")]
         [JsonPropertyName("created_date")]
@@ -283,11 +323,11 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("status")]
         [JsonPropertyName("status")]
-        public string? Status { get; set; }
+        public string Status { get; set; }
 
         [JsonProperty("internal_process")]
         [JsonPropertyName("internal_process")]
-        public PublicProcessDto InternalProcess { get; set; }
+        public InternalProcess InternalProcess { get; set; }
 
         [JsonProperty("pick_warehouse_id")]
         [JsonPropertyName("pick_warehouse_id")]
@@ -323,11 +363,11 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("data")]
         [JsonPropertyName("data")]
-        public Datato Data { get; set; }
+        public OrderDataDto Data { get; set; }
 
         [JsonProperty("soc_id")]
         [JsonPropertyName("soc_id")]
-        public string? SocId { get; set; }
+        public string SocId { get; set; }
 
         [JsonProperty("finish_date")]
         [JsonPropertyName("finish_date")]
@@ -367,11 +407,11 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("transportation_status")]
         [JsonPropertyName("transportation_status")]
-        public string? TransportationStatus { get; set; }
+        public string TransportationStatus { get; set; }
 
         [JsonProperty("transportation_phase")]
         [JsonPropertyName("transportation_phase")]
-        public string? TransportationPhase { get; set; }
+        public string TransportationPhase { get; set; }
 
         [JsonProperty("extra_service")]
         [JsonPropertyName("extra_service")]
@@ -379,19 +419,19 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("config_fee_id")]
         [JsonPropertyName("config_fee_id")]
-        public string? ConfigFeeId { get; set; }
+        public string ConfigFeeId { get; set; }
 
         [JsonProperty("extra_cost_id")]
         [JsonPropertyName("extra_cost_id")]
-        public string? ExtraCostId { get; set; }
+        public string ExtraCostId { get; set; }
 
         [JsonProperty("standard_config_fee_id")]
         [JsonPropertyName("standard_config_fee_id")]
-        public string? StandardConfigFeeId { get; set; }
+        public string StandardConfigFeeId { get; set; }
 
         [JsonProperty("standard_extra_cost_id")]
         [JsonPropertyName("standard_extra_cost_id")]
-        public string? StandardExtraCostId { get; set; }
+        public string StandardExtraCostId { get; set; }
 
         [JsonProperty("ecom_config_fee_id")]
         [JsonPropertyName("ecom_config_fee_id")]
@@ -415,230 +455,318 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("operation_partner")]
         [JsonPropertyName("operation_partner")]
-        public string? OperationPartner { get; set; }
+        public string OperationPartner { get; set; }
 
         [JsonProperty("process_partner_name")]
         [JsonPropertyName("process_partner_name")]
-        public string? ProcessPartnerName { get; set; }
-
-        [JsonProperty("type_order")]
-        [JsonPropertyName("type_order")]
-        public string? TypeOrder { get; set; }
-
-        [JsonProperty("type_order_code")]
-        [JsonPropertyName("type_order_code")]
-        public string? TypeOrderCode { get; set; }
+        public string ProcessPartnerName { get; set; }
     }
 
-
-    public class CategoryDto
+    public class SearchGhnOrderDetailDto
     {
-        [JsonProperty("level1")]
-        [JsonPropertyName("level1")]
-        public string? level1 { get; set; }
-    }
+        [JsonProperty("cod_failed_fee")]
+        [JsonPropertyName("cod_failed_fee")]
+        public int CodFailedFee { get; set; }
 
-    public class Datato
-    {
-    }
+        [JsonProperty("cod_fee")]
+        [JsonPropertyName("cod_fee")]
+        public int CodFee { get; set; }
 
-    public class DocumentReturnDto
-    {
-        [JsonProperty("flag")]
-        [JsonPropertyName("flag")]
-        public bool Flag { get; set; }
-    }
+        [JsonProperty("coupon")]
+        [JsonPropertyName("coupon")]
+        public int Coupon { get; set; }
 
-    public class ExtraServiceDto
-    {
+        [JsonProperty("deliver_remote_areas_fee")]
+        [JsonPropertyName("deliver_remote_areas_fee")]
+        public int DeliverRemoteAreasFee { get; set; }
+
+        [JsonProperty("deliver_remote_areas_fee_return")]
+        [JsonPropertyName("deliver_remote_areas_fee_return")]
+        public int DeliverRemoteAreasFeeReturn { get; set; }
+
         [JsonProperty("document_return")]
         [JsonPropertyName("document_return")]
-        public DocumentReturnDto DocumentReturn { get; set; }
+        public int DocumentReturn { get; set; }
 
         [JsonProperty("double_check")]
         [JsonPropertyName("double_check")]
-        public bool DoubleCheck { get; set; }
+        public int DoubleCheck { get; set; }
 
-        [JsonProperty("lastmile_ahamove_bulky")]
-        [JsonPropertyName("lastmile_ahamove_bulky")]
-        public bool LastmileAhamoveBulky { get; set; }
+        [JsonProperty("double_check_deliver")]
+        [JsonPropertyName("double_check_deliver")]
+        public int DoubleCheckDeliver { get; set; }
 
-        [JsonProperty("lastmile_trip_code")]
-        [JsonPropertyName("lastmile_trip_code")]
-        public string? LastmileTripCode { get; set; }
+        [JsonProperty("insurance")]
+        [JsonPropertyName("insurance")]
+        public int Insurance { get; set; }
 
-        [JsonProperty("original_deliver_warehouse_id")]
-        [JsonPropertyName("original_deliver_warehouse_id")]
-        public int OriginalDeliverWarehouseId { get; set; }
+        [JsonProperty("main_service")]
+        [JsonPropertyName("main_service")]
+        public int MainService { get; set; }
+
+        [JsonProperty("pick_remote_areas_fee")]
+        [JsonPropertyName("pick_remote_areas_fee")]
+        public int PickRemoteAreasFee { get; set; }
+
+        [JsonProperty("pick_remote_areas_fee_return")]
+        [JsonPropertyName("pick_remote_areas_fee_return")]
+        public int PickRemoteAreasFeeReturn { get; set; }
+
+        [JsonProperty("r2s")]
+        [JsonPropertyName("r2s")]
+        public int R2s { get; set; }
+
+        [JsonProperty("return")]
+        [JsonPropertyName("return")]
+        public int Return { get; set; }
+
+        [JsonProperty("return_again")]
+        [JsonPropertyName("return_again")]
+        public int ReturnAgain { get; set; }
+
+        [JsonProperty("station_do")]
+        [JsonPropertyName("station_do")]
+        public int StationDo { get; set; }
+
+        [JsonProperty("station_pu")]
+        [JsonPropertyName("station_pu")]
+        public int StationPu { get; set; }
     }
 
-    public class FromLocationDto
+    public class GhnDiffDto
     {
-        [JsonProperty("lat")]
-        [JsonPropertyName("lat")]
-        public double Lat { get; set; }
+        [JsonProperty("cod_failed_fee")]
+        [JsonPropertyName("cod_failed_fee")]
+        public int CodFailedFee { get; set; }
 
-        [JsonProperty("long")]
-        [JsonPropertyName("long")]
-        public double Long { get; set; }
+        [JsonProperty("cod_fee")]
+        [JsonPropertyName("cod_fee")]
+        public int CodFee { get; set; }
 
-        [JsonProperty("cell_code")]
-        [JsonPropertyName("cell_code")]
-        public string? CellCode { get; set; }
+        [JsonProperty("coupon")]
+        [JsonPropertyName("coupon")]
+        public int Coupon { get; set; }
 
-        [JsonProperty("place_id")]
-        [JsonPropertyName("place_id")]
-        public string? PlaceId { get; set; }
+        [JsonProperty("deliver_remote_areas_fee")]
+        [JsonPropertyName("deliver_remote_areas_fee")]
+        public int DeliverRemoteAreasFee { get; set; }
 
-        [JsonProperty("trust_level")]
-        [JsonPropertyName("trust_level")]
-        public int TrustLevel { get; set; }
+        [JsonProperty("deliver_remote_areas_fee_return")]
+        [JsonPropertyName("deliver_remote_areas_fee_return")]
+        public int DeliverRemoteAreasFeeReturn { get; set; }
 
-        [JsonProperty("wardcode")]
-        [JsonPropertyName("wardcode")]
-        public string? Wardcode { get; set; }
+        [JsonProperty("document_return")]
+        [JsonPropertyName("document_return")]
+        public int DocumentReturn { get; set; }
 
-        [JsonProperty("map_source")]
-        [JsonPropertyName("map_source")]
-        public string? MapSource { get; set; }
+        [JsonProperty("double_check")]
+        [JsonPropertyName("double_check")]
+        public int DoubleCheck { get; set; }
+
+        [JsonProperty("double_check_deliver")]
+        [JsonPropertyName("double_check_deliver")]
+        public int DoubleCheckDeliver { get; set; }
+
+        [JsonProperty("insurance")]
+        [JsonPropertyName("insurance")]
+        public int Insurance { get; set; }
+
+        [JsonProperty("main_service")]
+        [JsonPropertyName("main_service")]
+        public int MainService { get; set; }
+
+        [JsonProperty("pick_remote_areas_fee")]
+        [JsonPropertyName("pick_remote_areas_fee")]
+        public int PickRemoteAreasFee { get; set; }
+
+        [JsonProperty("pick_remote_areas_fee_return")]
+        [JsonPropertyName("pick_remote_areas_fee_return")]
+        public int PickRemoteAreasFeeReturn { get; set; }
+
+        [JsonProperty("r2s")]
+        [JsonPropertyName("r2s")]
+        public int R2s { get; set; }
+
+        [JsonProperty("return")]
+        [JsonPropertyName("return")]
+        public int Return { get; set; }
+
+        [JsonProperty("return_again")]
+        [JsonPropertyName("return_again")]
+        public int ReturnAgain { get; set; }
+
+        [JsonProperty("station_do")]
+        [JsonPropertyName("station_do")]
+        public int StationDo { get; set; }
+
+        [JsonProperty("station_pu")]
+        [JsonPropertyName("station_pu")]
+        public int StationPu { get; set; }
     }
 
-    public class PublicProcessDto
+    public class InternalProcess
     {
         [JsonProperty("status")]
         [JsonPropertyName("status")]
-        public string? Status { get; set; }
+        public string Status { get; set; }
 
         [JsonProperty("type")]
         [JsonPropertyName("type")]
-        public string? Type { get; set; }
+        public string Type { get; set; }
     }
 
-    public class ItemDto
+    public class GhnOrderPaymentDto
     {
-        [JsonProperty("name")]
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
+        [JsonProperty("created_date")]
+        [JsonPropertyName("created_date")]
+        public DateTime CreatedDate { get; set; }
 
-        [JsonProperty("quantity")]
-        [JsonPropertyName("quantity")]
-        public int Quantity { get; set; }
+        [JsonProperty("diff")]
+        [JsonPropertyName("diff")]
+        public GhnDiffDto Diff { get; set; }
 
-        [JsonProperty("length")]
-        [JsonPropertyName("length")]
-        public int Length { get; set; }
+        [JsonProperty("paid_date")]
+        [JsonPropertyName("paid_date")]
+        public DateTime PaidDate { get; set; }
 
-        [JsonProperty("width")]
-        [JsonPropertyName("width")]
-        public int Width { get; set; }
+        [JsonProperty("payment_type")]
+        [JsonPropertyName("payment_type")]
+        public int PaymentType { get; set; }
 
-        [JsonProperty("height")]
-        [JsonPropertyName("height")]
-        public int Height { get; set; }
-
-        [JsonProperty("category")]
-        [JsonPropertyName("category")]
-        public CategoryDto Category { get; set; }
-
-        [JsonProperty("status")]
-        [JsonPropertyName("status")]
-        public string? Status { get; set; }
-
-        [JsonProperty("item_order_code")]
-        [JsonPropertyName("item_order_code")]
-        public string? ItemOrderCode { get; set; }
+        [JsonProperty("value")]
+        [JsonPropertyName("value")]
+        public int Value { get; set; }
     }
 
-    public class OrderLogDto
+
+    public class SocDto
     {
-        [JsonProperty("status")]
-        [JsonPropertyName("status")]
-        public string? Status { get; set; }
+        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
+        public string Id { get; set; }
 
-        [JsonProperty("payment_type_id")]
-        [JsonPropertyName("payment_type_id")]
-        public int PaymentTypeId { get; set; }
+        [JsonProperty("cod_collect_date")]
+        [JsonPropertyName("cod_collect_date")]
+        public DateTime CodCollectDate { get; set; }
 
-        [JsonProperty("trip_code")]
-        [JsonPropertyName("trip_code")]
-        public string? TripCode { get; set; }
+        [JsonProperty("created_date")]
+        [JsonPropertyName("created_date")]
+        public DateTime CreatedDate { get; set; }
+
+        [JsonProperty("created_ip")]
+        [JsonPropertyName("created_ip")]
+        public string CreatedIp { get; set; }
+
+        [JsonProperty("detail")]
+        [JsonPropertyName("detail")]
+        public SearchGhnOrderDetailDto Detail { get; set; }
+
+        [JsonProperty("order_code")]
+        [JsonPropertyName("order_code")]
+        public string OrderCode { get; set; }
+
+        [JsonProperty("payment")]
+        [JsonPropertyName("payment")]
+        public List<GhnOrderPaymentDto> Payment { get; set; }
+
+        [JsonProperty("standard")]
+        [JsonPropertyName("standard")]
+        public StandardDto Standard { get; set; }
+
+        [JsonProperty("transaction_id")]
+        [JsonPropertyName("transaction_id")]
+        public string TransactionId { get; set; }
+
+        [JsonProperty("updated_client")]
+        [JsonPropertyName("updated_client")]
+        public int UpdatedClient { get; set; }
 
         [JsonProperty("updated_date")]
         [JsonPropertyName("updated_date")]
         public DateTime UpdatedDate { get; set; }
+
+        [JsonProperty("updated_employee")]
+        [JsonPropertyName("updated_employee")]
+        public int UpdatedEmployee { get; set; }
+
+        [JsonProperty("updated_ip")]
+        [JsonPropertyName("updated_ip")]
+        public string UpdatedIp { get; set; }
+
+        [JsonProperty("updated_source")]
+        [JsonPropertyName("updated_source")]
+        public string UpdatedSource { get; set; }
     }
 
-    public class PickupShiftDto
+    public class StandardDto
     {
-        [JsonProperty("from_time")]
-        [JsonPropertyName("from_time")]
-        public DateTime FromTime { get; set; }
+        [JsonProperty("cod_failed_fee")]
+        [JsonPropertyName("cod_failed_fee")]
+        public int CodFailedFee { get; set; }
 
-        [JsonProperty("to_time")]
-        [JsonPropertyName("to_time")]
-        public DateTime ToTime { get; set; }
+        [JsonProperty("cod_fee")]
+        [JsonPropertyName("cod_fee")]
+        public int CodFee { get; set; }
+
+        [JsonProperty("coupon")]
+        [JsonPropertyName("coupon")]
+        public int Coupon { get; set; }
+
+        [JsonProperty("deliver_remote_areas_fee")]
+        [JsonPropertyName("deliver_remote_areas_fee")]
+        public int DeliverRemoteAreasFee { get; set; }
+
+        [JsonProperty("deliver_remote_areas_fee_return")]
+        [JsonPropertyName("deliver_remote_areas_fee_return")]
+        public int DeliverRemoteAreasFeeReturn { get; set; }
+
+        [JsonProperty("document_return")]
+        [JsonPropertyName("document_return")]
+        public int DocumentReturn { get; set; }
+
+        [JsonProperty("double_check")]
+        [JsonPropertyName("double_check")]
+        public int DoubleCheck { get; set; }
+
+        [JsonProperty("double_check_deliver")]
+        [JsonPropertyName("double_check_deliver")]
+        public int DoubleCheckDeliver { get; set; }
+
+        [JsonProperty("insurance")]
+        [JsonPropertyName("insurance")]
+        public int Insurance { get; set; }
+
+        [JsonProperty("main_service")]
+        [JsonPropertyName("main_service")]
+        public int MainService { get; set; }
+
+        [JsonProperty("pick_remote_areas_fee")]
+        [JsonPropertyName("pick_remote_areas_fee")]
+        public int PickRemoteAreasFee { get; set; }
+
+        [JsonProperty("pick_remote_areas_fee_return")]
+        [JsonPropertyName("pick_remote_areas_fee_return")]
+        public int PickRemoteAreasFeeReturn { get; set; }
+
+        [JsonProperty("r2s")]
+        [JsonPropertyName("r2s")]
+        public int R2s { get; set; }
+
+        [JsonProperty("return")]
+        [JsonPropertyName("return")]
+        public int Return { get; set; }
+
+        [JsonProperty("return_again")]
+        [JsonPropertyName("return_again")]
+        public int ReturnAgain { get; set; }
+
+        [JsonProperty("station_do")]
+        [JsonPropertyName("station_do")]
+        public int StationDo { get; set; }
+
+        [JsonProperty("station_pu")]
+        [JsonPropertyName("station_pu")]
+        public int StationPu { get; set; }
     }
-
-    public class ReturnLocationDto
-    {
-        [JsonProperty("lat")]
-        [JsonPropertyName("lat")]
-        public double Lat { get; set; }
-
-        [JsonProperty("long")]
-        [JsonPropertyName("long")]
-        public double Long { get; set; }
-
-        [JsonProperty("cell_code")]
-        [JsonPropertyName("cell_code")]
-        public string? CellCode { get; set; }
-
-        [JsonProperty("place_id")]
-        [JsonPropertyName("place_id")]
-        public string? PlaceId { get; set; }
-
-        [JsonProperty("trust_level")]
-        [JsonPropertyName("trust_level")]
-        public int TrustLevel { get; set; }
-
-        [JsonProperty("wardcode")]
-        [JsonPropertyName("wardcode")]
-        public string? Wardcode { get; set; }
-
-        [JsonProperty("map_source")]
-        [JsonPropertyName("map_source")]
-        public string? MapSource { get; set; }
-    }
-
-    public class ToLocationDto
-    {
-        [JsonProperty("lat")]
-        [JsonPropertyName("lat")]
-        public double Lat { get; set; }
-
-        [JsonProperty("long")]
-        [JsonPropertyName("long")]
-        public double Long { get; set; }
-
-        [JsonProperty("cell_code")]
-        [JsonPropertyName("cell_code")]
-        public string? CellCode { get; set; }
-
-        [JsonProperty("place_id")]
-        [JsonPropertyName("place_id")]
-        public string? PlaceId { get; set; }
-
-        [JsonProperty("trust_level")]
-        [JsonPropertyName("trust_level")]
-        public int TrustLevel { get; set; }
-
-        [JsonProperty("wardcode")]
-        [JsonPropertyName("wardcode")]
-        public string? Wardcode { get; set; }
-
-        [JsonProperty("map_source")]
-        [JsonPropertyName("map_source")]
-        public string? MapSource { get; set; }
-    }
-
 }
+

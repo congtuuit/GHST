@@ -1,4 +1,7 @@
+import { revertdatetimeFormatMap } from '@/components/core/table-column/type';
 import { message } from 'antd';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
 export const commingSoon = () => {
   console.log('helo');
@@ -22,8 +25,8 @@ export function setItemWithExpiry(key: string, value: any, ttl: number) {
 
   // Create an object to store the value and its expiration time
   const item = {
-      value: value,
-      expiry: now.getTime() + ttl, // Expiration time in milliseconds
+    value: value,
+    expiry: now.getTime() + ttl, // Expiration time in milliseconds
   };
 
   // Store the item in local storage
@@ -36,7 +39,7 @@ export function getItemWithExpiry(key: string) {
 
   // If the item doesn't exist, return null
   if (!itemStr) {
-      return null;
+    return null;
   }
 
   const item = JSON.parse(itemStr);
@@ -44,10 +47,16 @@ export function getItemWithExpiry(key: string) {
 
   // Compare the expiration time with the current time
   if (now.getTime() > item.expiry) {
-      // Item has expired, remove it from local storage
-      localStorage.removeItem(key);
-      return null;
+    // Item has expired, remove it from local storage
+    localStorage.removeItem(key);
+    return null;
   }
 
   return item.value;
 }
+
+dayjs.extend(utc);
+// Function to format UTC to local time with Vietnamese locale
+export const formatUtcToLocalTime = (utcDateTime: string, format: string = revertdatetimeFormatMap['minute']) => {
+  return dayjs.utc(utcDateTime).local().format(format);
+};

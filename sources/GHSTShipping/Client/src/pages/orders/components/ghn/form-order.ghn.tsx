@@ -24,6 +24,13 @@ const serviceType = {
   HangNang: 5,
 };
 
+type Item = {
+  name: string;
+  weight: number;
+  quantity: number;
+  code?: string;
+};
+
 const FormOrderGhn = () => {
   const dispatch = useDispatch();
   const session = useSelector(state => state?.user?.session);
@@ -56,27 +63,28 @@ const FormOrderGhn = () => {
 
       // init sender address
 
-      const senderAddressJson = localStorage.getItem('senderAddress') ?? '';
-      if (Boolean(senderAddressJson)) {
-        const senderAddress = JSON.parse(senderAddressJson);
-        if (Boolean(senderAddress)) {
-          const senderInfo = {
-            from_name: senderAddress['name'],
-            from_phone: senderAddress['phone'],
-            from_address: senderAddress['address'],
-            from_ward_id: senderAddress['wardId'],
-            from_ward_name: senderAddress['wardName'],
-            from_district_id: parseInt(senderAddress['districtId']),
-            from_district_name: senderAddress['districtName'],
-            from_province_id: parseInt(senderAddress['provinceId']),
-            from_province_name: parseInt(senderAddress['provinceName']),
-          };
-          setTimeout(() => {
-            form.setFieldsValue(senderInfo);
-            fromAddressRef.current?.update(senderInfo);
-          }, 300);
-        }
-      }
+      //// AUTO FILL SENDER ADDRESS
+      // const senderAddressJson = localStorage.getItem('senderAddress') ?? '';
+      // if (Boolean(senderAddressJson)) {
+      //   const senderAddress = JSON.parse(senderAddressJson);
+      //   if (Boolean(senderAddress)) {
+      //     const senderInfo = {
+      //       from_name: senderAddress['name'],
+      //       from_phone: senderAddress['phone'],
+      //       from_address: senderAddress['address'],
+      //       from_ward_id: senderAddress['wardId'],
+      //       from_ward_name: senderAddress['wardName'],
+      //       from_district_id: parseInt(senderAddress['districtId']),
+      //       from_district_name: senderAddress['districtName'],
+      //       from_province_id: parseInt(senderAddress['provinceId']),
+      //       from_province_name: parseInt(senderAddress['provinceName']),
+      //     };
+      //     setTimeout(() => {
+      //       form.setFieldsValue(senderInfo);
+      //       fromAddressRef.current?.update(senderInfo);
+      //     }, 300);
+      //   }
+      // }
     } catch (error) {
       message.error('Lỗi khi tải ca lấy hàng');
     }
@@ -98,7 +106,6 @@ const FormOrderGhn = () => {
       const validate = orderBuilder.validateOrder();
 
       if (!validate.verified) {
-        console.log('validate ', validate);
         message.error('Thông tin đơn chưa hợp lệ, vui lòng kiểm tra lại!');
         return;
       }
@@ -110,10 +117,23 @@ const FormOrderGhn = () => {
 
         await fetchPickShifts();
       } else {
-        message.error(response.errors[0]?.description || 'Đã xảy ra lỗi');
+        message.error(response.errors[0]?.description || 'Xảy ra lỗi, vui lòng kiểm tra lại');
+        console.log(response.errors);
       }
     } catch (error) {
       message.info('Thông tin đơn hàng chưa đủ, vui lòng kiểm tra lại!');
+    }
+  };
+
+  const handleCalcTotalWeigh = (currentValues: any) => {
+    const orderItems = currentValues['items'] as Item[];
+    if (Boolean(orderItems) && orderItems?.length > 0) {
+      const calculateTotalWeight = (items: Item[]): number => {
+        return items.reduce((total, item) => total + (item.weight ?? 0) * (item.quantity ?? 0), 0);
+      };
+
+      const totalWeight = calculateTotalWeight(orderItems);
+      form.setFieldValue('weight', totalWeight);
     }
   };
 
@@ -121,6 +141,9 @@ const FormOrderGhn = () => {
   const handleValuesChange = debounce(changedValues => {
     const currentValues = form.getFieldsValue();
     dispatch(setOrder({ ...currentValues, ...changedValues }));
+
+    console.log('log ', currentValues);
+    handleCalcTotalWeigh(currentValues);
   }, 300);
 
   useEffect(() => {
@@ -140,12 +163,23 @@ const FormOrderGhn = () => {
   };
 
   return (
-    <div>
+    <div style={{ maxHeight: '83vh', overflowY: 'auto' }}>
       <Form layout="vertical" form={form} onValuesChange={handleValuesChange}>
         <Card style={{ marginBottom: '16px' }}>
           <Row>
             <Col span={12}>
-              <Form.Item label="Ca lấy hàng" name="pick_shift" valuePropName="value" getValueFromEvent={value => [value]}>
+              <Form.Item
+                label="Ca lấy hàng"
+                name="pick_shift"
+                valuePropName="value"
+                getValueFromEvent={value => [value]}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Vui lòng chọn ca lấy hàng',
+                  },
+                ]}
+              >
                 <Select placeholder="Chọn ca lấy hàng">
                   {pickShifts.map(i => (
                     <Option key={i.id} value={i.id}>
@@ -240,6 +274,7 @@ const FormOrderGhn = () => {
           </Form.Item>
         </Col>
       </Form>
+
       <CreateOrderButton />
     </div>
   );

@@ -17,12 +17,11 @@ using System.Threading.Tasks;
 
 namespace GHSTShipping.Application.Features.Orders.Commands
 {
-    public class CreateGhnOrderRequest : CreateDeliveryOrderRequest, IRequest<BaseResult<CreateDeliveryOrderResponse>>
+    public class GHN_CreateOrderRequest : CreateDeliveryOrderRequest, IRequest<BaseResult<CreateDeliveryOrderResponse>>
     {
-
     }
 
-    public class CreateGhnOrderRequestHandler : IRequestHandler<CreateGhnOrderRequest, BaseResult<CreateDeliveryOrderResponse>>
+    public class CreateGhnOrderRequestHandler : IRequestHandler<GHN_CreateOrderRequest, BaseResult<CreateDeliveryOrderResponse>>
     {
         private readonly IShopRepository _shopRepository;
         private readonly IOrderRepository _orderRepository;
@@ -35,6 +34,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         private readonly IMapper _mapper;
         private readonly IAuthenticatedUserService _authenticatedUserService;
         private readonly ILogger<CreateGhnOrderRequestHandler> _logger;
+        private readonly IMediator _mediator;
 
         public CreateGhnOrderRequestHandler(
             IShopRepository shopRepository,
@@ -47,7 +47,8 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             IGhnApiClient ghnApiClient,
             IMapper mapper,
             IAuthenticatedUserService authenticatedUserService,
-            ILogger<CreateGhnOrderRequestHandler> logger)
+            ILogger<CreateGhnOrderRequestHandler> logger,
+            IMediator mediator)
         {
             _shopRepository = shopRepository;
             _orderRepository = orderRepository;
@@ -60,9 +61,10 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             _mapper = mapper;
             _authenticatedUserService = authenticatedUserService;
             _logger = logger;
+            _mediator = mediator;
         }
 
-        public async Task<BaseResult<CreateDeliveryOrderResponse>> Handle(CreateGhnOrderRequest request, CancellationToken cancellationToken)
+        public async Task<BaseResult<CreateDeliveryOrderResponse>> Handle(GHN_CreateOrderRequest request, CancellationToken cancellationToken)
         {
             LogRequestData(request);
 
@@ -84,43 +86,57 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             return response;
         }
 
+        /// <summary>
+        /// Handle send order to delivery partner
+        /// </summary>
+        /// <param name="shop"></param>
+        /// <param name="deliveryConfig"></param>
+        /// <param name="apiConfig"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         private async Task<BaseResult<CreateDeliveryOrderResponse>> ProcessOrderAsync(
             ShopQueryDto shop,
             DeliveryConfigDto deliveryConfig,
             ApiConfig apiConfig,
-            CreateGhnOrderRequest request)
+            GHN_CreateOrderRequest request)
         {
-            var previewOrder = await _ghnApiClient.CreateDraftDeliveryOrderAsync(apiConfig, deliveryConfig.PartnerShopId, request);
-            if (previewOrder.Code != 200)
+            // Process order with GHN partner
+            if (deliveryConfig.PartnerConfig.DeliveryPartner == EnumDeliveryPartner.GHN)
             {
-                return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.Exception, $"{previewOrder.CodeMessageValue} {previewOrder.Message}"));
-            }
-
-            var (orderCode, orderId) = await SaveOrderAsync(request, shop.Id, shop.UniqueCode, shop.AllowPublishOrder);
-
-            if (shop.AllowPublishOrder)
-            {
-                var createOrder = await _ghnApiClient.CreateDeliveryOrderAsync(apiConfig, deliveryConfig.PartnerShopId, request);
-                if (createOrder.Code == 200)
+                var previewOrder = await _ghnApiClient.CreateDraftDeliveryOrderAsync(apiConfig, deliveryConfig.PartnerShopId, request);
+                if (previewOrder.Code != 200)
                 {
-                    await UpdateOrderAsync(createOrder.Data, orderId);
-                    return BaseResult<CreateDeliveryOrderResponse>.Ok(createOrder.Data);
+                    return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.Exception, $"{previewOrder.CodeMessageValue} {previewOrder.Message}"));
                 }
+
+                var (orderCode, orderId) = await SaveOrderAsync(request, shop.Id, shop.UniqueCode, shop.AllowPublishOrder, deliveryConfig.PartnerShopId);
+                if (shop.AllowPublishOrder)
+                {
+                    var createOrder = await _ghnApiClient.CreateDeliveryOrderAsync(apiConfig, deliveryConfig.PartnerShopId, request);
+                    if (createOrder.Code == 200)
+                    {
+                        await UpdateOrderAsync(createOrder.Data, orderId);
+                        return BaseResult<CreateDeliveryOrderResponse>.Ok(createOrder.Data);
+                    }
+                }
+
+                return BaseResult<CreateDeliveryOrderResponse>.Ok(previewOrder.Data);
             }
 
-            return BaseResult<CreateDeliveryOrderResponse>.Ok(previewOrder.Data);
+            return BaseResult<CreateDeliveryOrderResponse>.Ok(null);
         }
 
         private async Task<(string, Guid)> SaveOrderAsync(
-            CreateGhnOrderRequest request,
+            GHN_CreateOrderRequest request,
             Guid shopId,
             string uniqueShopCode,
-            bool allowPublishOrder)
+            bool allowPublishOrder,
+            string partnerShopId)
         {
             var deliveryFeePlan = await CalculateDeliveryFeeAsync(request, shopId);
-            var order = CreateOrderEntity(request, shopId, uniqueShopCode, allowPublishOrder, deliveryFeePlan);
+            var order = CreateOrderEntity(request, shopId, uniqueShopCode, allowPublishOrder, deliveryFeePlan, partnerShopId);
+            order.OrrverideDeliveryFee(order.DeliveryFee);
             order.GenerateOrderCode(await _orderCodeSequenceService.GenerateOrderCodeAsync(shopId), uniqueShopCode);
-
             await _orderRepository.AddAsync(order);
             await _orderHistoryRepository.AddAsync(new OrderStatusHistory
             {
@@ -135,10 +151,17 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             return (order.ClientOrderCode, order.Id);
         }
 
-        private Order CreateOrderEntity(CreateGhnOrderRequest request, Guid shopId, string uniqueShopCode, bool allowPublishOrder, int deliveryFeePlan)
+        private Order CreateOrderEntity(
+            GHN_CreateOrderRequest request,
+            Guid shopId,
+            string uniqueShopCode,
+            bool allowPublishOrder,
+            int deliveryFeePlan,
+            string partnerShopId)
         {
             return new Order
             {
+                PartnerShopId = partnerShopId,
                 ShopId = shopId,
                 UniqueCode = uniqueShopCode,
                 IsPublished = allowPublishOrder ? true : false,
@@ -151,6 +174,8 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 ReturnAddress = request.ReturnAddress,
                 ReturnDistrictId = request.ReturnDistrictName,
                 ReturnWardCode = request.ReturnWardName,
+                ReturnDistrictName = request.ReturnDistrictName,
+                ReturnWardName = request.ReturnWardName,
 
                 ClientOrderCode = uniqueShopCode,
                 PaymentTypeId = request.PaymentTypeId,
@@ -199,6 +224,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     Length = i.Length,
                     Width = i.Width,
                     Height = i.Height,
+                    Weight = i.Weight,
                 }).ToList(),
             };
         }
@@ -208,13 +234,17 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             var entity = await _orderRepository.Where(o => o.Id == orderId).FirstOrDefaultAsync();
             if (entity == null) return;
 
+            // Duplicated: update order from parter
             _unitOfWork.Orders.Modify(entity);
-            entity.private_order_code = response.order_code;
-            entity.private_sort_code = response.sort_code;
-            entity.private_trans_type = response.trans_type;
-            entity.private_total_fee = response.total_fee;
-            entity.private_expected_delivery_time = response.expected_delivery_time;
-            entity.private_operation_partner = response.operation_partner;
+            entity.Publish();
+            entity.PrivateUpdateFromPartner(
+                private_order_code: response.order_code,
+                private_sort_code: response.sort_code,
+                private_trans_type: response.trans_type,
+                private_total_fee: response.total_fee,
+                private_expected_delivery_time: response.expected_delivery_time,
+                private_operation_partner: response.operation_partner
+                );
 
             await _orderHistoryRepository.AddAsync(new OrderStatusHistory
             {
@@ -226,10 +256,13 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
             await _unitOfWork.SaveChangesAsync();
 
-            await _unitOfWork.SaveChangesAsync();
+            await _mediator.Send(new GHN_SyncOrderRequest
+            {
+                PartnerOrderCode = entity.private_order_code
+            });
         }
 
-        private async Task<int> CalculateDeliveryFeeAsync(CreateGhnOrderRequest request, Guid shopId)
+        private async Task<int> CalculateDeliveryFeeAsync(GHN_CreateOrderRequest request, Guid shopId)
         {
             string deliveryPartner = EnumSupplierConstants.GHN;
             var result = await _unitOfWork.ShopPricePlanes
@@ -241,7 +274,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             return (int)result;
         }
 
-        private void LogRequestData(CreateGhnOrderRequest request)
+        private void LogRequestData(GHN_CreateOrderRequest request)
         {
             _logger.LogInformation("{Handler} - Data: {Data}", nameof(CreateGhnOrderRequestHandler), JsonConvert.SerializeObject(request));
         }
@@ -278,10 +311,11 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             public string ProdEnv { get; set; }
             public EnumDeliveryPartner DeliveryPartner { get; set; }
         }
+
         private async Task<DeliveryConfigDto> GetDeliveryConfigAsync(Guid shopId, CancellationToken cancellationToken)
         {
-            return await _shopPartnerConfigRepository
-                .Where(i => i.ShopId == shopId)
+             var result = await _shopPartnerConfigRepository
+                .Where(i => i.ShopId == shopId && i.PartnerConfig.IsActivated)
                 .Select(i => new DeliveryConfigDto
                 {
                     ShopId = i.ShopId,
@@ -296,6 +330,8 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     }
                 })
                 .FirstOrDefaultAsync(cancellationToken);
+
+            return result;
         }
     }
 }

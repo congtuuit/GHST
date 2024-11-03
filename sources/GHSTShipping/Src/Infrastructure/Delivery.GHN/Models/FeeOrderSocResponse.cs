@@ -4,8 +4,8 @@
     {
         public string _id { get; set; }
         public string order_code { get; set; }
-        public Detail detail { get; set; }
-        public List<Payment> payment { get; set; }
+        public GhnOrderDetailDto detail { get; set; }
+        public List<GHNOrderPaymentDto> payment { get; set; }
         public DateTime cod_collect_date { get; set; }
         public string transaction_id { get; set; }
         public string created_ip { get; set; }
@@ -17,7 +17,7 @@
         public DateTime updated_date { get; set; }
     }
 
-    public class Detail
+    public class GhnOrderDetailDto
     {
         public int main_service { get; set; }
         public int insurance { get; set; }
@@ -28,7 +28,7 @@
         public int coupon { get; set; }
     }
 
-    public class Payment
+    public class GHNOrderPaymentDto
     {
         public int value { get; set; }
         public int payment_type { get; set; }

@@ -11,58 +11,89 @@ const adminMenu: MenuList = [
     icon: 'dashboard',
     path: '/dashboard',
   },
+  // {
+  //   code: 'customer',
+  //   label: {
+  //     zh_CN: '',
+  //     en_US: 'Customer',
+  //     vi_VN: 'Quản lý khách hàng', // Vietnamese translation
+  //   },
+  //   icon: 'customer',
+  //   path: '/customer',
+  //   children: [
+  //     {
+  //       code: 'customer_list',
+  //       label: {
+  //         zh_CN: '基本',
+  //         en_US: 'List',
+  //         vi_VN: 'Khách hàng', // Vietnamese translation
+  //       },
+  //       path: '/customer/list',
+  //     },
+  //     {
+  //       code: 'customer_pricing_plan',
+  //       label: {
+  //         zh_CN: '基本',
+  //         en_US: 'Pricing plan',
+  //         vi_VN: 'Bảng giá', // Vietnamese translation
+  //       },
+  //       path: '/customer/price-plan',
+  //     },
+  //   ],
+  // },
+
   {
-    code: 'customer',
+    code: 'customer_list',
     label: {
-      zh_CN: '',
-      en_US: 'Customer',
-      vi_VN: 'Quản lý khách hàng', // Vietnamese translation
+      zh_CN: '基本',
+      en_US: 'List',
+      vi_VN: 'Khách hàng', // Vietnamese translation
     },
-    icon: 'customer',
-    path: '/customer',
-    children: [
-      {
-        code: 'customer_list',
-        label: {
-          zh_CN: '基本',
-          en_US: 'List',
-          vi_VN: 'Khách hàng', // Vietnamese translation
-        },
-        path: '/customer/list',
-      },
-      {
-        code: 'customer_pricing_plan',
-        label: {
-          zh_CN: '基本',
-          en_US: 'Pricing plan',
-          vi_VN: 'Bảng giá', // Vietnamese translation
-        },
-        path: '/customer/price-plan',
-      },
-    ],
+    path: '/customer/list',
   },
   {
-    code: 'order',
+    code: 'customer_pricing_plan',
+    label: {
+      zh_CN: '基本',
+      en_US: 'Pricing plan',
+      vi_VN: 'Bảng giá', // Vietnamese translation
+    },
+    path: '/customer/price-plan',
+  },
+  // {
+  //   code: 'order',
+  //   label: {
+  //     zh_CN: '',
+  //     en_US: 'Order',
+  //     vi_VN: 'Quản lý đơn hàng', // Vietnamese translation
+  //   },
+  //   icon: 'order',
+  //   path: '/order',
+  //   children: [
+  //     {
+  //       code: 'order_list',
+  //       label: {
+  //         zh_CN: '',
+  //         en_US: 'Order',
+  //         vi_VN: 'DS đơn hàng', // Vietnamese translation
+  //       },
+  //       icon: 'order',
+  //       path: '/order/list',
+  //     },
+  //   ],
+  // },
+
+  {
+    code: 'order_list',
     label: {
       zh_CN: '',
       en_US: 'Order',
-      vi_VN: 'Quản lý đơn hàng', // Vietnamese translation
+      vi_VN: 'DS đơn hàng', // Vietnamese translation
     },
     icon: 'order',
-    path: '/order',
-    children: [
-      {
-        code: 'order_list',
-        label: {
-          zh_CN: '',
-          en_US: 'Order',
-          vi_VN: 'DS đơn hàng', // Vietnamese translation
-        },
-        icon: 'order',
-        path: '/order/list',
-      },
-    ],
+    path: '/order/list',
   },
+
   // {
   //   code: 'operation-report',
   //   label: {

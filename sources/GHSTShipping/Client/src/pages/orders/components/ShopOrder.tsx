@@ -7,7 +7,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { Button, Card, Col, message, Radio, Row, Select, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { apiCancelOrderGhn, apiGetOrderDetail, apiGetOrders, apiGetShopOrders } from '@/api/business.api';
+import { apiCancelOrderGhn, apiConfirmOrderGhn, apiGetOrderDetail, apiGetOrders, apiGetShopOrders } from '@/api/business.api';
 import Datatable from '@/components/core/datatable';
 import { suppliers } from '@/constants/data';
 import { commingSoon } from '@/utils/common';
@@ -30,11 +30,11 @@ const ShopOrders = () => {
   const fetchOrders = async (params: IOrderPagedParameter | null) => {
     if (params == null) {
       params = {
-        deliveryPartner: '',
+        deliveryPartner: supplierSelected ?? '',
         orderCode: '',
-        status: '',
-        pageNumber: 1,
-        pageSize: 10,
+        status: orderStatusFilter ?? '',
+        pageNumber: tablePaginationConfig?.current ??  1,
+        pageSize: tablePaginationConfig?.pageSize ?? 10,
       };
     }
 
@@ -61,6 +61,19 @@ const ShopOrders = () => {
     const response = await apiCancelOrderGhn([orderCode as string]);
     if (response.success) {
       message.success('Hủy đơn thành công!');
+    }
+  };
+
+  const handleConfirmOrder = async (orderId: string) => {
+    if (Boolean(orderId)) {
+      const response = await apiConfirmOrderGhn(orderId);
+      if (response.success) {
+        message.success('Đã xác nhận đơn hàng thành công!');
+        await fetchOrders(null);
+        
+      } else {
+        message.error("Xảy ra lỗi");
+      }
     }
   };
 
@@ -205,19 +218,19 @@ const ShopOrders = () => {
       align: 'center' as const,
       width: '190px',
       render: (_: any, record: IOrderViewDto) => {
-        if (record.status !== 'waiting_confirm') {
-          return (
-            <div key={record.id}>
-              <Button danger className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
-                Hủy đơn
-              </Button>
-            </div>
-          );
-        }
+        // if (record.status !== 'waiting_confirm') {
+        //   return (
+        //     <div key={record.id}>
+        //       <Button danger className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
+        //         Hủy đơn
+        //       </Button>
+        //     </div>
+        //   );
+        // }
 
         return (
           <div key={record.id}>
-            <Button type="dashed" className="table-btn-action" size="middle" onClick={commingSoon}>
+            <Button type="dashed" className="table-btn-action" size="middle" onClick={() => handleConfirmOrder(record.id)}>
               Xác nhận
             </Button>
             <Button danger className="table-btn-action" size="small" onClick={commingSoon}>
@@ -264,7 +277,7 @@ const ShopOrders = () => {
 
       <Datatable columns={columns} dataSource={orderPagination} onChange={handleChangeTable} />
 
-      <OrderDetailDialog data={orderDetail} /> 
+      <OrderDetailDialog data={orderDetail} />
     </Row>
   );
 };

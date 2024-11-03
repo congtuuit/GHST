@@ -10,6 +10,14 @@ namespace GHSTShipping.Domain.Entities
     public class Order : AuditableBaseEntity
     {
         #region System
+        /// <summary>
+        /// The shop ID in delivery has been connected 
+        /// </summary>
+        public string PartnerShopId { get; set; }
+
+        /// <summary>
+        /// System customer shop id
+        /// </summary>
         public Guid? ShopId { get; set; }
         public virtual Shop Shop { get; set; }
 
@@ -24,6 +32,11 @@ namespace GHSTShipping.Domain.Entities
         /// Delivery fee with price rules
         /// </summary>
         public int DeliveryFee { get; set; }
+
+        /// <summary>
+        /// Delivery fee has been orverried and just display on Admin
+        /// </summary>
+        public int CustomDeliveryFee { get; private set; }
 
         public DateTime? PublishDate { get; set; }
         #endregion
@@ -42,7 +55,13 @@ namespace GHSTShipping.Domain.Entities
         public string? ReturnDistrictId { get; set; }
 
         [MaxLength(100)]
+        public string? ReturnDistrictName { get; set; }
+
+        [MaxLength(100)]
         public string? ReturnWardCode { get; set; }
+
+        [MaxLength(100)]
+        public string? ReturnWardName { get; set; }
 
         [MaxLength(200)]
         public string? ClientOrderCode { get; set; }
@@ -129,23 +148,24 @@ namespace GHSTShipping.Domain.Entities
         public string private_order_code { get; set; }
 
         [MaxLength(100)]
-        public string private_sort_code { get; set; }
+        public string private_sort_code { get; private  set; }
 
         [MaxLength(100)]
-        public string private_trans_type { get; set; }
+        public string private_trans_type { get; private  set; }
 
-        public int private_total_fee { get; set; }
-        public DateTime private_expected_delivery_time { get; set; }
+        public int private_total_fee { get; private  set; }
+
+        public DateTime? private_expected_delivery_time { get; private  set; }
 
         [MaxLength(100)]
-        public string private_operation_partner { get; set; }
+        public string private_operation_partner { get; private  set; }
+
+        #endregion
 
 
         [MaxLength(100)]
         public string CurrentStatus { get; set; }
 
-
-        #endregion
 
         public void GenerateOrderCode(long sequenceCode, string prefix)
         {
@@ -157,5 +177,38 @@ namespace GHSTShipping.Domain.Entities
             this.ClientOrderCode = uniqueCode;
         }
 
+        public void Publish()
+        {
+            this.PublishDate = DateTime.UtcNow;
+            this.IsPublished = true;
+            this.CurrentStatus = OrderStatus.READY_TO_PICK;
+        }
+
+        public void Cancel()
+        {
+            this.CurrentStatus = OrderStatus.CANCEL;
+        }
+
+        public void OrrverideDeliveryFee(int fee)
+        {
+            this.CustomDeliveryFee = fee;
+        }
+
+        public void PrivateUpdateFromPartner(
+            string private_order_code,
+            string private_sort_code,
+            string private_trans_type,
+            int private_total_fee,
+            DateTime private_expected_delivery_time,
+            string private_operation_partner
+            )
+        {
+            this.private_order_code = private_order_code;
+            this.private_sort_code = private_sort_code;
+            this.private_trans_type = private_trans_type;
+            this.private_total_fee = private_total_fee;
+            this.private_expected_delivery_time = private_expected_delivery_time;
+            this.private_operation_partner = private_operation_partner;
+        }
     }
 }

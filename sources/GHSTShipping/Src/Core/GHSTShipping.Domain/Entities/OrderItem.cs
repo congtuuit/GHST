@@ -18,6 +18,7 @@ namespace GHSTShipping.Domain.Entities
         public int? Length { get; set; }
         public int? Width { get; set; }
         public int? Height { get; set; }
+        public int? Weight { get; set; }
 
         public Guid OrderId { get; set; }
         public virtual Order Order { get; set; }

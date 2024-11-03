@@ -102,5 +102,10 @@ namespace Delivery.GHN
         Task<IEnumerable<WardResponse>> GetWardAsync(ApiConfig config, int districtId);
 
         Task<IEnumerable<PickShiftResponse>> GetPickShiftAsync(ApiConfig config);
+
+        Task<SearchOrderResponse> SearchOrdersAsync(
+            ApiConfig config,
+            string shopId,
+            ShippingOrderSearchRequest request);
     }
 }

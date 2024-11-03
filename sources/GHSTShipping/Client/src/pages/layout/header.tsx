@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 import { LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from '@ant-design/icons';
-import { Dropdown, Layout, theme as antTheme, Tooltip } from 'antd';
+import { Dropdown, Layout, theme as antTheme, Tooltip, Button } from 'antd';
 import { createElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +34,7 @@ interface HeaderProps {
 type Action = 'userInfo' | 'userSetting' | 'logout';
 
 const HeaderComponent: FC<HeaderProps> = ({ collapsed, toggle }) => {
-  const { logged, locale, device } = useSelector(state => state.user);
+  const { logged, locale, device, userName } = useSelector(state => state.user);
   const { theme } = useSelector(state => state.global);
   const navigate = useNavigate();
   const token = antTheme.useToken();
@@ -89,7 +89,7 @@ const HeaderComponent: FC<HeaderProps> = ({ collapsed, toggle }) => {
           <span id="sidebar-trigger">{collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</span>
         </div>
         <div className="actions">
-          <Tooltip
+          {/* <Tooltip
             title={formatMessage({
               id: theme === 'dark' ? 'gloabal.tips.theme.lightTooltip' : 'gloabal.tips.theme.darkTooltip',
             })}
@@ -99,7 +99,7 @@ const HeaderComponent: FC<HeaderProps> = ({ collapsed, toggle }) => {
                 onClick: onChangeTheme,
               })}
             </span>
-          </Tooltip>
+          </Tooltip> */}
           <HeaderNoticeComponent />
           <Dropdown
             menu={{
@@ -132,8 +132,9 @@ const HeaderComponent: FC<HeaderProps> = ({ collapsed, toggle }) => {
                   {
                     key: '1',
                     icon: <UserOutlined />,
+                    onClick: () => navigate('/dashboard'),
                     label: (
-                      <div onClick={() => navigate('/dashboard')}>
+                      <div>
                         <LocaleFormatter id="header.avator.account" />
                       </div>
                     ),
@@ -141,8 +142,9 @@ const HeaderComponent: FC<HeaderProps> = ({ collapsed, toggle }) => {
                   {
                     key: '2',
                     icon: <LogoutOutlined />,
+                    onClick: () => onActionClick('logout'),
                     label: (
-                      <div onClick={() => onActionClick('logout')}>
+                      <div>
                         <LocaleFormatter id="header.avator.logout" />
                       </div>
                     ),

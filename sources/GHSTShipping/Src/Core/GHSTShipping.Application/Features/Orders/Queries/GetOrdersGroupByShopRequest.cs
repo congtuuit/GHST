@@ -4,6 +4,7 @@ using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Parameters;
 using GHSTShipping.Application.Wrappers;
+using GHSTShipping.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GHSTShipping.Application.Features.Orders.Queries
 {
@@ -48,7 +50,6 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     TotalDraftOrder = i.Orders.Count(o => o.IsPublished == false),
                     TotalPublishedOrder = i.Orders.Count(o => o.IsPublished == true)
                 })
-                .Where(i => i.TotalPublishedOrder > 0 ||  i.TotalDraftOrder > 0)
                 .ToPaginationAsync(request.PageNumber, request.PageSize);
 
             var shops = paginationResponse.Data;

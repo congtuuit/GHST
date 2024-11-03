@@ -12,6 +12,7 @@ export interface IOrderDto {
   publishDate: string;
   privateOrderCode: string;
   orderCode: string;
+  created: Date;
 }
 
 export interface IOrderDetail extends IOrderViewDto {
@@ -68,5 +69,6 @@ export interface IOrderViewDto {
   paymentTypeName: string;
   status: string;
   statusName: string;
+  statusColor: string;
 }
 

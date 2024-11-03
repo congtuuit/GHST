@@ -100,8 +100,8 @@ const AdminOrderList = () => {
     },
     {
       title: 'Đơn đã xác nhận',
-      dataIndex: 'totalDraftOrder',
-      key: 'totalDraftOrder',
+      dataIndex: 'totalPublishedOrder',
+      key: 'totalPublishedOrder',
       width: 'auto',
       align: 'right',
       render: (value: number) => {
@@ -114,8 +114,8 @@ const AdminOrderList = () => {
     },
     {
       title: 'Đơn chờ xác nhận',
-      dataIndex: 'totalPublishedOrder',
-      key: 'totalPublishedOrder',
+      dataIndex: 'totalDraftOrder',
+      key: 'totalDraftOrder',
       align: 'right',
       render: (value: number) => {
         return (

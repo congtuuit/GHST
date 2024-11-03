@@ -72,7 +72,6 @@ const CustomerTable = () => {
       width: 150,
       render: (value: string, record: ShopDatatableDto) => {
         const dateFormatted = dayjs(value).format(revertDateFormatMap['day']);
-
         return <span>{dateFormatted}</span>;
       },
     },
