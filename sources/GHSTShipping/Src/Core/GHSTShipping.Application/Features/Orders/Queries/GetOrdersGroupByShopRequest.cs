@@ -12,11 +12,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GHSTShipping.Application.Features.Orders.Queries
 {
-    public class GetOrdersGroupByShopRequest: PaginationRequestParameter, IRequest<BaseResult<PaginationResponseDto<ShopViewReportDto>>>
+    public class GetOrdersGroupByShopRequest : PaginationRequestParameter, IRequest<BaseResult<PaginationResponseDto<ShopViewReportDto>>>
     {
     }
 
@@ -47,8 +46,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     Id = i.Id,
                     UniqueCode = i.UniqueCode,
                     Name = i.Name,
-                    TotalDraftOrder = i.Orders.Count(o => o.IsPublished == false),
-                    TotalPublishedOrder = i.Orders.Count(o => o.IsPublished == true)
+                    TotalDraftOrder = i.Orders.Count(o => o.IsPublished == false && o.CurrentStatus != OrderStatus.CANCEL),
+                    TotalPublishedOrder = i.Orders.Count(o => o.IsPublished == true && o.CurrentStatus != OrderStatus.CANCEL)
                 })
                 .ToPaginationAsync(request.PageNumber, request.PageSize);
 
@@ -66,7 +65,6 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     i.ProvinceName
                 })
                 .ToListAsync();
-
 
             int index = 0;
             int skipCount = (request.PageNumber - 1) * request.PageSize;

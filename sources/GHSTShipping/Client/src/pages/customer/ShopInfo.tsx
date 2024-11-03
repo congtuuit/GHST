@@ -1,9 +1,9 @@
 import type { IShopViewDetailDto } from '@/interface/shop';
-import type { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { Button, Checkbox, Col, Descriptions, Modal, Row, Select, Tag, Card } from 'antd';
+import { Button, Checkbox, Col, Descriptions, Modal, Row, Select, Tag, Card, Switch } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { apiUpdateGhnShopId } from '@/api/business.api';
+import { SwitchChangeEventHandler } from 'antd/es/switch';
 
 interface ShopInfoProps {
   data: IShopViewDetailDto | undefined;
@@ -22,7 +22,7 @@ const ShopInfo: React.FC<ShopInfoProps> = ({ data, onChange }) => {
     setOpen(false);
   };
 
-  const handleChangeAllowPublishOrder = (e: CheckboxChangeEvent) => {
+  const handleChangeAllowPublishOrder = () => {
     onChange && onChange(detail?.id as string);
   };
 
@@ -53,20 +53,20 @@ const ShopInfo: React.FC<ShopInfoProps> = ({ data, onChange }) => {
             contentStyle={{ textAlign: 'right' }}
             colon={false} // Remove colon for cleaner look
           >
-            <Descriptions.Item label="Mã Cửa Hàng">{detail?.shopUniqueCode}</Descriptions.Item>
-            <Descriptions.Item label="Ngày Đăng Ký">
+            <Descriptions.Item label="Mã Cửa Hàng: ">{detail?.shopUniqueCode}</Descriptions.Item>
+            <Descriptions.Item label="Ngày Đăng Ký: ">
               {detail?.registerDate ? moment(detail?.registerDate).format('DD/MM/YYYY') : 'Không có'}
             </Descriptions.Item>
-            <Descriptions.Item label="Tên Cửa Hàng">{detail?.shopName}</Descriptions.Item>
-            <Descriptions.Item label="Chủ Sở Hữu">{detail?.fullName}</Descriptions.Item>
-            <Descriptions.Item label="Email">{detail?.email}</Descriptions.Item>
-            <Descriptions.Item label="Sức Chứa Hàng Tháng">{detail?.avgMonthlyCapacity?.toLocaleString() ?? 'Không có'}</Descriptions.Item>
-            <Descriptions.Item label="Số Điện Thoại">{detail?.phoneNumber}</Descriptions.Item>
+            <Descriptions.Item label="Tên Cửa Hàng: ">{detail?.shopName}</Descriptions.Item>
+            <Descriptions.Item label="Chủ Sở Hữu: ">{detail?.fullName}</Descriptions.Item>
+            <Descriptions.Item label="Email: ">{detail?.email}</Descriptions.Item>
+            <Descriptions.Item label="Sản lượng đơn trung bình 1 tháng: ">{detail?.avgMonthlyCapacity?.toLocaleString() ?? 'Không có'}</Descriptions.Item>
+            <Descriptions.Item label="Số Điện Thoại: ">{detail?.phoneNumber}</Descriptions.Item>
           </Descriptions>
         </Card>
       </Col>
       <Col span={12}>
-        <Card type="inner" title="Tài khoản ngân hàng" bordered={true} style={{ marginBottom: '20px' }}>
+        <Card type="inner" title="Tài khoản ngân hàng: " bordered={true} style={{ marginBottom: '20px' }}>
           <Descriptions
             column={1} // Adjust column to fit layout needs
             layout="horizontal"
@@ -90,10 +90,17 @@ const ShopInfo: React.FC<ShopInfoProps> = ({ data, onChange }) => {
             colon={false} // Remove colon for cleaner look
           >
             <Descriptions.Item label="Cho Phép Đăng Đơn Hàng:">
-              <Checkbox onChange={handleChangeAllowPublishOrder} checked={detail?.allowPublishOrder ?? false}>
-                Cho phép
-              </Checkbox>
+              <Switch title={'Cho phép'} onChange={() => handleChangeAllowPublishOrder()} checked={detail?.allowPublishOrder ?? false} />
             </Descriptions.Item>
+            <span style={{ fontStyle: 'italic' }}>{'(cho phép shop tạo & đẩy đơn sang đơn vị vận chuyển)'}</span>
+            <br />
+
+            <Descriptions.Item label="Cho Phép Sử Dụng Địa Chỉ Mặc Định:">
+            <Switch title={'Cho phép'} onChange={() => handleChangeAllowPublishOrder()} checked={detail?.allowPublishOrder ?? false} />
+            </Descriptions.Item>
+            <span style={{ fontStyle: 'italic' }}>{'(Sử dụng địa chỉ của cửa hàng trên tài khoản đơn vị vận chuyển để tạo đơn)'}</span>
+            <br />
+
             <Descriptions.Item label="Trạng Thái:">
               <Tag color={detail?.isVerified ? 'green' : 'warning'}>{detail?.status}</Tag>
             </Descriptions.Item>

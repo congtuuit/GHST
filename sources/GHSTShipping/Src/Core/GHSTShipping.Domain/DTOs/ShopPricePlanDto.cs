@@ -6,7 +6,7 @@ namespace GHSTShipping.Domain.DTOs
 {
     public class ShopPricePlanDto
     {
-        public int No {  get; set; }
+        public int No { get; set; }
 
         public Guid Id { get; set; }
 
@@ -28,7 +28,11 @@ namespace GHSTShipping.Domain.DTOs
         [Precision(18, 2)]
         public decimal OfficialPrice { get; set; }
 
-        [Precision(18, 2)]
-        public decimal Capacity { get; set; }
+        public int Weight { get; set; }
+        public int Length { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+
+        public int ConvertedWeight { get; set; }
     }
 }

@@ -6,19 +6,22 @@ using GHSTShipping.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.Application.Features.Shops.Commands
 {
-    public class CreateShopPriceCommand : CreateShopPriceRequest, IRequest<BaseResult<Guid>>
+    public class CreateShopPriceCommand : CreateShopPriceRequest, IRequest<BaseResult>
     {
     }
 
-    public class CreateShopPriceCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateShopPriceCommand, BaseResult<Guid>>
+    public class CreateShopPriceCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateShopPriceCommand, BaseResult>
     {
-        public async Task<BaseResult<Guid>> Handle(CreateShopPriceCommand request, CancellationToken cancellationToken)
+        private static int MAX_LOOP = 50;
+
+        public async Task<BaseResult> Handle(CreateShopPriceCommand request, CancellationToken cancellationToken)
         {
             var suppliers = EnumSupplierExtension.GetSuppliers();
             if (suppliers.Contains(request.Supplier) == false)
@@ -36,31 +39,74 @@ namespace GHSTShipping.Application.Features.Shops.Commands
             }
         }
 
-        public async Task<BaseResult<Guid>> HandleCreateShopPriceAsync(CreateShopPriceCommand request, CancellationToken cancellationToken)
+        public async Task<BaseResult> HandleCreateShopPriceAsync(CreateShopPriceCommand request, CancellationToken cancellationToken)
         {
-            using var transaction = await unitOfWork.BeginTransactionAsync(cancellationToken);
-            try
+            var shopPricePlanes = new List<ShopPricePlan>();
+            if (request.Mode == "mutilple")
             {
-                var newPricePlan = new ShopPricePlan(
+                var currentPrice = request.OfficialPrice;
+                var currentConvertedWeight = new ShopPricePlan().CalcConvertedWeight(request.Length, request.Width, request.Height);
+                var maxConvertedWeight = request.MaxConvertedWeight;
+                int loop = 0;
+                while (maxConvertedWeight > currentConvertedWeight)
+                {
+                    if (loop >= MAX_LOOP)
+                    {
+                        break;
+                    }
+
+                    var pricePlan = new ShopPricePlan(
+                       request.ShopId,
+                       request.Supplier,
+                       request.PrivatePrice,
+                       currentPrice,
+                       request.Weight,
+                       request.Length,
+                       request.Width,
+                       request.Height,
+                       currentConvertedWeight
+                    );
+
+                    shopPricePlanes.Add(pricePlan);
+
+                    // Next price plan
+                    currentPrice += request.StepPrice;
+
+                    // Next converted weight
+                    currentConvertedWeight += request.StepWeight;
+
+                    loop++;
+                }
+            }
+            else
+            {
+                shopPricePlanes.Add(new ShopPricePlan(
                     request.ShopId,
                     request.Supplier,
                     request.PrivatePrice,
                     request.OfficialPrice,
-                    request.Capacity
-                    );
+                    request.Weight,
+                    request.Length,
+                    request.Width,
+                    request.Height
+                    ));
+            }
 
-                await unitOfWork.ShopPricePlanes.AddAsync(newPricePlan);
+            using var transaction = await unitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                await unitOfWork.ShopPricePlanes.AddRangeAsync(shopPricePlanes);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
 
-                return BaseResult<Guid>.Ok(newPricePlan.Id);
+                return BaseResult.Ok();
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync(cancellationToken);
             }
 
-            return BaseResult<Guid>.Failure();
+            return BaseResult.Failure();
         }
 
         public async Task<BaseResult<Guid>> HandleUpdateShopPriceAsunc(CreateShopPriceCommand request, CancellationToken cancellationToken)
@@ -73,7 +119,10 @@ namespace GHSTShipping.Application.Features.Shops.Commands
                     Supplier = i.Supplier,
                     PrivatePrice = i.PrivatePrice,
                     OfficialPrice = i.OfficialPrice,
-                    Capacity = i.Capacity,
+                    Weight = i.Weight,
+                    Length = i.Length,
+                    Width = i.Width,
+                    Height = i.Height,
                 })
                 .FirstOrDefaultAsync();
 
@@ -90,7 +139,10 @@ namespace GHSTShipping.Application.Features.Shops.Commands
                     pricePlan.Supplier = request.Supplier;
                     pricePlan.PrivatePrice = request.PrivatePrice;
                     pricePlan.OfficialPrice = request.OfficialPrice;
-                    pricePlan.Capacity = request.Capacity;
+                    pricePlan.Weight = request.Weight;
+                    pricePlan.Length = request.Length;
+                    pricePlan.Width = request.Width;
+                    pricePlan.Height = request.Height;
 
                     await unitOfWork.SaveChangesAsync(cancellationToken);
                     await transaction.CommitAsync(cancellationToken);

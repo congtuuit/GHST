@@ -9,12 +9,12 @@ import { useSelector } from 'react-redux';
 import { apiCancelOrderGhn, apiConfirmOrderGhn, apiGetOrderDetail, apiGetOrders, apiGetShopOrders } from '@/api/business.api';
 import Datatable from '@/components/core/datatable';
 import { suppliers } from '@/constants/data';
-import { commingSoon, formatUtcToLocalTime } from '@/utils/common';
-import { IOrderStatus, orderStatuses } from '../orderStatus';
+import { formatUtcToLocalTime } from '@/utils/common';
+import { orderStatuses } from '../orderStatus';
 import OrderDetailDialog from './ghn/order-detail';
 import GoBackButton from '@/components/core/GoBackButton';
 import OrderStatus from './OrderStatus';
-import { revertDateFormatMap, revertdatetimeFormatMap } from '@/components/core/table-column/type';
+import { revertDateFormatMap } from '@/components/core/table-column/type';
 
 const { Option } = Select;
 
@@ -136,7 +136,7 @@ const ShopOrders = ({ shopId }: ShopOrdersProps) => {
           <div>
             <div>{value}</div>
             <div>{record?.fromPhone}</div>
-            <div style={{fontStyle: "italic", fontSize: "12px"}}>Ngày tạo: {dateFormatted}</div>
+            <div style={{ fontStyle: 'italic', fontSize: '12px' }}>Ngày tạo: {dateFormatted}</div>
           </div>
         );
       },

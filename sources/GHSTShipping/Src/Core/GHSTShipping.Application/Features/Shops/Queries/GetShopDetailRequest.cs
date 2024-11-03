@@ -44,6 +44,7 @@ namespace GHSTShipping.Application.Features.Shops.Queries
                     BankAccountNumber = i.BankAccountNumber,
                     BankAddress = i.BankAddress,
                     AllowPublishOrder = i.AllowPublishOrder,
+                    AllowUsePartnerShopAddress = i.AllowUsePartnerShopAddress,
                     GhnShopId = i.GhnShopId,
                 })
                 .FirstOrDefaultAsync(cancellationToken);

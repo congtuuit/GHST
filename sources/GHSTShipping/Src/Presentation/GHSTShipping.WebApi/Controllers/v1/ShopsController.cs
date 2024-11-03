@@ -34,12 +34,12 @@ namespace GHSTShipping.WebApi.Controllers.v1
             => await Mediator.Send(request);
 
         [HttpPost, Authorize]
-        public async Task<BaseResult<System.Guid>> Prices([FromBody] CreateShopPriceCommand request)
+        public async Task<BaseResult> Prices([FromBody] CreateShopPriceCommand request)
             => await Mediator.Send(request);
 
         [HttpPut, Authorize]
         [Route("{Id}")]
-        public async Task<BaseResult<System.Guid>> Prices([FromRoute] System.Guid Id, CreateShopPriceCommand request)
+        public async Task<BaseResult> Prices([FromRoute] System.Guid Id, CreateShopPriceCommand request)
         {
             request.Id = Id;
 

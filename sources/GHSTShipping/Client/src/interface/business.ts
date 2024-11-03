@@ -35,7 +35,11 @@ export interface ShopPricePlanDto {
   supplier: 'GHN' | 'SHOPEE EXPRESS' | 'J&T' | 'Best' | 'Viettel' | 'GHTK'; // Các giá trị cho supplier
   privatePrice: number;
   officialPrice: number;
-  capacity: number;
+  weight: number;
+  length: number;
+  width: number;
+  height: number;
+  convertedWeight: number;
 }
 
 export interface ICreateDeliveryOrderRequest {

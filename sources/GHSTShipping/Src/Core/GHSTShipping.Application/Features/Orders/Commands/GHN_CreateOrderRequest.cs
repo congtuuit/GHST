@@ -265,9 +265,10 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         private async Task<int> CalculateDeliveryFeeAsync(GHN_CreateOrderRequest request, Guid shopId)
         {
             string deliveryPartner = EnumSupplierConstants.GHN;
+            var calculateWeight = request.Length * request.Width * request.Height;
             var result = await _unitOfWork.ShopPricePlanes
-                .Where(i => i.ShopId == shopId && i.Supplier == deliveryPartner && i.Capacity > request.Weight)
-                .OrderBy(i => i.Capacity)
+                .Where(i => i.ShopId == shopId && i.Supplier == deliveryPartner && i.ConvertedWeight > calculateWeight)
+                .OrderBy(i => i.ConvertedWeight)
                 .Select(i => i.OfficialPrice)
                 .FirstOrDefaultAsync();
 

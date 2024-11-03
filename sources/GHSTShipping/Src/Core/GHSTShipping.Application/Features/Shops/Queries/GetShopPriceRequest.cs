@@ -5,6 +5,7 @@ using GHSTShipping.Application.Parameters;
 using GHSTShipping.Application.Wrappers;
 using GHSTShipping.Domain.DTOs;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading;
@@ -41,12 +42,16 @@ namespace GHSTShipping.Application.Features.Shops.Queries
                     ShopId = i.ShopId,
                     ShopName = i.Shop.Name,
                     ShopUniqueCode = i.Shop.UniqueCode,
-                    Capacity = i.Capacity,
+                    Weight = i.Weight,
+                    Length = i.Length,
+                    Width = i.Width,
+                    Height = i.Height,
+                    ConvertedWeight = i.ConvertedWeight,
                     OfficialPrice = i.OfficialPrice,
                     PrivatePrice = i.PrivatePrice,
                     Supplier = i.Supplier,
                 })
-                .OrderBy(i => i.Capacity)
+                .OrderBy(i => i.ConvertedWeight)
                 .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);
 
             int index = 0;

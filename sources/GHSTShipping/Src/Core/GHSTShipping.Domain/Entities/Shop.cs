@@ -40,6 +40,11 @@ namespace GHSTShipping.Domain.Entities
 
         public bool AllowPublishOrder { get; set; }
 
+        /// <summary>
+        /// Allow to use shop address connected
+        /// </summary>
+        public bool AllowUsePartnerShopAddress { get; set; }
+
         [Obsolete]
         public int? GhnShopId { get; set; }
 

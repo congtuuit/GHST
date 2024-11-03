@@ -20,7 +20,11 @@ interface ShopPricePlanDatatable {
   supplier: 'GHN' | 'SHOPEE EXPRESS' | 'J&T' | 'Best' | 'Viettel' | 'GHTK'; // Có thể giới hạn giá trị nếu cần
   privatePrice: number; // decimal in C# can be represented as number in TypeScript
   officialPrice: number; // decimal in C# can be represented as number in TypeScript
-  capacity: number; // decimal in C# can be represented as number in TypeScript
+  weight: number;
+  length: number;
+  width: number;
+  height: number;
+  convertedWeight: number;
 }
 
 interface PriceTableProps {
@@ -79,9 +83,23 @@ const PriceTable = (props: PriceTableProps) => {
       dataIndex: 'shopName',
       key: 'shopName',
       align: 'left' as const,
+      width: 180,
     },
     {
-      title: 'Giá',
+      title: 'Đơn vị vận chuyển',
+      dataIndex: 'supplier',
+      key: 'supplier',
+      width: 180,
+      align: 'center' as const,
+      filters: suppliers.map(i => {
+        return {
+          text: i,
+          value: i,
+        };
+      }),
+    },
+    {
+      title: 'Giá riêng',
       dataIndex: 'privatePrice',
       key: 'privatePrice',
       align: 'right' as const,
@@ -115,28 +133,30 @@ const PriceTable = (props: PriceTableProps) => {
       },
     },
     {
-      title: 'Khối lượng',
-      dataIndex: 'capacity',
-      key: 'capacity',
+      title: 'Cân nặng',
+      dataIndex: 'weight',
+      key: 'weight',
       align: 'right' as const,
     },
     {
-      title: 'Đơn vị vận chuyển',
-      dataIndex: 'supplier',
-      key: 'supplier',
-      width: 180,
-      align: 'center' as const,
-      filters: suppliers.map(i => {
-        return {
-          text: i,
-          value: i,
-        };
-      }),
+      title: 'Dài x Rộng x Cao',
+      dataIndex: '_lxwxh',
+      key: '_lxwxh',
+      align: 'right' as const,
+      render: (value: string, record: ShopPricePlanDatatable) => {
+        return <span>{`${record.length}x${record.width}x${record.height}`}</span>;
+      },
+    },
+    {
+      title: 'Khối lượng chuyển đổi',
+      dataIndex: 'convertedWeight',
+      key: 'convertedWeight',
+      align: 'right' as const,
     },
     {
       title: 'Thao tác',
       key: 'action',
-      width: 150,
+      width: 200,
       align: 'center' as const,
       render: (_: any, record: ShopPricePlanDatatable) => {
         return (
@@ -177,7 +197,11 @@ const PriceTable = (props: PriceTableProps) => {
           supplier: record.supplier,
           privatePrice: record.privatePrice,
           officialPrice: record.officialPrice,
-          capacity: record.capacity,
+          weight: record.weight,
+          length: record.length,
+          width: record.width,
+          height: record.height,
+          convertedWeight: record.convertedWeight,
         } as ShopPricePlanDto,
         (success: boolean) => {
           if (success) {

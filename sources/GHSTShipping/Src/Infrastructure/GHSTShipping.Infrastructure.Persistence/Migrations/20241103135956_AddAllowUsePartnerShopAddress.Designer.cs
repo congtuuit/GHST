@@ -4,6 +4,7 @@ using GHSTShipping.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GHSTShipping.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241103135956_AddAllowUsePartnerShopAddress")]
+    partial class AddAllowUsePartnerShopAddress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -594,18 +597,15 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ConvertedWeight")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Capacity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Height")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -615,10 +615,6 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Length")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("int");
 
                     b.Property<decimal>("OfficialPrice")
                         .HasPrecision(18, 2)
@@ -634,14 +630,6 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                     b.Property<string>("Supplier")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Weight")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("int");
-
-                    b.Property<int>("Width")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

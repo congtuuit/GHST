@@ -23,6 +23,7 @@ namespace GHSTShipping.Application.DTOs.Shop
         public string BankAccountHolder { get; set; }
         public string BankAddress { get; set; }
         public bool AllowPublishOrder { get; set; }
+        public bool AllowUsePartnerShopAddress { get; set; }
 
         public int? GhnShopId { get; set; }
 
