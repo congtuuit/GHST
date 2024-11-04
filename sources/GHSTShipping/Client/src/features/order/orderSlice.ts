@@ -3,7 +3,7 @@ import { ICreateDeliveryOrderRequest } from '@/interface/business';
 import { ShopOrderViewDto } from '@/interface/order/order.interface';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface IOrderState {
+export interface IOrderState {
   order: ICreateDeliveryOrderRequest | null;
   orders: any[];
   shop: ShopOrderViewDto | null;

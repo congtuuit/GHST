@@ -8,3 +8,5 @@
 **/.vs
 **/logs
 /sources/GHSTShipping/Src/Presentation/GHSTShipping.WebApi/wwwroot
+/sources/GHSTShipping/Client/package-lock.json
+/sources/GHSTShipping/Client/yarn.lock

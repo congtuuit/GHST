@@ -13,7 +13,7 @@ export interface LoginResult {
   id: string;
   userName: string;
   email: string;
-  roles: string[];
+  roles: Role[];
   isVerified: boolean;
   jwToken: string;
   phoneNumber: string;

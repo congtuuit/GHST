@@ -19,6 +19,7 @@ import ResetPasswordPage from '@/pages/reset-password';
 
 import WrapperRouteComponent from './config';
 import AdminViewShopOrders from '@/pages/orders/AdminViewShopOrders';
+import { Roles } from '@/features/auth/roles';
 
 const NotFound = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/404'));
 const Documentation = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/doucumentation'));
@@ -70,11 +71,11 @@ const routeList: RouteObject[] = [
       },
       {
         path: 'customer/list',
-        element: <WrapperRouteComponent element={<CustomerPage />} titleId="title.customer" />,
+        element: <WrapperRouteComponent element={<CustomerPage />} titleId="title.customer" allowedRoles={[Roles.Admin]} />,
       },
       {
         path: 'customer/price-plan',
-        element: <WrapperRouteComponent element={<CustomerPricePage />} titleId="title.customerPrice" />,
+        element: <WrapperRouteComponent element={<CustomerPricePage />} titleId="title.customerPrice" allowedRoles={[Roles.Admin]} />,
       },
       {
         path: 'order/list',
@@ -82,7 +83,7 @@ const routeList: RouteObject[] = [
       },
       {
         path: 'order/list/:shopId',
-        element: <WrapperRouteComponent element={<AdminViewShopOrders />} titleId="title.orderListByShop" />,
+        element: <WrapperRouteComponent element={<AdminViewShopOrders />} titleId="title.orderListByShop" allowedRoles={[Roles.Admin]} />,
       },
       {
         path: 'order/create',
@@ -90,9 +91,8 @@ const routeList: RouteObject[] = [
       },
       {
         path: 'settings',
-        element: <WrapperRouteComponent element={<DeliveryConfigPage />} titleId="title.deliveryConfig" />,
+        element: <WrapperRouteComponent element={<DeliveryConfigPage />} titleId="title.deliveryConfig" allowedRoles={[Roles.Admin]} />,
       },
-
       {
         path: 'documentation',
         element: <WrapperRouteComponent element={<Documentation />} titleId="title.documentation" />,
