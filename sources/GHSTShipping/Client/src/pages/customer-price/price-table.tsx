@@ -1,13 +1,14 @@
-import type { PaginationResponse, ShopPricePlanDto } from '@/interface/business';
+import type { IPaginationResponse, PaginationResponse, ShopPricePlanDto } from '@/interface/business';
 import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Modal, Row, Table, Tag, Typography } from 'antd';
+import { Button, message, Modal, Row, Table, Tag, Typography } from 'antd';
 import { type FC, useEffect, useState } from 'react';
 
 import { apiDeleteShopPricePlan, apiGetShopPricePlanes } from '@/api/business.api';
 import { suppliers } from '@/constants/data';
+import Datatable from '@/components/core/datatable';
 
 const { confirm } = Modal;
 
@@ -36,7 +37,7 @@ interface PriceTableProps {
 const PriceTable = (props: PriceTableProps) => {
   const { selectedShop, refreshTable, onEdit } = props;
   const [reloadTable, setReloadTable] = useState<boolean>(refreshTable);
-  const [pagination, setPagination] = useState<PaginationResponse>();
+  const [pagination, setPagination] = useState<IPaginationResponse<ShopPricePlanDatatable> | null>(null);
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
 
@@ -51,13 +52,11 @@ const PriceTable = (props: PriceTableProps) => {
     }
 
     let supplierQuery = '';
-
     if (Boolean(supplier)) {
       supplierQuery = supplier?.length > 0 ? supplier.join(',') : ''; // join the array into a comma-separated string
     }
 
     const { success, data } = await apiGetShopPricePlanes(shopId, supplierQuery, pageNumber, pageSize);
-
     if (success) {
       setPagination(data);
     }
@@ -213,15 +212,25 @@ const PriceTable = (props: PriceTableProps) => {
 
   const handleDelete = async (record: ShopPricePlanDatatable) => {
     const { id } = record;
-
     await apiDeleteShopPricePlan(id);
-
     setReloadTable(!reloadTable);
   };
 
   const handleChangeTable = (config: TablePaginationConfig, filters: Record<string, FilterValue | null>) => {
     setTablePaginationConfig(config);
     setTableFilters(filters);
+  };
+
+  const handleSelectedRows = (rows: ShopPricePlanDatatable[]) => {
+  };
+
+  const handleDeleteRows = async (rows: ShopPricePlanDatatable[]) => {
+    const ids = rows.map(i => i.id);
+    const response = await apiDeleteShopPricePlan(ids[0], ids);
+    if (response.success) {
+      message.success('Xoá thành công!');
+      setReloadTable(!reloadTable);
+    }
   };
 
   useEffect(() => {
@@ -258,18 +267,13 @@ const PriceTable = (props: PriceTableProps) => {
   }, [refreshTable]);
 
   return (
-    <Table
-      style={{ width: '100%', marginTop: '10px' }}
+    <Datatable
       columns={columns}
-      dataSource={pagination?.data as ShopPricePlanDatatable[]}
-      pagination={{
-        pageSize: pagination?.pageSize,
-        current: pagination?.pageNumber,
-        total: pagination?.count,
-      }}
-      rowKey="key"
-      scroll={{ x: 'max-content' }}
+      dataSource={pagination}
       onChange={handleChangeTable}
+      onSelectedRows={handleSelectedRows}
+      handleDeleteRows={handleDeleteRows}
+      mode="mutilple"
     />
   );
 };

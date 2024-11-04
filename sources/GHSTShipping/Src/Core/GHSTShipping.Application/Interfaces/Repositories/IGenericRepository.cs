@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace GHSTShipping.Application.Interfaces.Repositories
 {
@@ -15,6 +14,8 @@ namespace GHSTShipping.Application.Interfaces.Repositories
         Task AddRangeAsync(IEnumerable<T> entities);
         void Update(T entity);
         void Delete(T entity);
+        void HardDelete(T entity);
+        void HardDeleteRange(IEnumerable<T> entities);
 
         void Modify(T entities);
         void ModifyRange(IEnumerable<T> entities);

@@ -39,8 +39,8 @@ export const apiCreateShopPricePlan = (data: ShopPricePlanDto) => {
   return request('post', `/shops/prices`, data);
 };
 
-export const apiDeleteShopPricePlan = (id: string) => {
-  return request('delete', `/shops/prices/${id}`);
+export const apiDeleteShopPricePlan = (id: string, ids: string[] = []) => {
+  return request('delete', `/shops/prices/${id}`, ids);
 };
 
 //ICreateDeliveryOrderRequest

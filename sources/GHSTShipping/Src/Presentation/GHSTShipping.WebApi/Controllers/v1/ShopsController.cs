@@ -7,6 +7,7 @@ using GHSTShipping.Domain.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.WebApi.Controllers.v1
@@ -48,9 +49,9 @@ namespace GHSTShipping.WebApi.Controllers.v1
 
         [HttpDelete, Authorize]
         [Route("{Id}")]
-        public async Task<BaseResult> Prices([FromRoute] System.Guid Id)
+        public async Task<BaseResult> Prices([FromRoute] System.Guid Id, [FromBody] IEnumerable<Guid> Ids = null)
         {
-            return await Mediator.Send(new DeleteShopPriceCommand() { Id = Id });
+            return await Mediator.Send(new DeleteShopPriceCommand() { Id = Id, Ids = Ids });
         }
     }
 }

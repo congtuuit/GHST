@@ -39,6 +39,16 @@ namespace GHSTShipping.Infrastructure.Persistence.Repositories
             entity.IsDeleted = true;
         }
 
+        public void HardDelete(T entity)
+        {
+            dbContext.Set<T>().Remove(entity);
+        }
+
+        public void HardDeleteRange(IEnumerable<T> entities)
+        {
+            dbContext.Set<T>().RemoveRange(entities);
+        }
+
         public async Task<IReadOnlyList<T>> GetAllAsync()
         {
             return await dbContext

@@ -26,8 +26,9 @@ const PriceConfigurationForm = (props: PriceConfigurationFormProps) => {
       setIsEditing(true);
       form.setFieldsValue({
         ...data,
+        mode: 'single',
       });
-
+      setPriceConfigMode('single');
       showModal();
     }
   }, [data, form]);
@@ -141,6 +142,7 @@ const PriceConfigurationForm = (props: PriceConfigurationFormProps) => {
 
             <Col span={24}>
               <Radio.Group
+                value={priceConfigMode}
                 defaultValue="single"
                 onChange={e => {
                   setPriceConfigMode(e.target.value);
@@ -169,7 +171,7 @@ const PriceConfigurationForm = (props: PriceConfigurationFormProps) => {
                   <Form.Item label="Giá khởi điểm" name="officialPrice" rules={[{ required: true, message: 'Vui lòng nhập' }]}>
                     <Input placeholder="Nhập giá trị" type="number" />
                   </Form.Item>
-                  <p style={{ fontStyle: 'italic' }}>Giá trị khối lượng chuyển đổi hiện tại: {currentConvertedWeight ?? 0}</p>
+                  <p style={{ fontStyle: 'italic' }}>Giá trị khối lượng chuyển đổi hiện tại: {currentConvertedWeight ?? 0} gram</p>
                   <Form.Item label="Giá trị khối lượng tối đa" name="maxConvertedWeight" rules={[{ required: true, message: 'Vui lòng nhập' }]}>
                     <Input placeholder="Nhập giá trị" type="number" />
                   </Form.Item>
