@@ -8,12 +8,13 @@ import { Button, InputNumber, Row, Table, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 
-import { apiActiveShops, apiChangeAllowPublishOrder, apiGetShopDetail, apiGetShops } from '@/api/business.api';
+import { apiActiveShops, apiChangeOperationConfig, apiGetShopDetail, apiGetShops } from '@/api/business.api';
 import { dateFormatMap, revertDateFormatMap } from '@/components/core/table-column/type';
 
 import CustomerDetail from './customer-detail';
 import { render } from 'react-dom';
 import CommaDecimalDisplay from '@/components/core/CommaDecimalDisplay';
+import { IChangeOperationConfig } from '@/api/type';
 
 interface ShopDatatableDto {
   key: string;
@@ -175,9 +176,8 @@ const CustomerTable = () => {
     }
   };
 
-  const handleChangeAllowPublishOrder = async (id: string) => {
-    const response = await apiChangeAllowPublishOrder(id);
-
+  const handleChangeAllowPublishOrder = async (payload: IChangeOperationConfig) => {
+    const response = await apiChangeOperationConfig(payload);
     if (response.success) {
       setCustomerDetail(response.data);
     }

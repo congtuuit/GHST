@@ -14,6 +14,7 @@ export interface IShopViewDetailDto {
   bankAccountHolder: string;
   bankAddress: string;
   allowPublishOrder: boolean;
+  allowUsePartnerShopAddress: boolean;
   status: string;
   ghnShopDetails?: { [id: string]: IGhnShopDetailDto[] };
   ghnShopId?: number;

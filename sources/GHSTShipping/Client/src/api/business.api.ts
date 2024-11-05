@@ -16,6 +16,7 @@ import { buildQueryString } from '@/utils/queryEncode';
 
 import { request } from './base/request';
 import { IOrder } from '@/features/order/type';
+import { IChangeOperationConfig } from './type';
 
 export const apiGetProvinces = () => request<any[]>('get', '/metadata/provinces');
 export const apiGetDictricts = () => request<any[]>('get', '/metadata/dictricts');
@@ -72,7 +73,8 @@ export const apiGetShops = (pageNumber: number | undefined = 1, pageSize: number
 export const apiActiveShops = (shopId: string) => request<PaginationResponse>('put', `/users/activeshop/${shopId}`);
 
 export const apiGetShopDetail = (shopId: string) => request<IShopViewDetailDto>('get', `/shops/detail/${shopId}`);
-export const apiChangeAllowPublishOrder = (shopId: string) => request<IShopViewDetailDto>('put', `/shops/allowPublishOrder/${shopId}`);
+export const apiChangeOperationConfig = (payload: IChangeOperationConfig) =>
+  request<IShopViewDetailDto>('put', `/shops/changeOperationConfig/${payload.shopId}`, payload);
 export const apiUpdateGhnShopId = (shopId: string, ghnShopId: number) =>
   request('put', `/shops/ghnShopId/${shopId}`, {
     shopId: shopId,

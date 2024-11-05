@@ -31,7 +31,12 @@ type Item = {
   code?: string;
 };
 
-const FormOrderGhn = () => {
+interface FormOrderGhnProps {
+  isActivated: boolean;
+}
+
+const FormOrderGhn = (props: FormOrderGhnProps) => {
+  const { isActivated } = props;
   const dispatch = useDispatch();
   const session = useSelector(state => state?.user?.session);
   const [pickShifts, setPickShifts] = useState<IPickShift[]>([]);
@@ -164,7 +169,7 @@ const FormOrderGhn = () => {
 
   return (
     <div style={{ maxHeight: '83vh', overflowY: 'auto' }}>
-      <Form layout="vertical" form={form} onValuesChange={handleValuesChange}>
+      <Form layout="vertical" form={form} onValuesChange={handleValuesChange} disabled={!isActivated}>
         <Card style={{ marginBottom: '16px' }}>
           <Row>
             <Col span={12}>

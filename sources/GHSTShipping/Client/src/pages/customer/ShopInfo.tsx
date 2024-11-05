@@ -1,13 +1,12 @@
 import type { IShopViewDetailDto } from '@/interface/shop';
-import { Button, Checkbox, Col, Descriptions, Modal, Row, Select, Tag, Card, Switch } from 'antd';
+import { Col, Descriptions, Row, Tag, Card, Switch } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { apiUpdateGhnShopId } from '@/api/business.api';
-import { SwitchChangeEventHandler } from 'antd/es/switch';
+import { IChangeOperationConfig } from '@/api/type';
 
 interface ShopInfoProps {
   data: IShopViewDetailDto | undefined;
-  onChange?: (id: string) => void;
+  onChange?: (obj: IChangeOperationConfig) => void;
 }
 
 const ShopInfo: React.FC<ShopInfoProps> = ({ data, onChange }) => {
@@ -22,8 +21,8 @@ const ShopInfo: React.FC<ShopInfoProps> = ({ data, onChange }) => {
     setOpen(false);
   };
 
-  const handleChangeAllowPublishOrder = () => {
-    onChange && onChange(detail?.id as string);
+  const handleChangeOperationConfig = (payload: IChangeOperationConfig) => {
+    onChange && onChange(payload);
   };
 
   useEffect(() => {
@@ -60,7 +59,9 @@ const ShopInfo: React.FC<ShopInfoProps> = ({ data, onChange }) => {
             <Descriptions.Item label="Tên Cửa Hàng: ">{detail?.shopName}</Descriptions.Item>
             <Descriptions.Item label="Chủ Sở Hữu: ">{detail?.fullName}</Descriptions.Item>
             <Descriptions.Item label="Email: ">{detail?.email}</Descriptions.Item>
-            <Descriptions.Item label="Sản lượng đơn trung bình 1 tháng: ">{detail?.avgMonthlyCapacity?.toLocaleString() ?? 'Không có'}</Descriptions.Item>
+            <Descriptions.Item label="Sản lượng đơn trung bình 1 tháng: ">
+              {detail?.avgMonthlyCapacity?.toLocaleString() ?? 'Không có'}
+            </Descriptions.Item>
             <Descriptions.Item label="Số Điện Thoại: ">{detail?.phoneNumber}</Descriptions.Item>
           </Descriptions>
         </Card>
@@ -90,13 +91,31 @@ const ShopInfo: React.FC<ShopInfoProps> = ({ data, onChange }) => {
             colon={false} // Remove colon for cleaner look
           >
             <Descriptions.Item label="Cho Phép Đăng Đơn Hàng:">
-              <Switch title={'Cho phép'} onChange={() => handleChangeAllowPublishOrder()} checked={detail?.allowPublishOrder ?? false} />
+              <Switch
+                title={'Cho phép'}
+                onChange={value =>
+                  handleChangeOperationConfig({
+                    shopId: detail?.id as string,
+                    allowPublishOrder: value,
+                  })
+                }
+                checked={detail?.allowPublishOrder ?? false}
+              />
             </Descriptions.Item>
             <span style={{ fontStyle: 'italic' }}>{'(cho phép shop tạo & đẩy đơn sang đơn vị vận chuyển)'}</span>
             <br />
 
             <Descriptions.Item label="Cho Phép Sử Dụng Địa Chỉ Mặc Định:">
-            <Switch title={'Cho phép'} onChange={() => handleChangeAllowPublishOrder()} checked={detail?.allowPublishOrder ?? false} />
+              <Switch
+                title={'Cho phép'}
+                onChange={value =>
+                  handleChangeOperationConfig({
+                    shopId: detail?.id as string,
+                    allowUsePartnerShopAddress: value,
+                  })
+                }
+                checked={detail?.allowUsePartnerShopAddress ?? false}
+              />
             </Descriptions.Item>
             <span style={{ fontStyle: 'italic' }}>{'(Sử dụng địa chỉ của cửa hàng trên tài khoản đơn vị vận chuyển để tạo đơn)'}</span>
             <br />

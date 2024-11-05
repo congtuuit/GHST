@@ -6,6 +6,7 @@ import { apiGetOrderMetaData } from '@/api/business.api';
 import { IOrderMetadata } from '@/interface/shop';
 
 const CreateOrderPage = () => {
+  const [isActiveGhnForm, setIsActiveGhnForm] = useState<boolean>(false);
   const [_, setCreateOrderMetadata] = useState<IOrderMetadata>();
 
   const fetchCreateOrderMetadata = async () => {
@@ -15,6 +16,7 @@ const CreateOrderPage = () => {
       const config = response.data.deliveryConfigs[0];
       const partner = config.deliveryPartnerName;
       if (partner === supplierKeys.GHN) {
+        setIsActiveGhnForm(true);
         const shop = config.shops[0];
         localStorage.setItem('senderAddress', JSON.stringify(shop));
       }
@@ -28,7 +30,7 @@ const CreateOrderPage = () => {
   return (
     <Card className="my-card-containter" title="Tạo đơn hàng">
       <Col span={24}>
-        <FormOrderGhn />
+        <FormOrderGhn isActivated={isActiveGhnForm} />
       </Col>
     </Card>
   );

@@ -103,13 +103,32 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             // Process order with GHN partner
             if (deliveryConfig.PartnerConfig.DeliveryPartner == EnumDeliveryPartner.GHN)
             {
+                // Override sender address
+                if (shop.AllowUsePartnerShopAddress)
+                {
+                    int? _fromWardId = null;
+                    string stringNumber = deliveryConfig.WardCode;
+                    if (int.TryParse(stringNumber, out int __fromWardId))
+                    {
+                        _fromWardId = __fromWardId;
+                    }
+                    request.FromName = deliveryConfig.ShopName;
+                    request.FromPhone = deliveryConfig.ClientPhone;
+                    request.FromWardId = _fromWardId;
+                    request.FromWardName = deliveryConfig.WardName;
+                    request.FromDistrictId = int.Parse(deliveryConfig.DistrictId);
+                    request.FromDistrictName = deliveryConfig.DistrictName;
+                    request.FromProvinceId = int.Parse(deliveryConfig.ProvinceId);
+                    request.FromProvinceName = deliveryConfig.ProvinceName;
+                }
+
                 var previewOrder = await _ghnApiClient.CreateDraftDeliveryOrderAsync(apiConfig, deliveryConfig.PartnerShopId, request);
                 if (previewOrder.Code != 200)
                 {
                     return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.Exception, $"{previewOrder.CodeMessageValue} {previewOrder.Message}"));
                 }
 
-                var (orderCode, orderId) = await SaveOrderAsync(request, shop.Id, shop.UniqueCode, shop.AllowPublishOrder, deliveryConfig.PartnerShopId);
+                var (orderCode, orderId) = await SaveOrderAsync(request, shop, deliveryConfig.PartnerShopId);
                 if (shop.AllowPublishOrder)
                 {
                     var createOrder = await _ghnApiClient.CreateDeliveryOrderAsync(apiConfig, deliveryConfig.PartnerShopId, request);
@@ -128,13 +147,25 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
         private async Task<(string, Guid)> SaveOrderAsync(
             GHN_CreateOrderRequest request,
-            Guid shopId,
-            string uniqueShopCode,
-            bool allowPublishOrder,
+            ShopQueryDto shop,
             string partnerShopId)
         {
+            var shopId = shop.Id;
+            var uniqueShopCode = shop.UniqueCode;
+            var allowPublishOrder = shop.AllowPublishOrder;
             var deliveryFeePlan = await CalculateDeliveryFeeAsync(request, shopId);
-            var order = CreateOrderEntity(request, shopId, uniqueShopCode, allowPublishOrder, deliveryFeePlan, partnerShopId);
+
+            var allowUsePartnerShopAddress = shop.AllowUsePartnerShopAddress;
+            if (allowUsePartnerShopAddress)
+            {
+
+            }
+
+            var order = CreateOrderEntity(
+                request,
+                shop,
+                deliveryFeePlan,
+                partnerShopId);
             order.OrrverideDeliveryFee(order.DeliveryFee);
             order.GenerateOrderCode(await _orderCodeSequenceService.GenerateOrderCodeAsync(shopId), uniqueShopCode);
             await _orderRepository.AddAsync(order);
@@ -153,12 +184,15 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
         private Order CreateOrderEntity(
             GHN_CreateOrderRequest request,
-            Guid shopId,
-            string uniqueShopCode,
-            bool allowPublishOrder,
+            ShopQueryDto shop,
             int deliveryFeePlan,
             string partnerShopId)
         {
+            var shopId = shop.Id;
+            var uniqueShopCode = shop.UniqueCode;
+            var allowPublishOrder = shop.AllowPublishOrder;
+            var allowUsePartnerShopAddress = shop.AllowUsePartnerShopAddress;
+
             return new Order
             {
                 PartnerShopId = partnerShopId,
@@ -285,14 +319,23 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             public Guid Id { get; set; }
             public string UniqueCode { get; set; }
             public bool AllowPublishOrder { get; set; }
+            public bool AllowUsePartnerShopAddress { get; set; }
             public bool IsVerified { get; set; }
+
         }
         private async Task<ShopQueryDto> GetShopDetailsAsync(CancellationToken cancellationToken)
         {
             var userId = _authenticatedUserService.UId;
             return await _shopRepository
                 .Where(i => i.AccountId == userId)
-                .Select(i => new ShopQueryDto { Id = i.Id, UniqueCode = i.UniqueCode, AllowPublishOrder = i.AllowPublishOrder, IsVerified = i.IsVerified })
+                .Select(i => new ShopQueryDto
+                {
+                    Id = i.Id,
+                    UniqueCode = i.UniqueCode,
+                    AllowPublishOrder = i.AllowPublishOrder,
+                    AllowUsePartnerShopAddress = i.AllowUsePartnerShopAddress,
+                    IsVerified = i.IsVerified
+                })
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
@@ -302,7 +345,17 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             public Guid ShopId { get; set; }
             public Guid PartnerConfigId { get; set; }
             public string PartnerShopId { get; set; }
+
             public string ClientPhone { get; set; }
+            public string? Address { get; set; }
+            public string? WardName { get; set; }
+            public string? WardCode { get; set; }
+            public string? DistrictName { get; set; }
+            public string? DistrictId { get; set; }
+            public string? ProvinceName { get; set; }
+            public string? ProvinceId { get; set; }
+            public string ShopName { get; set; }
+
             public PartnerConfigDto PartnerConfig { get; set; }
         }
 
@@ -315,22 +368,30 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
         private async Task<DeliveryConfigDto> GetDeliveryConfigAsync(Guid shopId, CancellationToken cancellationToken)
         {
-             var result = await _shopPartnerConfigRepository
-                .Where(i => i.ShopId == shopId && i.PartnerConfig.IsActivated)
-                .Select(i => new DeliveryConfigDto
-                {
-                    ShopId = i.ShopId,
-                    PartnerConfigId = i.PartnerConfigId,
-                    PartnerShopId = i.PartnerShopId,
-                    ClientPhone = i.ClientPhone,
-                    PartnerConfig = new PartnerConfigDto
-                    {
-                        ApiKey = i.PartnerConfig.ApiKey,
-                        ProdEnv = i.PartnerConfig.ProdEnv,
-                        DeliveryPartner = i.PartnerConfig.DeliveryPartner
-                    }
-                })
-                .FirstOrDefaultAsync(cancellationToken);
+            var result = await _shopPartnerConfigRepository
+               .Where(i => i.ShopId == shopId && i.PartnerConfig.IsActivated)
+               .Select(i => new DeliveryConfigDto
+               {
+                   ShopId = i.ShopId,
+                   PartnerConfigId = i.PartnerConfigId,
+                   PartnerShopId = i.PartnerShopId,
+                   ClientPhone = i.ClientPhone,
+                   Address = i.Address,
+                   WardCode = i.WardCode,
+                   WardName = i.WardName,
+                   DistrictId = i.DistrictId,
+                   DistrictName = i.DistrictName,
+                   ProvinceId = i.ProvinceId,
+                   ProvinceName = i.ProvinceName,
+                   ShopName = i.ShopName,
+                   PartnerConfig = new PartnerConfigDto
+                   {
+                       ApiKey = i.PartnerConfig.ApiKey,
+                       ProdEnv = i.PartnerConfig.ProdEnv,
+                       DeliveryPartner = i.PartnerConfig.DeliveryPartner
+                   }
+               })
+               .FirstOrDefaultAsync(cancellationToken);
 
             return result;
         }

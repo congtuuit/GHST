@@ -13,32 +13,47 @@ using System.Threading.Tasks;
 
 namespace GHSTShipping.Application.Features.Shops.Commands
 {
-    public class AllowPublishOrderRequest : IRequest<BaseResult<ShopViewDetailDto>>
+    public class ChangeOperationConfigRequest : IRequest<BaseResult<ShopViewDetailDto>>
     {
         public Guid? ShopId { get; set; }
+
+        public bool? AllowPublishOrder { get; set; }
+
+        public bool? AllowUsePartnerShopAddress { get; set; }
     }
 
-    public class AllowPublishOrderRequestHandler(
+    public class ChangeOperationConfigRequestHandler(
        IUnitOfWork unitOfWork,
        IShopRepository shopRepository,
        IAccountServices accountServices,
        IMediator mediator
-       ) : IRequestHandler<AllowPublishOrderRequest, BaseResult<ShopViewDetailDto>>
+       ) : IRequestHandler<ChangeOperationConfigRequest, BaseResult<ShopViewDetailDto>>
     {
-        public async Task<BaseResult<ShopViewDetailDto>> Handle(AllowPublishOrderRequest request, CancellationToken cancellationToken)
+        public async Task<BaseResult<ShopViewDetailDto>> Handle(ChangeOperationConfigRequest request, CancellationToken cancellationToken)
         {
             var shop = await shopRepository.Where(i => i.Id == request.ShopId)
                 .Select(i => new Domain.Entities.Shop()
                 {
                     Id = i.Id,
                     AllowPublishOrder = i.AllowPublishOrder,
+                    AllowUsePartnerShopAddress = i.AllowUsePartnerShopAddress,
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (shop != null)
             {
                 shopRepository.Modify(shop);
-                shop.AllowPublishOrder = !shop.AllowPublishOrder;
+
+                if (request.AllowPublishOrder.HasValue)
+                {
+                    shop.AllowPublishOrder = request.AllowPublishOrder.Value;
+                }
+
+                if (request.AllowUsePartnerShopAddress.HasValue)
+                {
+                    shop.AllowUsePartnerShopAddress = request.AllowUsePartnerShopAddress.Value;
+                }
+
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             }
 

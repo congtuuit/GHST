@@ -13,7 +13,7 @@ import ForgotPasswordPage from '@/pages/forgot-password';
 import LayoutPage from '@/pages/layout';
 import LoginPage from '@/pages/login';
 import OrdersPage from '@/pages/orders';
-import CreateOrderPage from '@/pages/orders/create';
+import CreateOrderPage from '@/pages/orders/CreateOrderPage';
 import RegisterPage from '@/pages/register';
 import ResetPasswordPage from '@/pages/reset-password';
 

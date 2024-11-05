@@ -3,11 +3,12 @@ import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 import { Button, Form, Modal, Switch } from 'antd';
 import { useEffect, useState } from 'react';
-import { apiChangeAllowPublishOrder, apiGetDeliveryConfigs, apiUpdateDeliveryConfigs } from '@/api/business.api';
+import { apiChangeOperationConfig, apiGetDeliveryConfigs, apiUpdateDeliveryConfigs } from '@/api/business.api';
 import Datatable from '@/components/core/datatable';
 import { IDeliveryConfigDto } from '.';
 import PartnerConfig from './PartnerConfig';
 import ActionButton from '@/components/core/ActionButton';
+import { IChangeOperationConfig } from '@/api/type';
 
 interface TableDeliveryConfigProps {
   reload: boolean;
@@ -111,8 +112,8 @@ const TableDeliveryConfig = (props: TableDeliveryConfigProps) => {
     setOpenEditDialog(true);
   };
 
-  const handleChangeAllowPublishOrder = async (id: string) => {
-    const response = await apiChangeAllowPublishOrder(id);
+  const handleChangeAllowPublishOrder = async (payload: IChangeOperationConfig) => {
+    const response = await apiChangeOperationConfig(payload);
 
     // if (response.success) {
     //   setCustomerDetail(response.data);

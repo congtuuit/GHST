@@ -16,13 +16,9 @@ import { rolesSelector } from './stores/user.store';
 
 const App: React.FC = () => {
   const roles = useSelector(rolesSelector);
-
   const { locale } = useSelector(state => state.user);
   const { theme, loading } = useSelector(state => state.global);
   const dispatch = useDispatch();
-
-  console.log("roles ", roles)
-
   const setTheme = (dark = false) => {
     dispatch(
       setGlobalState({
