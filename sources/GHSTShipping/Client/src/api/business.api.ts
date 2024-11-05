@@ -92,3 +92,4 @@ export const apiGetShopOrders = (params: IPaginationRequestParameter) => {
   return request<IPaginationResponse<ShopOrderViewDto>>('get', `/orders/group-by-shops?${queryString}`);
 };
 export const apiConfirmOrderGhn = (orderId: string) => request('put', `/orders/ghn/confirm/${orderId}`);
+export const apiCountOrderByStatus = (shopId: string) => request('get', `/orders/ghn/count-order-by-status/${shopId}`);

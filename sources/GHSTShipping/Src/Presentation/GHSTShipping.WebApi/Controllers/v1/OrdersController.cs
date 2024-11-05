@@ -63,7 +63,14 @@ namespace GHSTShipping.WebApi.Controllers.v1
             return await Mediator.Send(new GHN_ConfirmOrderRequest() { OrderId = orderId});
         }
 
+        [HttpGet]
+        [Route("ghn/count-order-by-status/{shopId}")]
+        public async Task<BaseResult<string>> CountOrderByStatus([FromRoute] Guid shopId)
+        {
+            var response = await Mediator.Send(new GHN_CountOrderByStatusRequest() { ShopId = shopId });
 
+            return BaseResult<string>.Ok(response);
+        }
 
     }
 }

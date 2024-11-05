@@ -6,7 +6,15 @@ import type { ColumnsType } from 'antd/lib/table';
 import { Button, Card, Col, message, Radio, Row, Select, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { apiCancelOrderGhn, apiConfirmOrderGhn, apiGetOrderDetail, apiGetOrders, apiGetShopOrders } from '@/api/business.api';
+import {
+  apiCancelOrderGhn,
+  apiConfirmOrderGhn,
+  apiCountOrderByStatus,
+  apiGetOrderDetail,
+  apiGetOrders,
+  apiGetShopDetail,
+  apiGetShopOrders,
+} from '@/api/business.api';
 import Datatable from '@/components/core/datatable';
 import { suppliers } from '@/constants/data';
 import { formatUtcToLocalTime } from '@/utils/common';
@@ -15,6 +23,9 @@ import OrderDetailDialog from './ghn/order-detail';
 import GoBackButton from '@/components/core/GoBackButton';
 import OrderStatus from './OrderStatus';
 import { revertDateFormatMap } from '@/components/core/table-column/type';
+import AdminOrderFilterWrapper from './AdminOrderFilterWrapper';
+import { useParams } from 'react-router-dom';
+import ghnOrderFilter from '@/features/order/ghnOrderFilter';
 
 const { Option } = Select;
 
@@ -22,16 +33,26 @@ interface ShopOrdersProps {
   shopId: string | undefined;
 }
 
-const ShopOrders = ({ shopId }: ShopOrdersProps) => {
-  const orderStatusSection = orderStatuses.GHN;
+const orderStatusSection = new ghnOrderFilter().filterStatus;
 
-  const { shop } = useSelector(state => state.order);
+const ShopOrders = (props: ShopOrdersProps) => {
+  const { shopId } = useParams(); // Destructure shopId from useParams
+  const { orderFilter } = useSelector(state => state.order);
+
   const [orderPagination, setOrderPagination] = useState<IPaginationResponse<IOrderDto> | null>(null);
   const [orderDetail, setOrderDetail] = useState<IOrderDetail | undefined>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
-  const [orderStatusFilter, setOrderStatusFilter] = useState<string>(orderStatusSection[0].code);
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>(orderStatusSection[0].name);
   const [supplierSelected, setSupplierSelected] = useState<string>();
+  const [shopDetail, setShopDetail] = useState<any>(null);
+
+  const fetchShopDetail = async () => {
+    const response = await apiGetShopDetail(shopId as string);
+    if (response.success) {
+      setShopDetail(response.data);
+    }
+  };
 
   const fetchOrders = async (params: IOrderPagedParameter | null) => {
     if (params == null) {
@@ -84,6 +105,14 @@ const ShopOrders = ({ shopId }: ShopOrdersProps) => {
     }
   };
 
+  const fetchCountOrderByStatus = async (shopId: string) => {
+    const response = await apiCountOrderByStatus(shopId);
+    if (response.success) {
+      const data = JSON.parse(response.data);
+      console.log('response ', data);
+    }
+  };
+
   useEffect(() => {
     fetchOrders({
       shopId: shopId,
@@ -92,7 +121,13 @@ const ShopOrders = ({ shopId }: ShopOrdersProps) => {
       pageSize: 6,
       status: orderStatusFilter,
     } as IOrderPagedParameter);
+
+    fetchShopDetail();
   }, [shopId, supplierSelected, orderStatusFilter]);
+
+  useEffect(() => {
+    fetchCountOrderByStatus(shopId as string);
+  }, [shopId]);
 
   const columns: ColumnsType<IOrderViewDto> = [
     {
@@ -109,15 +144,12 @@ const ShopOrders = ({ shopId }: ShopOrdersProps) => {
       width: '50px',
       render: (value: string, record: IOrderViewDto) => {
         return (
-          <div>
-            <Button type="link" onClick={() => handleViewOrderDetail(record.id)}>
-              {value}
-            </Button>
-
+          <div onClick={() => handleViewOrderDetail(record.id)}>
+            <Button type="link">{value}</Button>
             <OrderStatus
               isPublished={record?.isPublished}
               status={record?.status}
-              statusName={record?.statusName}
+              statusName={record?.statusName ?? 'N/A'}
               statusColor={record?.statusColor}
             />
             <span>{record?.fromPhone}</span>
@@ -142,41 +174,20 @@ const ShopOrders = ({ shopId }: ShopOrdersProps) => {
       },
     },
     {
-      title: 'Địa chỉ',
-      children: [
-        {
-          title: 'Gửi',
-          dataIndex: 'fromAddress',
-          key: 'fromAddress',
-          render: (value: string, record: IOrderViewDto) => {
-            return (
-              <div>
-                <div>{value}</div>
-                <div>
-                  {record?.fromWardName} - {record?.fromDistrictName}
-                </div>
-                <div>{record?.fromProvinceName}</div>
-              </div>
-            );
-          },
-        },
-        {
-          title: 'Nhận',
-          dataIndex: 'toAddress',
-          key: 'toAddress',
-          render: (value: string, record: IOrderViewDto) => {
-            return (
-              <div>
-                <div>{value}</div>
-                <div>
-                  {record?.toWardName} - {record?.toDistrictName}
-                </div>
-                <div>{record?.toProvinceName}</div>
-              </div>
-            );
-          },
-        },
-      ],
+      title: 'Địa chỉ gửi',
+      dataIndex: 'fromAddress',
+      key: 'fromAddress',
+      render: (value: string, record: IOrderViewDto) => {
+        return (
+          <div>
+            <div>{value}</div>
+            <div>
+              {record?.fromWardName} - {record?.fromDistrictName}
+            </div>
+            <div>{record?.fromProvinceName}</div>
+          </div>
+        );
+      },
     },
     {
       title: 'Người nhận',
@@ -188,6 +199,22 @@ const ShopOrders = ({ shopId }: ShopOrdersProps) => {
           <div>
             <div>{value}</div>
             <div>{record?.toPhone}</div>
+          </div>
+        );
+      },
+    },
+    {
+      title: 'Địa chỉ nhận',
+      dataIndex: 'toAddress',
+      key: 'toAddress',
+      render: (value: string, record: IOrderViewDto) => {
+        return (
+          <div>
+            <div>{value}</div>
+            <div>
+              {record?.toWardName} - {record?.toDistrictName}
+            </div>
+            <div>{record?.toProvinceName}</div>
           </div>
         );
       },
@@ -230,6 +257,9 @@ const ShopOrders = ({ shopId }: ShopOrdersProps) => {
               <Button type="dashed" className="table-btn-action" size="middle" onClick={() => handleConfirmOrder(record.id)}>
                 Xác nhận
               </Button>
+              <Button danger className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
+                Hủy đơn
+              </Button>
             </div>
           );
         }
@@ -252,7 +282,7 @@ const ShopOrders = ({ shopId }: ShopOrdersProps) => {
   return (
     <div>
       <GoBackButton />
-      <Card className="my-card-containter" title={'Thông tin đơn hàng ' + shop?.name + `(${shop?.uniqueCode})`}>
+      <Card className="my-card-containter" title={'Thông tin đơn hàng ' + shopDetail?.shopName + `(${shopDetail?.shopUniqueCode})`}>
         <Row>
           <Col span={6} style={{ display: 'flex' }}>
             <Select value={supplierSelected} onChange={setSupplierSelected} style={{ width: '100%' }} placeholder="Chọn đơn vị vận chuyển">
@@ -271,8 +301,8 @@ const ShopOrders = ({ shopId }: ShopOrdersProps) => {
               <Radio.Group onChange={(e: RadioChangeEvent) => setOrderStatusFilter(e.target.value)} value={orderStatusFilter}>
                 {orderStatusSection?.map((i, key) => {
                   return (
-                    <Radio.Button key={key} value={i.code}>
-                      {i.name}
+                    <Radio.Button key={key} value={i.name}>
+                      {i.name} {i.total > 0 && `(${i.total})`}
                     </Radio.Button>
                   );
                 })}
@@ -280,9 +310,15 @@ const ShopOrders = ({ shopId }: ShopOrdersProps) => {
             )}
           </Col>
 
-          <Datatable columns={columns} dataSource={orderPagination} onChange={handleChangeTable} />
+          {/* Order list table */}
+          <Datatable
+            columns={columns}
+            dataSource={orderPagination}
+            onChange={handleChangeTable}
+            headerBox={<AdminOrderFilterWrapper style={{ marginTop: '10px', marginBottom: '10px' }} styleContent={{ width: '200px' }} />}
+          />
 
-          <OrderDetailDialog data={orderDetail} />
+          <OrderDetailDialog data={orderDetail} showSenderAddress={true} />
         </Row>
       </Card>
     </div>

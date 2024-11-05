@@ -1,8 +1,8 @@
 import type { IPaginationResponse } from '@/interface/business';
 import type { FilterValue, TableRowSelection } from 'antd/es/table/interface';
 import type { TablePaginationConfig } from 'antd/lib/table';
-import { Table, Input, Col, Button } from 'antd';
-import { useEffect, useState } from 'react';
+import { Table, Input, Col, Button, Row } from 'antd';
+import { ReactElement, useEffect, useState } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 
 const { Search } = Input;
@@ -17,6 +17,7 @@ interface DatatableProps<T> {
   onSelectedRows?: (selectedRows: T[]) => void;
   handleDeleteRows?: (selectedRows: T[]) => void;
   mode?: 'single' | 'mutilple';
+  headerBox?: ReactElement;
 }
 
 const Datatable = <T extends object>({
@@ -28,6 +29,7 @@ const Datatable = <T extends object>({
   showSearch,
   handleDeleteRows,
   mode = 'single',
+  headerBox,
 }: DatatableProps<T>) => {
   const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
   const [selectedRows, setSelectedRows] = useState<T[]>([]);
@@ -41,12 +43,21 @@ const Datatable = <T extends object>({
     setSelectedRows([]);
   }, [dataSource]);
 
+  console.log('headerBox ', headerBox);
+
   return (
     <div style={{ width: '100%' }}>
-      {showSearch && (
-        <Col span={8}>
-          <Search placeholder="Nhập để tìm kiếm" onSearch={onSearch} enterButton />
-        </Col>
+      {showSearch || headerBox ? (
+        <Row>
+          {headerBox && headerBox}
+          {showSearch && (
+            <Col span={8}>
+              <Search placeholder="Nhập để tìm kiếm" onSearch={onSearch} enterButton />
+            </Col>
+          )}
+        </Row>
+      ) : (
+        <></>
       )}
 
       {mode === 'mutilple' && selectedRows.length > 0 && (

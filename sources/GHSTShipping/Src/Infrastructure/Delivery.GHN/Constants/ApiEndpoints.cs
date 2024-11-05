@@ -32,7 +32,9 @@
 
         public const string CANCEL_SHIFT = "/shiip/public-api/v2/switch-status/cancel";
 
+        // Fake client
         public const string SEARCH = "/shiip/public-api/v2/shipping-order/search";
+        public const string COUNT_ORDER_BY_STATUS = "/shiip/public-api/v2/shipping-order/count-order-by-status";
 
     }
 }

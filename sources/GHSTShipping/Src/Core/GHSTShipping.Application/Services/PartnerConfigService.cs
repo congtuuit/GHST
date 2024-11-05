@@ -32,11 +32,12 @@ namespace GHSTShipping.Application.Services
                 .Select(i => new
                 {
                     i.PartnerConfig.ProdEnv,
-                    i.PartnerConfig.ApiKey
+                    i.PartnerConfig.ApiKey,
+                    i.PartnerShopId
                 })
                 .FirstOrDefaultAsync();
 
-            var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey);
+            var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey, partnerConfig.PartnerShopId);
 
             return apiConfig;
         }

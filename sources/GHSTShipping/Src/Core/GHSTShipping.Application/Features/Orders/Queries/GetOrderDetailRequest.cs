@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Delivery.GHN;
-using Delivery.GHN.Models;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Wrappers;
@@ -55,20 +54,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 return BaseResult<OrderDetailDto>.Ok(order);
             }
 
-            // Fetch user shop details
-            var userId = authenticatedUserService.UId;
-            var shop = await shopRepository
-                .Where(i => i.AccountId == userId)
-                .Select(i => new
-                {
-                    ShopId = i.Id,
-                    i.UniqueCode,
-                    i.AllowPublishOrder,
-                })
-                .FirstOrDefaultAsync(cancellationToken);
-
             // Fetch API config for the delivery partner (GHN)
-            var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, shop.ShopId);
+            var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, order.ShopId.Value);
 
             // Fetch the delivery order details from GHN
             var apiResult = await ghnApiClient.DetailDeliveryOrderAsync(apiConfig, order.PrivateOrderCode);

@@ -107,5 +107,7 @@ namespace Delivery.GHN
             ApiConfig config,
             string shopId,
             ShippingOrderSearchRequest request);
+
+        Task<string> CountOrderByStatusAsync(ApiConfig config);
     }
 }

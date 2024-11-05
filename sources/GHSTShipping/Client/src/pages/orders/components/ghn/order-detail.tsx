@@ -9,9 +9,10 @@ const { Title, Text } = Typography;
 
 interface OrderDialogProps {
   data: IOrderDetail | undefined;
+  showSenderAddress?: boolean;
 }
 
-const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data }) => {
+const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data, showSenderAddress = false }) => {
   const [orderDetail, setOrderDetail] = useState<IOrderDetail | undefined>();
   const [isVisible, setIsVisible] = useState(false); // To handle modal visibility
 
@@ -63,15 +64,17 @@ const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data }) => {
       >
         <Row gutter={[16, 24]}>
           {/* Thông tin Người gửi */}
-          <Col span={12}>
-            <Title level={4}>Thông tin Người gửi</Title>
-            <Text strong>Tên: </Text> <Text>{data?.fromName}</Text>
-            <br />
-            <Text strong>Số điện thoại: </Text> <Text>{data?.fromPhone}</Text>
-            <br />
-            <Text strong>Địa chỉ: </Text>
-            <Text>{`${data?.fromAddress}, ${data?.fromWardName}, ${data?.fromDistrictName}, ${data?.fromProvinceName}`}</Text>
-          </Col>
+          {showSenderAddress && (
+            <Col span={12}>
+              <Title level={4}>Thông tin Người gửi</Title>
+              <Text strong>Tên: </Text> <Text>{data?.fromName}</Text>
+              <br />
+              <Text strong>Số điện thoại: </Text> <Text>{data?.fromPhone}</Text>
+              <br />
+              <Text strong>Địa chỉ: </Text>
+              <Text>{`${data?.fromAddress}, ${data?.fromWardName}, ${data?.fromDistrictName}, ${data?.fromProvinceName}`}</Text>
+            </Col>
+          )}
 
           {/* Thông tin Người nhận */}
           <Col span={12}>

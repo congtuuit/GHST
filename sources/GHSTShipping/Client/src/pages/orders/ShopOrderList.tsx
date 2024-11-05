@@ -17,6 +17,7 @@ import { orderStatuses } from './orderStatus';
 import NumberFormatter from '@/components/core/NumberFormatter';
 import OrderStatus from './components/OrderStatus';
 import { revertDateFormatMap } from '@/components/core/table-column/type';
+import OrderFilter from './components/ghn/OrderFilter';
 
 const ShopOrderList = () => {
   const { session } = useSelector(state => state.user);
@@ -68,13 +69,11 @@ const ShopOrderList = () => {
       title: 'Mã đơn',
       dataIndex: 'clientOrderCode',
       key: 'clientOrderCode',
-      width: 120,
+      width: 160,
       render: (value: string, record: IOrderViewDto) => {
         return (
           <div onClick={() => handleViewOrderDetail(record.id)} style={{ cursor: 'pointer' }}>
-            <Button type="link">
-              {value} <SearchOutlined />
-            </Button>
+            <Button type="link">{value}</Button>
             <OrderStatus
               isPublished={record?.isPublished}
               status={record?.status}
@@ -90,7 +89,7 @@ const ShopOrderList = () => {
       title: 'Người nhận',
       dataIndex: 'toName',
       key: 'toName',
-      width: '150px',
+      width: '200px',
       render: (value: string, record: IOrderViewDto) => {
         const dateFormatted = formatUtcToLocalTime(record?.created, revertDateFormatMap['day']);
         return (
@@ -103,9 +102,10 @@ const ShopOrderList = () => {
       },
     },
     {
-      title: 'Địa chỉ đến',
+      title: 'Địa chỉ nhận',
       dataIndex: 'toAddress',
       key: 'toAddress',
+      width: '200px',
       render: (value: string, record: IOrderViewDto) => {
         return (
           <div>
@@ -133,22 +133,20 @@ const ShopOrderList = () => {
       },
     },
     {
-      title: 'Trọng lượng (gram)',
-      dataIndex: 'weight',
-      key: 'weight',
-      width: 'auto',
-      align: 'right',
-      render: (value: number) => {
-        return <NumberFormatter value={value} style="unit" unit="gram" />;
-      },
-    },
-    {
-      title: 'Giá trị đơn hàng',
+      title: 'Đơn hàng',
       dataIndex: 'insuranceValue',
       key: 'insuranceValue',
-      align: 'right',
-      render: (value: number) => {
-        return <Price value={value} />;
+      render: (value: number, record: IOrderViewDto) => {
+        return (
+          <div>
+            <div>
+              Trọng lượng: <NumberFormatter value={record?.weight} style="unit" unit="gram" />
+            </div>
+            <div>
+              Giá trị đơn hàng: <Price value={value} />
+            </div>
+          </div>
+        );
       },
     },
     {
@@ -166,6 +164,15 @@ const ShopOrderList = () => {
       dataIndex: 'paymentTypeName',
       key: 'paymentTypeName',
       align: 'left',
+      render: (value: string, record: IOrderViewDto) => {
+        return (
+          <div>
+            <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
+              {value}
+            </Tag>
+          </div>
+        );
+      },
     },
     {
       title: 'Trạng thái',
@@ -184,7 +191,7 @@ const ShopOrderList = () => {
         if (record.status === 'waiting_confirm' || record.status === 'draft' || record.status === 'ready_to_pick') {
           return (
             <div key={record.id}>
-              <Button className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
+              <Button danger className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
                 Hủy đơn
               </Button>
             </div>
@@ -232,7 +239,13 @@ const ShopOrderList = () => {
     <Card className="my-card-containter" title="Danh sách đơn hàng">
       <Row>
         <Col span={24}>
-          <Datatable onSearch={handleSearchOrder} showSearch columns={columns} dataSource={orderPagination} onChange={handleChangeTable} />
+          <Datatable
+            onSearch={handleSearchOrder}
+            showSearch
+            columns={columns}
+            dataSource={orderPagination}
+            onChange={handleChangeTable}
+          />
         </Col>
       </Row>
       <OrderDetailDialog data={orderDetail} />

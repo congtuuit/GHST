@@ -7,6 +7,9 @@ public class CreateDeliveryOrderRequest
     [JsonPropertyName("pick_shift")]
     public List<int> PickShift { get; set; }
 
+    /// <summary>
+    /// 2: Hàng nhẹ, 5: Hàng nặng
+    /// </summary>
     [JsonProperty("service_type_id")]
     [JsonPropertyName("service_type_id")]
     public int ServiceTypeId { get; set; }

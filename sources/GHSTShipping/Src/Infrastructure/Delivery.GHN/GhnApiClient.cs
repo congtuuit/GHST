@@ -618,6 +618,45 @@ namespace Delivery.GHN
             }
         }
 
+        public async Task<string> CountOrderByStatusAsync(ApiConfig config)
+        {
+            try
+            {
+                // Ensure HttpClient is configured
+                ConfigureHttpClient(config);
+
+                _httpClient.DefaultRequestHeaders.Add("referer", "https://khachhang.ghn.vn/");
+                _httpClient.DefaultRequestHeaders.Add("shopid", config.ShopId);
+                _httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
+
+                var content = new StringContent(JsonConvert.SerializeObject(new
+                {
+                    shop_id = config.ShopId,
+                    source = "5sao"
+                }), Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(ApiEndpoints.COUNT_ORDER_BY_STATUS, content);
+
+                // Read the response content
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+
+                // Validate the result and return data
+                return jsonResponse;
+            }
+            catch (HttpRequestException httpEx) when (_allowLogging)
+            {
+                throw new Exception("Failed to fetch search due to an HTTP error.", httpEx);
+            }
+            catch (JsonException jsonEx) when (_allowLogging)
+            {
+                throw new Exception("Failed to parse response.", jsonEx);
+            }
+            catch (Exception ex) when (_allowLogging)
+            {
+                return string.Empty;
+            }
+        }
+
 
         // Helper method for configuring the HttpClient
         private void ConfigureHttpClient(ApiConfig config)

@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
 namespace Delivery.GHN.Constants
@@ -70,4 +71,114 @@ namespace Delivery.GHN.Constants
         Damage
 
     }
+
+
+    public static class OrderStatusHelper
+    {
+        public static string ToStringValue(this GHN_OrderStatus status)
+        {
+            // Get the field information for the enum member
+            FieldInfo fieldInfo = status.GetType().GetField(status.ToString());
+
+            // Get the EnumMember attribute from the field
+            EnumMemberAttribute attribute = fieldInfo.GetCustomAttribute<EnumMemberAttribute>();
+
+            // Return the value from the attribute, or the enum name if not found
+            return attribute != null ? attribute.Value : status.ToString();
+        }
+
+        public static List<string> GetDetails(this OrderGroupStatus orderGroupStatus)
+        {
+            switch (orderGroupStatus)
+            {
+                case OrderGroupStatus.ChoBanGiao:
+                    return new List<string>()
+                    {
+                        GHN_OrderStatus.ReadyToPick.ToStringValue(),
+                        GHN_OrderStatus.Picking.ToStringValue(),
+                        GHN_OrderStatus.MoneyCollectPicking.ToStringValue(),
+                    };
+
+                case OrderGroupStatus.DaBanGiaoDangGiao:
+                    return new List<string>
+                    {
+                        GHN_OrderStatus.Picked.ToStringValue(),
+                        GHN_OrderStatus.Sorting.ToStringValue(),
+                        GHN_OrderStatus.Storing.ToStringValue(),
+                        GHN_OrderStatus.Transporting.ToStringValue(),
+                        GHN_OrderStatus.Delivering.ToStringValue(),
+                        GHN_OrderStatus.DeliveryFail.ToStringValue(),
+                        GHN_OrderStatus.MoneyCollectDelivering.ToStringValue(),
+                    };
+
+                case OrderGroupStatus.DaBanGiaoDangHoangHang:
+                    return new List<string>
+                    {
+                        GHN_OrderStatus.Return.ToStringValue(),
+                        GHN_OrderStatus.Returning.ToStringValue(),
+                        GHN_OrderStatus.ReturnFail.ToStringValue(),
+                        GHN_OrderStatus.ReturnTransporting.ToStringValue(),
+                        GHN_OrderStatus.ReturnSorting.ToStringValue(),
+                    };
+
+                case OrderGroupStatus.ChoXacNhanGiaoLai:
+                    return new List<string>
+                    {
+                        GHN_OrderStatus.WaitingToReturn.ToStringValue(),
+                    };
+
+                case OrderGroupStatus.HoanTat:
+                    return new List<string>
+                    {
+                        GHN_OrderStatus.Returned.ToStringValue(),
+                        GHN_OrderStatus.Delivered.ToStringValue(),
+                    };
+
+                case OrderGroupStatus.DaHuy:
+                    return new List<string>
+                    {
+                        GHN_OrderStatus.Cancel.ToStringValue(),
+                    };
+
+                case OrderGroupStatus.ThatLacHong:
+                    return new List<string>
+                    {
+                        GHN_OrderStatus.Lost.ToStringValue(),
+                        GHN_OrderStatus.Damage.ToStringValue(),
+                    };
+
+                default:
+                    return new List<string>();
+            }
+        }
+    }
+
+    public enum OrderGroupStatus
+    {
+        [EnumMember(Value = "nhap")]
+        Nhap,
+
+        [EnumMember(Value = "cho_ban_giao")]
+        ChoBanGiao,
+
+        [EnumMember(Value = "da_ban_giao_dang_giao")]
+        DaBanGiaoDangGiao,
+
+        [EnumMember(Value = "da_ban_giao_dang_hoang")]
+        DaBanGiaoDangHoangHang,
+
+        [EnumMember(Value = "cho_xac_nhan_giao_lai")]
+        ChoXacNhanGiaoLai,
+
+        [EnumMember(Value = "hoan_tat")]
+        HoanTat,
+
+        [EnumMember(Value = "da_huy")]
+        DaHuy,
+
+        [EnumMember(Value = "that_lac_hong")]
+        ThatLacHong,
+    }
+
+
 }
