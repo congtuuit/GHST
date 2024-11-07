@@ -24,6 +24,6 @@ jobs:
 
     - name: Build
       run: |
-        cd ".\sources\GHSTShipping\Client"
+        cd ".\GHST\sources\GHSTShipping\Client"
         yarn
         yarn build-dev
