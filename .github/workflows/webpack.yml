@@ -17,5 +17,7 @@ jobs:
           node-version: "18.x"
 
       - name: Install and Build
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
         run: |
-          echo ${{ secrets.FTP_SERVER }}
+          echo $FTP_SERVER
