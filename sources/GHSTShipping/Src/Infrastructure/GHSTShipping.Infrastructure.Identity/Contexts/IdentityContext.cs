@@ -8,6 +8,8 @@ namespace GHSTShipping.Infrastructure.Identity.Contexts
 {
     public class IdentityContext(DbContextOptions<IdentityContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>(options)
     {
+        public DbSet<UserSession> UserSessions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -45,6 +47,11 @@ namespace GHSTShipping.Infrastructure.Identity.Contexts
             builder.Entity<IdentityUserToken<Guid>>(entity =>
             {
                 entity.ToTable("UserTokens");
+            });
+
+            builder.Entity<UserSession>(entity =>
+            {
+                entity.ToTable(name: "UserSessions");
             });
         }
     }

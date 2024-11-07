@@ -24,6 +24,29 @@ namespace GHSTShipping.Application.Services
         IGhnApiClient ghnApiClient
         , IUnitOfWork unitOfWork) : IPartnerConfigService
     {
+
+        public async Task<ApiConfig> GetApiConfigAsync(EnumDeliveryPartner enumDeliveryPartner, Guid shopId)
+        {
+            var partnerConfig = await shopPartnerConfigRepository
+                .Where(i => i.ShopId == shopId && i.PartnerConfig.DeliveryPartner == enumDeliveryPartner)
+                .Select(i => new
+                {
+                    i.PartnerConfig.ProdEnv,
+                    i.PartnerConfig.ApiKey,
+                    i.PartnerShopId
+                })
+                .FirstOrDefaultAsync();
+
+            if (partnerConfig == null)
+            {
+                return null;
+            }
+
+            var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey, partnerConfig.PartnerShopId);
+
+            return apiConfig;
+        }
+
         public async Task<PartnerConfigDto> GetPartnerConfigAsync(EnumDeliveryPartner enumDeliveryPartner)
         {
             var result = await partnerConfigRepository.Where(i => i.DeliveryPartner == enumDeliveryPartner && i.IsActivated)
@@ -58,9 +81,24 @@ namespace GHSTShipping.Application.Services
                 Email = i.Email,
                 PhoneNumber = i.PhoneNumber,
                 FullName = i.FullName,
-                ProdEnv = i.ProdEnv
+                ProdEnv = i.ProdEnv,
             })
             .ToListAsync();
+
+            var configIds = result.Select(c => c.Id);
+            var connects = await shopPartnerConfigRepository.Where(c => configIds.Contains(c.PartnerConfigId))
+                .Select(c => new
+                {
+                    c.PartnerConfigId,
+                    c.ShopName,
+                })
+                .ToListAsync();
+
+            foreach (var config in result)
+            {
+                var shopConnects = connects.Where(c => c.PartnerConfigId == config.Id);
+                config.ShopNames = string.Join(", ", shopConnects.Select(c => c.ShopName));
+            }
 
             return result;
         }
@@ -145,6 +183,10 @@ namespace GHSTShipping.Application.Services
                     PartnerConfigId = i.PartnerConfigId,
                     PartnerShopId = i.PartnerShopId,
                     ClientPhone = i.ClientPhone,
+                    Address = i.Address,
+                    WardName = i.WardName,
+                    DistrictName = i.DistrictName,
+                    ProvinceName = i.ProvinceName,
                 })
                 .ToListAsync();
 
@@ -155,35 +197,100 @@ namespace GHSTShipping.Application.Services
         {
             // Get the existing config IDs for the shop
             var existedConfig = await shopPartnerConfigRepository
-                .Where(i => i.ShopId == request.ShopId && request.DeliveryConfigId == i.PartnerConfigId)
+                .Where(i => i.ShopId == request.ShopId)
+                .ToListAsync();
+
+            string address = request.Address;
+            string wardName = request.WardName;
+            string wardId = string.Empty;
+            string districtName = request.DistrictName;
+            string districtId = string.Empty;
+            string provinceName = request.ProviceName;
+            string provinceId = string.Empty;
+            string shopName = string.Empty;
+
+            if (request.PartnerShopId != null)
+            {
+                var partnerConfig = await partnerConfigRepository.Where(i => i.Id == request.DeliveryConfigId).Select(i => new
+                {
+                    i.DeliveryPartner,
+                    i.ApiKey,
+                    i.ProdEnv,
+                })
                 .FirstOrDefaultAsync();
+
+                if (partnerConfig != null && partnerConfig.DeliveryPartner == EnumDeliveryPartner.GHN)
+                {
+                    var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey);
+                    var shopsResult = await ghnApiClient.GetAllShopsAsync(apiConfig, new GetAllShopsRequest
+                    {
+                        offset = 1,
+                        limit = 200,
+                        client_phone = request.ClientPhone,
+                    });
+
+                    if (shopsResult.Code == 200)
+                    {
+                        var shops = shopsResult.Data.shops;
+                        var targetShop = shops.FirstOrDefault(i => i._id.ToString() == request.PartnerShopId);
+                        if (targetShop != null)
+                        {
+                            address = targetShop.address;
+                            shopName = targetShop.name;
+
+                            var districts = await ghnApiClient.GetDistrictAsync(apiConfig);
+                            var targetDisctrict = districts.FirstOrDefault(i => i.DistrictID == targetShop.district_id);
+                            if (targetDisctrict != null)
+                            {
+                                provinceName = targetDisctrict.ProvinceName;
+                                provinceId = targetDisctrict.ProvinceID.ToString();
+                                districtName = targetDisctrict.DistrictName;
+                                districtId = targetDisctrict.DistrictID.ToString();
+                            }
+
+                            var wards = await ghnApiClient.GetWardAsync(apiConfig, targetDisctrict.DistrictID);
+                            var targetWard = wards.FirstOrDefault(i => i.WardCode == targetShop.ward_code);
+                            if (targetWard != null)
+                            {
+                                wardId = targetWard.WardCode;
+                                wardName = targetWard.WardName;
+                            }
+                        }
+                    }
+                }
+            }
+
+            var shopPartnerConfig = new ShopPartnerConfig()
+            {
+                ShopId = request.ShopId,
+                PartnerShopId = request.PartnerShopId,
+                PartnerConfigId = request.DeliveryConfigId,
+                ClientPhone = request.ClientPhone,
+                ShopName = shopName,
+
+                Address = address,
+                WardName = wardName,
+                WardCode = wardId,
+                DistrictName = districtName,
+                DistrictId = districtId,
+                ProvinceName = provinceName,
+                ProvinceId = provinceId,
+            };
 
             using var transaction = await unitOfWork.BeginTransactionAsync();
             try
             {
-                if (existedConfig == null)
+                // Remove all configs
+                if (existedConfig.Any())
                 {
-                    var shopPartnerConfig = new ShopPartnerConfig()
-                    {
-                        ShopId = request.ShopId,
-                        PartnerShopId = request.PartnerShopId,
-                        PartnerConfigId = request.DeliveryConfigId,
-                        ClientPhone = request.ClientPhone,
-                    };
-
-                    await shopPartnerConfigRepository.AddAsync(shopPartnerConfig);
+                    var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}'";
+                    //var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}' AND PartnerConfigId = '{request.DeliveryConfigId}'";
+                    await shopPartnerConfigRepository.ExecuteSqlRawAsync(sqlQuery);
                 }
-                else
+
+                if (request.IsConnect)
                 {
-                    if (request.IsConnect)
-                    {
-                        existedConfig.PartnerShopId = request.PartnerShopId;
-                    }
-                    else
-                    {
-                        var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}' AND PartnerConfigId = '{request.DeliveryConfigId}'";
-                        await shopPartnerConfigRepository.ExecuteSqlRawAsync(sqlQuery);
-                    }
+                    await shopPartnerConfigRepository.AddAsync(shopPartnerConfig);
                 }
 
                 // Commit changes to the database
@@ -221,7 +328,7 @@ namespace GHSTShipping.Application.Services
                 {
                     return response.Data.shops.Select(i => new GhnShopDetailDto
                     {
-                        Id = i._id,
+                        Id = $"{i._id}",
                         Name = i.name,
                         Phone = i.phone,
                         Address = i.address,

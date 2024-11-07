@@ -85,3 +85,10 @@ Project setup
   "Env": "DEV",
   "EnableSwagger":  true
 }
+
+
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=localhost;Initial Catalog=GHSTShipping;User ID=sa;Password=123456;MultipleActiveResultSets=True;TrustServerCertificate=True",
+    "IdentityConnection": "Data Source=localhost;Initial Catalog=GHSTShipping;User ID=sa;Password=123456;MultipleActiveResultSets=True;TrustServerCertificate=True",
+    "FileManagerConnection": "Data Source=localhost;Initial Catalog=GHSTShippingFileManager;User ID=sa;Password=123456;MultipleActiveResultSets=True;TrustServerCertificate=True"
+  },

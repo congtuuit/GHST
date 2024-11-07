@@ -6,33 +6,19 @@ import { apiGetOrderMetaData } from '@/api/business.api';
 import { IOrderMetadata } from '@/interface/shop';
 
 const CreateOrderPage = () => {
+  const [isActiveGhnForm, setIsActiveGhnForm] = useState<boolean>(false);
   const [_, setCreateOrderMetadata] = useState<IOrderMetadata>();
-  const [selectedSupplier, setSelectedSupplier] = useState<string>('');
-
-  const handleChange = (value: string) => {
-    setSelectedSupplier(value);
-  };
 
   const fetchCreateOrderMetadata = async () => {
     const response = await apiGetOrderMetaData();
     if (response.success) {
       setCreateOrderMetadata(response.data);
-
       const config = response.data.deliveryConfigs[0];
       const partner = config.deliveryPartnerName;
-      setSelectedSupplier(partner);
-
       if (partner === supplierKeys.GHN) {
+        setIsActiveGhnForm(true);
         const shop = config.shops[0];
-        const values = {
-          name: shop.name,
-          phone: shop.phone,
-          address: shop.address,
-          wardCode: shop.wardCode,
-          districtId: shop.districtId,
-        }
-        
-        localStorage.setItem('senderAddress', JSON.stringify(values));
+        localStorage.setItem('senderAddress', JSON.stringify(shop));
       }
     }
   };
@@ -42,8 +28,10 @@ const CreateOrderPage = () => {
   }, []);
 
   return (
-    <Card>
-      <Col span={24}>{selectedSupplier === supplierKeys.GHN && <FormOrderGhn />}</Col>
+    <Card className="my-card-containter" title="Tạo đơn hàng">
+      <Col span={24}>
+        <FormOrderGhn isActivated={isActiveGhnForm} />
+      </Col>
     </Card>
   );
 };

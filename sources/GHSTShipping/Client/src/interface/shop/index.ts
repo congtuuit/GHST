@@ -14,6 +14,7 @@ export interface IShopViewDetailDto {
   bankAccountHolder: string;
   bankAddress: string;
   allowPublishOrder: boolean;
+  allowUsePartnerShopAddress: boolean;
   status: string;
   ghnShopDetails?: { [id: string]: IGhnShopDetailDto[] };
   ghnShopId?: number;
@@ -46,6 +47,11 @@ export interface IShopConfig {
   partnerConfigId: string;
   partnerShopId?: string;
   clientPhone?: string;
+
+  address?: string;
+  wardName?: string;
+  districtName?: string;
+  proviceName?: string;
 }
 
 export interface IDeliveryParter {

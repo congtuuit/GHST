@@ -17,6 +17,21 @@ namespace GHSTShipping.Application.DTOs.Shop
 
         public decimal OfficialPrice { get; set; }
 
-        public decimal Capacity { get; set; }
+
+        public int Weight { get; set; }
+
+        public int Length { get; set; }
+
+        public int Width { get; set; }
+
+        public int Height { get; set; }
+
+        /// <summary>
+        /// single | mutilple
+        /// </summary>
+        public string Mode { get; set; }
+        public int MaxConvertedWeight { get; set; }
+        public int StepWeight { get; set; }
+        public int StepPrice { get; set; }
     }
 }

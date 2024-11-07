@@ -12,7 +12,7 @@ namespace GHSTShipping.Application.DTOs.User
         public string ShopName { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
-        public decimal AvgMonthlyCapacity { get; set; }
+        public string AvgMonthlyCapacity { get; set; }
         public bool IsVerified { get; set; }
 
         public Guid AccountId { get; set; }

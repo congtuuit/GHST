@@ -16,32 +16,85 @@ const OrderInfoForm = () => {
       <Row gutter={16}>
         {/* Weight */}
         <Col span={6}>
-          <Form.Item label="KL (gram)" name={'weight'}>
-            <MyInputNumber defaultValue="500" />
+          <Form.Item
+            label="KL (gram)"
+            name={'weight'}
+            rules={[
+              { required: true, message: 'Vui lòng nhập' },
+              {
+                type: 'number',
+                min: 1,
+                max: 50000,
+                message: 'Khối lượng từ 1 - 50.000 gram',
+                transform: value => {
+                  return Number(value) || 0;
+                },
+              },
+            ]}
+          >
+            <MyInputNumber max={50000} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
 
         {/* Dimensions */}
-        <Col span={4}>
-          <Form.Item label="Dài (cm)" name={'length'}>
-            <MyInputNumber defaultValue="10" max={999999} />
-          </Form.Item>
-        </Col>
-        <Col span={4}>
-          <Form.Item label="Rộng (cm)" name={'width'}>
-            <MyInputNumber defaultValue="10" max={999999} />
-          </Form.Item>
-        </Col>
-        <Col span={4}>
-          <Form.Item label="Cao (cm)" name={'height'}>
-            <MyInputNumber defaultValue="10" max={999999} />
-          </Form.Item>
-        </Col>
-
-        {/* Equivalent Weight */}
         <Col span={6}>
-          <Form.Item label="KL quy đổi (gram)">
-            <Input defaultValue="200" disabled />
+          <Form.Item
+            label="Dài (cm)"
+            name={'length'}
+            rules={[
+              { required: true, message: 'Vui lòng nhập' },
+              {
+                type: 'number',
+                min: 1,
+                max: 50000,
+                message: 'Chiều dài từ 1 - 200 cm',
+                transform: value => {
+                  return Number(value) || 0;
+                },
+              },
+            ]}
+          >
+            <MyInputNumber max={200} placeholder="Nhập giá trị" />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item
+            label="Rộng (cm)"
+            name={'width'}
+            rules={[
+              { required: true, message: 'Vui lòng nhập' },
+              {
+                type: 'number',
+                min: 1,
+                max: 50000,
+                message: 'Chiều rộng từ 1 - 200 cm',
+                transform: value => {
+                  return Number(value) || 0;
+                },
+              },
+            ]}
+          >
+            <MyInputNumber max={200} placeholder="Nhập giá trị" />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item
+            label="Cao (cm)"
+            name={'height'}
+            rules={[
+              { required: true, message: 'Vui lòng nhập' },
+              {
+                type: 'number',
+                min: 1,
+                max: 50000,
+                message: 'Chiều cao từ 1 - 200 cm',
+                transform: value => {
+                  return Number(value) || 0;
+                },
+              },
+            ]}
+          >
+            <MyInputNumber max={200} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
       </Row>
@@ -50,7 +103,7 @@ const OrderInfoForm = () => {
         {/* COD */}
         <Col span={12}>
           <Form.Item name="cod_amount" label="Tổng tiền thu hộ (COD)" tooltip={{ title: 'Nhập số tiền COD', icon: <InfoCircleOutlined /> }}>
-            <MyInputNumber defaultValue="0" max={99999999} />
+            <MyInputNumber defaultValue="0" max={50000000} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
 
@@ -61,7 +114,7 @@ const OrderInfoForm = () => {
             label="Tổng giá trị hàng hóa"
             tooltip={{ title: 'Nhập tổng giá trị hàng hóa', icon: <InfoCircleOutlined /> }}
           >
-            <MyInputNumber defaultValue="0" max={99999999} />
+            <MyInputNumber defaultValue="0" max={5000000} placeholder="Nhập giá trị"/>
           </Form.Item>
         </Col>
       </Row>
@@ -78,7 +131,7 @@ const OrderInfoForm = () => {
         {failedDelivery && (
           <Col span={12}>
             <Form.Item name="cod_failed_amount">
-              <MyInputNumber defaultValue="20000" max={99999999} />
+              <MyInputNumber defaultValue="" max={99999999} placeholder="Nhập giá trị"/>
             </Form.Item>
           </Col>
         )}

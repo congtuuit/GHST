@@ -111,7 +111,9 @@ export const request = <T = any>(method: Lowercase<Method>, url: string, data?: 
   }
 
   if (method === 'delete') {
-    return axiosInstance.delete(endpoint, config);
+    return axiosInstance.delete(endpoint, {
+      data: data,
+    });
   }
 
   return axiosInstance.get(endpoint, {

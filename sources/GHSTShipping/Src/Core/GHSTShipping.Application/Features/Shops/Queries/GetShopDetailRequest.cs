@@ -4,6 +4,7 @@ using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Interfaces.UserInterfaces;
 using GHSTShipping.Application.Wrappers;
 using GHSTShipping.Domain.DTOs;
+using GHSTShipping.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -44,7 +45,7 @@ namespace GHSTShipping.Application.Features.Shops.Queries
                     BankAccountNumber = i.BankAccountNumber,
                     BankAddress = i.BankAddress,
                     AllowPublishOrder = i.AllowPublishOrder,
-                    GhnShopId = i.GhnShopId,
+                    AllowUsePartnerShopAddress = i.AllowUsePartnerShopAddress,
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -66,6 +67,7 @@ namespace GHSTShipping.Application.Features.Shops.Queries
                 })
                 .ToList();
 
+                Guid? ghnParterConfigId = null;
                 // Fetch ghn shop by configs
                 var ghnShopDetails = new Dictionary<Guid, IEnumerable<GhnShopDetailDto>>();
                 foreach (var parterConfig in parterConfigs)
@@ -90,11 +92,16 @@ namespace GHSTShipping.Application.Features.Shops.Queries
 
                 var deliveryConfigs = await _partnerConfigService.GetShopConfigsAsync(shop.Id);
                 shop.ShopConfigs = deliveryConfigs.ToList();
+
+                // Get current GHN shop Id has been connected
+                var ghnConfig = await _partnerConfigService.GetApiConfigAsync(EnumDeliveryPartner.GHN, shop.Id);
+                if (ghnConfig != null)
+                {
+                    shop.CurrentGhnShopId = ghnConfig.ShopId;
+                }
             }
 
             return BaseResult<ShopViewDetailDto>.Ok(shop);
         }
-
-
     }
 }

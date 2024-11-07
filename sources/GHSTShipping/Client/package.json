@@ -10,7 +10,6 @@
     "axios": "^0.24.0",
     "driver.js": "^0.9.8",
     "history": "^5.0.1",
-    "lodash": "^4.17.21",
     "mockjs": "^1.1.0",
     "moment": "^2.30.1",
     "query-string": "^7.0.1",
@@ -31,7 +30,9 @@
     "build": "tsc && vite build",
     "build-fe": "yarn build && yarn move",
     "build-be": "cd ../Src/Presentation/GHSTShipping.WebApi && dotnet publish -c Release -r win-x86 --self-contained false -o D:/deploy_ghst",
-    "release": "yarn build-fe && yarn build-be"
+    "cleanFiles": "node cleanFiles.js D:/deploy_ghst",
+    "artifact": "node archiver.js D:/deploy_ghst deploy.zip",
+    "release": "node clean.js D:/deploy_ghst && yarn build-fe && yarn build-be && yarn cleanFiles"
   },
   "browserslist": {
     "production": [
@@ -60,6 +61,7 @@
     "@typescript-eslint/parser": "^5.3.0",
     "@vitejs/plugin-react": "^1.1.0",
     "@vitejs/plugin-react-refresh": "^1.3.6",
+    "archiver": "^7.0.1",
     "babel-plugin-import": "^1.13.3",
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",

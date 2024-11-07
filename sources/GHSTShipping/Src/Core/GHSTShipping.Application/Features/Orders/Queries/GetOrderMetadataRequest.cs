@@ -2,7 +2,6 @@
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Wrappers;
-using GHSTShipping.Domain.DTOs;
 using GHSTShipping.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -105,17 +104,26 @@ namespace GHSTShipping.Application.Features.Orders.Queries
 
                 if (deliveryConfig.PartnerConfig.DeliveryPartner == Domain.Enums.EnumDeliveryPartner.GHN)
                 {
-                    var _ghnShopDetails = await _partnerConfigService.GetGhnShopDetailDtos(new PartnerConfigDto
-                    {
-                        ProdEnv = deliveryConfig.PartnerConfig.ProdEnv,
-                        ApiKey = deliveryConfig.PartnerConfig.ApiKey,
-                    },
-                    deliveryConfig.ClientPhone);
+                    var shopDetail = await _shopPartnerConfigRepository.Where(i => i.ShopId == deliveryConfig.ShopId && i.PartnerConfigId == deliveryConfig.PartnerConfigId)
+                        .Select(i => new GhnShopDetailDto
+                        {
+                            Id = i.PartnerShopId,
+                            Phone = i.ClientPhone,
+                            Name = i.ShopName,
 
-                    var targetConfigs = _ghnShopDetails.Where(i => i.Id.ToString() == deliveryConfig.PartnerShopId).ToList();
-                    if (targetConfigs.Any())
+                            Address = i.Address,
+                            WardId = i.WardCode,
+                            WardName = i.WardName,
+                            DistrictId = i.DistrictId,
+                            DistrictName = i.DistrictName,
+                            ProvinceId = i.ProvinceId,
+                            ProvinceName = i.ProvinceName,
+                        })
+                        .FirstOrDefaultAsync();
+
+                    if (shopDetail != null)
                     {
-                        deliveryConfigDto.Shops.AddRange(targetConfigs);
+                        deliveryConfigDto.Shops.Add(shopDetail);
                     }
                 }
 

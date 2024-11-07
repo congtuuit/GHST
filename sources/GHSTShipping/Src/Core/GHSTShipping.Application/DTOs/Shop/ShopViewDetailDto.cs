@@ -2,6 +2,7 @@
 using GHSTShipping.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace GHSTShipping.Application.DTOs.Shop
 {
@@ -13,7 +14,7 @@ namespace GHSTShipping.Application.DTOs.Shop
         public string ShopName { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
-        public decimal AvgMonthlyCapacity { get; set; }
+        public string AvgMonthlyCapacity { get; set; }
         public bool IsVerified { get; set; }
         public Guid AccountId { get; set; }
         public string PhoneNumber { get; set; }
@@ -22,8 +23,10 @@ namespace GHSTShipping.Application.DTOs.Shop
         public string BankAccountHolder { get; set; }
         public string BankAddress { get; set; }
         public bool AllowPublishOrder { get; set; }
+        public bool AllowUsePartnerShopAddress { get; set; }
 
         public int? GhnShopId { get; set; }
+        public string CurrentGhnShopId { get; set; }
 
         public string Status
         {
@@ -42,7 +45,10 @@ namespace GHSTShipping.Application.DTOs.Shop
 
     public class GhnShopDetailDto
     {
-        public int Id { get; set; }
+        /// <summary>
+        /// GHN Shop Id
+        /// </summary>
+        public string Id { get; set; }
         public string Name { get; set; }
         public string DisplayName { get { return $"{this.Id} - {this.Name}"; } }
 
@@ -50,7 +56,13 @@ namespace GHSTShipping.Application.DTOs.Shop
         // https://api.ghn.vn/home/docs/detail?id=106
         public string Phone { get; set; }
         public string Address { get; set; }
+
+        public string WardId{ get; set; }
+        public string WardName { get; set; }
         public string WardCode { get; set; }
         public string DistrictId { get; set; }
+        public string DistrictName { get; set; }
+        public string ProvinceId { get; set; }
+        public string ProvinceName { get;set; }
     }
 }

@@ -2,15 +2,15 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 import { createSlice } from '@reduxjs/toolkit';
 
-interface State {
+export interface GlobalState {
   theme: 'light' | 'dark';
   loading: boolean;
 }
 
 const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-const userTheme = localStorage.getItem('theme') as State['theme'];
+const userTheme = localStorage.getItem('theme') as GlobalState['theme'];
 
-const initialState: State = {
+const initialState: GlobalState = {
   theme: userTheme || systemTheme,
   loading: false,
 };
@@ -19,7 +19,7 @@ const globalSlice = createSlice({
   name: 'global',
   initialState,
   reducers: {
-    setGlobalState(state, action: PayloadAction<Partial<State>>) {
+    setGlobalState(state, action: PayloadAction<Partial<GlobalState>>) {
       Object.assign(state, action.payload);
 
       if (action.payload.theme) {

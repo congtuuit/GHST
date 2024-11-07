@@ -33,10 +33,28 @@ namespace GHSTShipping.Infrastructure.Persistence.Repositories
             dbContext.Entry(entity).State = EntityState.Modified;
         }
 
+        public void UpdateRange(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                dbContext.Entry(entity).State = EntityState.Modified;
+            }
+        }
+
         public void Delete(T entity)
         {
             dbContext.Set<T>().Attach(entity);
             entity.IsDeleted = true;
+        }
+
+        public void HardDelete(T entity)
+        {
+            dbContext.Set<T>().Remove(entity);
+        }
+
+        public void HardDeleteRange(IEnumerable<T> entities)
+        {
+            dbContext.Set<T>().RemoveRange(entities);
         }
 
         public async Task<IReadOnlyList<T>> GetAllAsync()

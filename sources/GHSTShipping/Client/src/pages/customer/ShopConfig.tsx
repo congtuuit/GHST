@@ -2,7 +2,7 @@ import type { IDeliveryParter, IGhnShopDetailDto, IShopConfig, IUpdateShopDelive
 import { Button, Card, Col, Row, Select, message } from 'antd';
 import { ApiOutlined, DisconnectOutlined } from '@ant-design/icons';
 import React, { useEffect, useMemo, useState } from 'react';
-import { apiUpdateShopDeliveryConfig } from '@/api/business.api';
+import { apiGetShopDetail, apiUpdateShopDeliveryConfig } from '@/api/business.api';
 import { DeliveryParterName } from '@/constants/data';
 
 interface ShopInfoProps {
@@ -17,9 +17,10 @@ interface PartnerConnectionProps {
   shopId?: string;
   ghnShopDetails?: { [id: string]: IGhnShopDetailDto[] };
   shopConfigs?: IShopConfig[];
+  onChange?: () => void;
 }
 
-const PartnerConnection: React.FC<PartnerConnectionProps> = ({ partner, shopId, ghnShopDetails, shopConfigs }) => {
+const PartnerConnection: React.FC<PartnerConnectionProps> = ({ partner, shopId, ghnShopDetails, shopConfigs, onChange }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [ghnShopId, setGhnShopId] = useState('');
   const [clientPhone, setClientPhone] = useState('');
@@ -46,13 +47,13 @@ const PartnerConnection: React.FC<PartnerConnectionProps> = ({ partner, shopId, 
       deliveryConfigId: partner.partnerConfigId,
       partnerShopId: ghnShopId.toString(),
       isConnect,
-      clientPhone
+      clientPhone,
     };
     const response = await apiUpdateShopDeliveryConfig(payload);
-
     if (response.success) {
       message.success(isConnect ? 'Kết nối thành công' : 'Hủy kết nối thành công');
       setIsConnected(isConnect);
+      onChange && onChange();
     } else {
       message.error('Kết nối thất bại, vui lòng thử lại');
     }
@@ -111,10 +112,27 @@ const PartnerConnection: React.FC<PartnerConnectionProps> = ({ partner, shopId, 
 };
 
 const ShopConfig: React.FC<ShopInfoProps> = ({ shopId, partners, ghnShopDetails, shopConfigs }) => {
+  const [currentShopConfigs, setCurrentShopConfigs] = useState(shopConfigs);
+
+  const fetchShopDetail = async () => {
+    const response = await apiGetShopDetail(shopId as string);
+    if (response.success) {
+      const detail = response.data;
+      setCurrentShopConfigs(detail.shopConfigs);
+    }
+  };
+
   return (
     <Row gutter={[10, 10]} style={{ gap: '12px' }} className="shop-config">
       {partners?.map((partner, index) => (
-        <PartnerConnection key={index} partner={partner} shopId={shopId} ghnShopDetails={ghnShopDetails} shopConfigs={shopConfigs} />
+        <PartnerConnection
+          onChange={fetchShopDetail}
+          key={index}
+          partner={partner}
+          shopId={shopId}
+          ghnShopDetails={ghnShopDetails}
+          shopConfigs={currentShopConfigs}
+        />
       ))}
     </Row>
   );

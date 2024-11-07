@@ -101,7 +101,7 @@ const Overview: FC<{ loading: boolean }> = ({ loading }) => {
   const { formatMessage } = useLocale();
 
   return (
-    <Row gutter={[12, 12]}>
+    <Row gutter={[12, 12]} style={{ margin: '0' }}>
       <ColCard
         loading={loading}
         metaName={formatMessage({ id: 'app.dashboard.overview.totalSales' })}

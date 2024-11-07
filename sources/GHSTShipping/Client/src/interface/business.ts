@@ -24,9 +24,18 @@ export interface IPaginationResponse<T> {
 }
 
 export interface IOrderPagedParameter extends IPaginationRequestParameter {
-  deliveryPartner: string | undefined;
-  orderCode: string | undefined;
-  status: string | undefined;
+  deliveryPartner?: string | undefined;
+  orderCode?: string | undefined;
+  status?: string | number| undefined;
+  shopId?: string;
+
+  groupStatus?: number | undefined;
+  fromDate?: Date | null;
+  toDate?: Date | null;
+  paymentTypeId?: number;
+  isPrint?: boolean;
+  isCodFailedCollected?: boolean;
+  isDocumentPod?: boolean;
 }
 
 export interface ShopPricePlanDto {
@@ -35,7 +44,11 @@ export interface ShopPricePlanDto {
   supplier: 'GHN' | 'SHOPEE EXPRESS' | 'J&T' | 'Best' | 'Viettel' | 'GHTK'; // Các giá trị cho supplier
   privatePrice: number;
   officialPrice: number;
-  capacity: number;
+  weight: number;
+  length: number;
+  width: number;
+  height: number;
+  convertedWeight: number;
 }
 
 export interface ICreateDeliveryOrderRequest {
@@ -97,4 +110,11 @@ interface DeliveryOrderItemDto {
 
 interface OrderCategoryDto {
   level1: string; // Required level 1 category
+}
+
+export interface IPickShift {
+  id: number;
+  title: string;
+  fromTime: number;
+  toTime: number;
 }

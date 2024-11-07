@@ -1,24 +1,27 @@
-import type { PageData } from '@/interface';
+import type { IPaginationRequestParameter, PageData } from '@/interface';
 import type {
   BuniesssUser,
   ICreateDeliveryOrderRequest,
   IOrderPagedParameter,
   IPaginationResponse,
+  IPickShift,
   PaginationResponse,
   ShopPricePlanDto,
 } from '@/interface/business';
-import type { IOrderDetail, IOrderDto } from '@/interface/order/order.interface';
+import type { IOrderDetail, IOrderDto, ShopOrderViewDto } from '@/interface/order/order.interface';
 import type { IOrderMetadata, IShopViewDetailDto, IUpdateShopDeliveryConfigRequest } from '@/interface/shop';
 import type { IDeliveryConfigDto } from '@/pages/delivery-config';
 
 import { buildQueryString } from '@/utils/queryEncode';
 
 import { request } from './base/request';
+import { IOrder } from '@/features/order/type';
+import { IChangeOperationConfig } from './type';
 
 export const apiGetProvinces = () => request<any[]>('get', '/metadata/provinces');
 export const apiGetDictricts = () => request<any[]>('get', '/metadata/dictricts');
 export const apiGetWards = (districtId: number) => request<any[]>('get', '/metadata/wards?districtId=' + districtId);
-export const apiGetPickShifts = () => request<any[]>('get', '/delivery/pickshifts');
+export const apiGetPickShifts = () => request<IPickShift[]>('get', '/delivery/pickshifts');
 export const getBusinessUserList = (params: any) => request<PageData<BuniesssUser>>('get', '/business/list', params);
 
 export const apiGetShopPricePlanes = (
@@ -37,11 +40,12 @@ export const apiCreateShopPricePlan = (data: ShopPricePlanDto) => {
   return request('post', `/shops/prices`, data);
 };
 
-export const apiDeleteShopPricePlan = (id: string) => {
-  return request('delete', `/shops/prices/${id}`);
+export const apiDeleteShopPricePlan = (id: string, ids: string[] = []) => {
+  return request('delete', `/shops/prices/${id}`, ids);
 };
 
-export const apiCreateDeliveryOrder = (data: ICreateDeliveryOrderRequest) => {
+//ICreateDeliveryOrderRequest
+export const apiCreateDeliveryOrder = (data: IOrder) => {
   return request('post', '/orders/ghn/create', data);
 };
 
@@ -56,8 +60,10 @@ export const apiGetOrderDetail = (orderId: string | undefined) => {
   return request<IOrderDetail>('get', `/orders/ghn/detail/${orderId}`);
 };
 
-export const apiCancelOrderGhn = (orderCodes: string[]) => {
-  return request<IOrderDetail>('put', `/orders/ghn/cancel`, orderCodes);
+export const apiCancelOrderGhn = (orderIds: string[]) => {
+  return request<IOrderDetail>('put', `/orders/ghn/cancel`, {
+    orderIds: orderIds,
+  });
 };
 
 export const apiGetShops = (pageNumber: number | undefined = 1, pageSize: number | undefined = 10) => {
@@ -67,7 +73,8 @@ export const apiGetShops = (pageNumber: number | undefined = 1, pageSize: number
 export const apiActiveShops = (shopId: string) => request<PaginationResponse>('put', `/users/activeshop/${shopId}`);
 
 export const apiGetShopDetail = (shopId: string) => request<IShopViewDetailDto>('get', `/shops/detail/${shopId}`);
-export const apiChangeAllowPublishOrder = (shopId: string) => request<IShopViewDetailDto>('put', `/shops/allowPublishOrder/${shopId}`);
+export const apiChangeOperationConfig = (payload: IChangeOperationConfig) =>
+  request<IShopViewDetailDto>('put', `/shops/changeOperationConfig/${payload.shopId}`, payload);
 export const apiUpdateGhnShopId = (shopId: string, ghnShopId: number) =>
   request('put', `/shops/ghnShopId/${shopId}`, {
     shopId: shopId,
@@ -80,3 +87,9 @@ export const apiCreateDeliveryConfig = (payload: any) => request('post', `/confi
 
 export const apiUpdateShopDeliveryConfig = (payload: IUpdateShopDeliveryConfigRequest) => request('put', `/configs/shop`, payload);
 export const apiGetOrderMetaData = () => request<IOrderMetadata>('get', `/orders/metadata`);
+export const apiGetShopOrders = (params: IPaginationRequestParameter) => {
+  const queryString = buildQueryString(params);
+  return request<IPaginationResponse<ShopOrderViewDto>>('get', `/orders/group-by-shops?${queryString}`);
+};
+export const apiConfirmOrderGhn = (orderId: string) => request('put', `/orders/ghn/confirm/${orderId}`);
+export const apiCountOrderByStatus = (shopId: string) => request('get', `/orders/ghn/count-order-by-status/${shopId}`);

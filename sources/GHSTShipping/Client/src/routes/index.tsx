@@ -7,17 +7,19 @@ import { useRoutes } from 'react-router-dom';
 
 import CustomerPage from '@/pages/customer';
 import CustomerPricePage from '@/pages/customer-price';
-import Dashboard from '@/pages/dashboard';
+import Dashboard from '@/pages/dashboard/index';
 import DeliveryConfigPage from '@/pages/delivery-config';
 import ForgotPasswordPage from '@/pages/forgot-password';
 import LayoutPage from '@/pages/layout';
 import LoginPage from '@/pages/login';
 import OrdersPage from '@/pages/orders';
-import CreateOrderPage from '@/pages/orders/create';
+import CreateOrderPage from '@/pages/orders/CreateOrderPage';
 import RegisterPage from '@/pages/register';
 import ResetPasswordPage from '@/pages/reset-password';
 
 import WrapperRouteComponent from './config';
+import AdminViewShopOrders from '@/pages/orders/AdminViewShopOrders';
+import { Roles } from '@/features/auth/roles';
 
 const NotFound = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/404'));
 const Documentation = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/doucumentation'));
@@ -69,15 +71,19 @@ const routeList: RouteObject[] = [
       },
       {
         path: 'customer/list',
-        element: <WrapperRouteComponent element={<CustomerPage />} titleId="title.customer" />,
+        element: <WrapperRouteComponent element={<CustomerPage />} titleId="title.customer" allowedRoles={[Roles.Admin]} />,
       },
       {
         path: 'customer/price-plan',
-        element: <WrapperRouteComponent element={<CustomerPricePage />} titleId="title.customerPrice" />,
+        element: <WrapperRouteComponent element={<CustomerPricePage />} titleId="title.customerPrice" allowedRoles={[Roles.Admin]} />,
       },
       {
         path: 'order/list',
         element: <WrapperRouteComponent element={<OrdersPage />} titleId="title.orderList" />,
+      },
+      {
+        path: 'order/list/:shopId',
+        element: <WrapperRouteComponent element={<AdminViewShopOrders />} titleId="title.orderListByShop" allowedRoles={[Roles.Admin]} />,
       },
       {
         path: 'order/create',
@@ -85,9 +91,8 @@ const routeList: RouteObject[] = [
       },
       {
         path: 'settings',
-        element: <WrapperRouteComponent element={<DeliveryConfigPage />} titleId="title.deliveryConfig" />,
+        element: <WrapperRouteComponent element={<DeliveryConfigPage />} titleId="title.deliveryConfig" allowedRoles={[Roles.Admin]} />,
       },
-
       {
         path: 'documentation',
         element: <WrapperRouteComponent element={<Documentation />} titleId="title.documentation" />,
@@ -134,7 +139,6 @@ const routeList: RouteObject[] = [
 
 const RenderRouter: FC = () => {
   const element = useRoutes(routeList);
-
   return element;
 };
 

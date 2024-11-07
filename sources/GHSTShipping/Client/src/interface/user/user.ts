@@ -13,8 +13,6 @@ export interface UserState {
   /** login status */
   logged: boolean;
 
-  roles: Role[];
-
   /** user's device */
   device: Device;
 

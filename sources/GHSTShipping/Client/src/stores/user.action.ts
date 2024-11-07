@@ -12,11 +12,9 @@ export const loginAsync = createAsyncAction<LoginParams, boolean>(payload => {
   return async dispatch => {
     const _result = await apiLogin(payload);
     const { success, data, message } = _result;
-
     if (success) {
       if (!data.isVerified) {
         $message.info('Tài khoản của bạn chưa được kích hoạt, vui lòng liên hệ Admin!');
-
         return false;
       }
 

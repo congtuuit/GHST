@@ -7,6 +7,7 @@ using GHSTShipping.Domain.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GHSTShipping.WebApi.Controllers.v1
@@ -21,8 +22,8 @@ namespace GHSTShipping.WebApi.Controllers.v1
 
         [HttpPut, Authorize]
         [Route("{shopId}")]
-        public async Task<BaseResult<ShopViewDetailDto>> AllowPublishOrder([FromRoute] Guid? shopId)
-          => await Mediator.Send(new AllowPublishOrderRequest() { ShopId = shopId });
+        public async Task<BaseResult<ShopViewDetailDto>> ChangeOperationConfig([FromRoute] Guid? shopId, [FromBody] ChangeOperationConfigRequest request)
+          => await Mediator.Send(request);
 
         [HttpPut, Authorize]
         [Route("{shopId}")]
@@ -34,12 +35,12 @@ namespace GHSTShipping.WebApi.Controllers.v1
             => await Mediator.Send(request);
 
         [HttpPost, Authorize]
-        public async Task<BaseResult<System.Guid>> Prices([FromBody] CreateShopPriceCommand request)
+        public async Task<BaseResult> Prices([FromBody] CreateShopPriceCommand request)
             => await Mediator.Send(request);
 
         [HttpPut, Authorize]
         [Route("{Id}")]
-        public async Task<BaseResult<System.Guid>> Prices([FromRoute] System.Guid Id, CreateShopPriceCommand request)
+        public async Task<BaseResult> Prices([FromRoute] System.Guid Id, CreateShopPriceCommand request)
         {
             request.Id = Id;
 
@@ -48,9 +49,9 @@ namespace GHSTShipping.WebApi.Controllers.v1
 
         [HttpDelete, Authorize]
         [Route("{Id}")]
-        public async Task<BaseResult> Prices([FromRoute] System.Guid Id)
+        public async Task<BaseResult> Prices([FromRoute] System.Guid Id, [FromBody] IEnumerable<Guid> Ids = null)
         {
-            return await Mediator.Send(new DeleteShopPriceCommand() { Id = Id });
+            return await Mediator.Send(new DeleteShopPriceCommand() { Id = Id, Ids = Ids });
         }
     }
 }

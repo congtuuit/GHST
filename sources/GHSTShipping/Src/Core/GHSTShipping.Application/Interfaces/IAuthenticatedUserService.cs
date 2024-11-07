@@ -26,5 +26,9 @@ namespace GHSTShipping.Application.Interfaces
         string Type { get; }
 
         Guid? ShopId { get; }
+
+        string DeviceInfo { get; }
+        string IpAddress { get; }
+        Guid? SessionId { get; }
     }
 }

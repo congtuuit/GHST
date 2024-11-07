@@ -47,20 +47,34 @@ const ProductForm = () => {
         <div key={index} style={{ marginBottom: 16, border: '1px solid #e8e8e8', padding: 16 }}>
           <Row gutter={[16, 16]}>
             {/* Product Name */}
-            <Col span={4}>
-              <Form.Item label={`SP ${index + 1}`} name={['items', index, 'name']}>
+            <Col span={6}>
+              <Form.Item label={`Sản phẩm ${index + 1}`} name={['items', index, 'name']} rules={[{ required: true, message: 'Vui lòng nhập' }]}>
                 <Input placeholder="Nhập tên sản phẩm" value={product.name} onChange={e => handleInputChange(index, 'name', e.target.value)} />
               </Form.Item>
             </Col>
 
             {/* Weight */}
-            <Col span={4}>
-              <Form.Item label="KL (gram)" name={['items', index, 'weight']}>
+            <Col span={6}>
+              <Form.Item
+                label="KL (gram)"
+                name={['items', index, 'weight']}
+                rules={[
+                  { required: true, message: 'Vui lòng nhập' },
+                  {
+                    type: 'number',
+                    min: 1,
+                    message: 'Khối lượng phải lớn hơn 0',
+                    transform: value => {
+                      return Number(value) || 0;
+                    },
+                  },
+                ]}
+              >
                 <MyInputNumber
+                  placeholder="Nhập giá trị"
                   value={product.weight}
                   onChange={e => {
                     const value: string = e.toString();
-
                     handleInputChange(index, 'weight', value || '');
                   }}
                 />
@@ -68,13 +82,27 @@ const ProductForm = () => {
             </Col>
 
             {/* Quantity */}
-            <Col span={4}>
-              <Form.Item label="Số lượng" name={['items', index, 'quantity']}>
+            <Col span={6}>
+              <Form.Item
+                label="Số lượng"
+                name={['items', index, 'quantity']}
+                rules={[
+                  { required: true, message: 'Vui lòng nhập' },
+                  {
+                    type: 'number',
+                    min: 1,
+                    message: 'Số lượng phải lớn hơn 0',
+                    transform: value => {
+                      return Number(value) || 0;
+                    },
+                  },
+                ]}
+              >
                 <MyInputNumber
+                  placeholder="Nhập số lượng"
                   value={product.quantity}
                   onChange={e => {
                     const value: string = e.toString();
-
                     handleInputChange(index, 'quantity', value || '');
                   }}
                 />
@@ -82,7 +110,7 @@ const ProductForm = () => {
             </Col>
 
             {/* Product Code */}
-            <Col span={4}>
+            <Col span={6}>
               <Form.Item label="Mã sản phẩm" name={['items', index, 'code']}>
                 <Input placeholder="Nhập mã sản phẩm" value={product.code} onChange={e => handleInputChange(index, 'code', e.target.value)} />
               </Form.Item>
@@ -90,7 +118,7 @@ const ProductForm = () => {
 
             {/* Image Upload */}
             <Col span={4}>
-              <Form.Item label="Hình ảnh">
+              <Form.Item label="Hình ảnh" hidden>
                 <Upload>
                   <Button icon={<UploadOutlined />}>Upload</Button>
                 </Upload>

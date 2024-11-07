@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import ShopInfo from './ShopInfo';
 import { InfoCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import ShopConfig from './ShopConfig';
+import { IChangeOperationConfig } from '@/api/type';
 
 interface CustomerDetailProps {
   data: IShopViewDetailDto | undefined;
-  onChange: (id: string) => void;
+  onChange: (id: IChangeOperationConfig) => void;
 }
 
 const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
@@ -73,7 +74,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
                 <InfoCircleOutlined /> Thông tin cửa hàng
               </span>
             ),
-            children: <ShopInfo data={detail} onChange={() => onChange && onChange(detail?.id as string)} />,
+            children: <ShopInfo data={detail} onChange={onChange} />,
           },
           {
             disabled: !detail?.isVerified,

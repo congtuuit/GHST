@@ -12,12 +12,13 @@ import { history, HistoryRouter } from '@/routes/history';
 import { localeConfig, LocaleFormatter } from './locales';
 import RenderRouter from './routes';
 import { setGlobalState } from './stores/global.store';
+import { rolesSelector } from './stores/user.store';
 
 const App: React.FC = () => {
+  const roles = useSelector(rolesSelector);
   const { locale } = useSelector(state => state.user);
   const { theme, loading } = useSelector(state => state.global);
   const dispatch = useDispatch();
-
   const setTheme = (dark = false) => {
     dispatch(
       setGlobalState({
@@ -89,7 +90,6 @@ const App: React.FC = () => {
               }}
               tip={<LocaleFormatter id="gloabal.tips.loading" />}
             ></Spin>
-
             <RenderRouter />
           </Suspense>
         </HistoryRouter>

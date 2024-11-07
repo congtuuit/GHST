@@ -1,34 +1,17 @@
 import type { FC } from 'react';
-
+import { useSelector } from 'react-redux';
+import ShopDashboard from './ShopDashboard';
+import AdminDashBoard from './AdminDashBoard';
 import './index.less';
 
-import { useEffect, useState } from 'react';
-
-import Overview from './overview';
-import SalePercent from './salePercent';
-import TimeLine from './timeLine';
-
 const DashBoardPage: FC = () => {
-  const [loading, setLoading] = useState(true);
-
-  // mock timer to mimic dashboard data loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(undefined as any);
-    }, 2000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
-
-  return (
-    <div>
-      <Overview loading={loading} />
-      <SalePercent loading={loading} />
-      <TimeLine loading={loading} />
-    </div>
-  );
+  const { session } = useSelector(state => state.user);
+  const isAdmin = session.roles.includes('ADMIN');
+  if (isAdmin) {
+    return <AdminDashBoard />;
+  } else {
+    return <ShopDashboard />;
+  }
 };
 
 export default DashBoardPage;

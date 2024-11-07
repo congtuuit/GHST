@@ -1,3 +1,4 @@
+using GHSTShipping.Application.DTOs.Account;
 using GHSTShipping.Application.DTOs.Account.Requests;
 using GHSTShipping.Application.DTOs.Account.Responses;
 using GHSTShipping.Application.Helpers;
@@ -26,6 +27,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
         IdentityContext identityContext,
         UserManager<ApplicationUser> userManager,
         IAuthenticatedUserService authenticatedUser,
+        IUserSessionService userSessionService,
         SignInManager<ApplicationUser> signInManager,
         IEmailSender emailSender,
         JwtSettings jwtSettings, ITranslator translator) : IAccountServices
@@ -86,7 +88,11 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 return new Error(ErrorCode.FieldDataInvalid, translator.GetString(TranslatorMessages.AccountMessages.Invalid_password()), nameof(request.Password));
             }
 
-            return await GetAuthenticationResponse(user);
+            var userSession = await AddUserSessionAsync(user.Id);
+
+            var result = await GetAuthenticationResponse(user, userSession.Id);
+
+            return result;
         }
 
         public async Task<BaseResult<AuthenticationResponse>> AuthenticateByUserNameAsync(string username)
@@ -97,7 +103,11 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 return new Error(ErrorCode.NotFound, translator.GetString(TranslatorMessages.AccountMessages.Account_NotFound_with_UserName(username)), nameof(username));
             }
 
-            return await GetAuthenticationResponse(user);
+            var userSession = await AddUserSessionAsync(user.Id);
+
+            var result = await GetAuthenticationResponse(user, userSession.Id);
+
+            return result;
         }
 
         public async Task<BaseResult<string>> RegisterGhostAccountAsync()
@@ -283,6 +293,17 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             }).AsQueryable();
         }
 
+        // https://chatgpt.com/c/67226163-bf38-8002-bde9-d815f87372b6
+        public async Task<UserSessionDto> AddUserSessionAsync(Guid userId)
+        {
+            var ipAddress = authenticatedUser.IpAddress;
+            var deviceInfo = authenticatedUser.DeviceInfo;
+
+            var userSession = await userSessionService.RegisterUserSessionAsync(userId, deviceInfo, ipAddress);
+
+            return userSession;
+        }
+
         private static string GeneratePassword(int length)
         {
             const string lowerCase = "abcdefghijklmnopqrstuvwxyz";
@@ -310,7 +331,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
             return new string(password.ToString().OrderBy(c => random.Next()).ToArray());
         }
 
-        private async Task<AuthenticationResponse> GetAuthenticationResponse(ApplicationUser user)
+        private async Task<AuthenticationResponse> GetAuthenticationResponse(ApplicationUser user, Guid sessionId)
         {
             await userManager.UpdateSecurityStampAsync(user);
 
@@ -340,6 +361,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                 {
                     new Claim("DisplayName", user.Name), // Add your custom claim
                     new Claim("Type", user.Type), // Add your custom claim
+                    new Claim("Session_Id", sessionId.ToString()), // Add your custom claim
                 };
 
                 claims.AddRange(claimsPrincipal.Claims);
@@ -352,5 +374,7 @@ namespace GHSTShipping.Infrastructure.Identity.Services
                     signingCredentials: signingCredentials);
             }
         }
+
+
     }
 }

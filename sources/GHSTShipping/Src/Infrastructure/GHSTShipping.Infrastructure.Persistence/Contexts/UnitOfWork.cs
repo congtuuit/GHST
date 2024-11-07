@@ -17,6 +17,7 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
         private IGenericRepository<ShopPricePlan> _shopPricePlan;
         private IGenericRepository<ShopOrderCodeSequence> _shopOrderCodeSequence;
         private IGenericRepository<Order> _order;
+        private IGenericRepository<OrderItem> _orderItems;
 
         public IGenericRepository<Shop> Shops 
             => _shop ??= new GenericRepository<Shop>(dbContext);
@@ -26,6 +27,8 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
             => _shopOrderCodeSequence ??= new GenericRepository<ShopOrderCodeSequence>(dbContext);
         public IGenericRepository<Order> Orders 
             => _order ??= new GenericRepository<Order>(dbContext);
+        public IGenericRepository<OrderItem> OrderItems
+            => _orderItems ??= new GenericRepository<OrderItem>(dbContext);
 
         public async Task<bool> SaveChangesAsync(CancellationToken cancellation = default)
         {

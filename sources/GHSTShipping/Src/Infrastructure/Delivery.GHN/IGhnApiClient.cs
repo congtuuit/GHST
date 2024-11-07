@@ -56,7 +56,10 @@ namespace Delivery.GHN
         /// <param name="shopId">The ID of the shop creating the delivery order.</param>
         /// <param name="request">The request object containing parameters for creating the delivery order.</param>
         /// <returns>A task representing the asynchronous operation, with a response indicating the result of the order creation.</returns>
-        Task<GhnApiResponse<CreateDeliveryOrderResponse>> CreateDeliveryOrderAsync(ApiConfig config, string shopId, CreateDeliveryOrderRequest request);
+        Task<GhnApiResponse<CreateDeliveryOrderResponse>> CreateDeliveryOrderAsync(
+            ApiConfig config,
+            string shopId,
+            CreateDeliveryOrderRequest request);
 
         /// <summary>
         /// Asynchronously creates a draft delivery order using the provided API configuration and request data.
@@ -99,5 +102,11 @@ namespace Delivery.GHN
         Task<IEnumerable<WardResponse>> GetWardAsync(ApiConfig config, int districtId);
 
         Task<IEnumerable<PickShiftResponse>> GetPickShiftAsync(ApiConfig config);
+
+        Task<SearchOrderResponse> SearchOrdersAsync(
+            ApiConfig config,
+            ShippingOrderSearchRequest request);
+
+        Task<string> CountOrderByStatusAsync(ApiConfig config);
     }
 }

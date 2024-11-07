@@ -1,22 +1,23 @@
 import type { IOrderStatus } from './orderStatus';
 import type { IOrderPagedParameter, IPaginationResponse } from '@/interface/business';
-import type { IOrderDetail, IOrderDto } from '@/interface/order/order.interface';
-import type { RadioChangeEvent, TablePaginationConfig } from 'antd';
+import type { IOrderDetail, IOrderDto, IOrderViewDto } from '@/interface/order/order.interface';
+import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 import type { ColumnsType } from 'antd/lib/table';
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Card, Col, message, Radio, Row, Select, Tag } from 'antd';
+import { Button, Card, Col, message, Row, Tag, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { apiCancelOrderGhn, apiGetOrderDetail, apiGetOrders } from '@/api/business.api';
 import Datatable from '@/components/core/datatable';
 import Price from '@/components/core/price';
-import { suppliers } from '@/constants/data';
-import { commingSoon } from '@/utils/common';
+import { formatUtcToLocalTime } from '@/utils/common';
 import OrderDetailDialog from './components/ghn/order-detail';
 import { orderStatuses } from './orderStatus';
-
-const { Option } = Select;
+import NumberFormatter from '@/components/core/NumberFormatter';
+import OrderStatus from './components/OrderStatus';
+import { revertDateFormatMap } from '@/components/core/table-column/type';
+import OrderFilter from './components/ghn/OrderFilter';
 
 const ShopOrderList = () => {
   const { session } = useSelector(state => state.user);
@@ -27,14 +28,8 @@ const ShopOrderList = () => {
   const [orderDetail, setOrderDetail] = useState<IOrderDetail | undefined>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
-
-  const handleChange = (value: string) => {
-    setSelectedSupplier(value);
-  };
-
-  const handleSelectOrderStatusFilter = (e: RadioChangeEvent) => {
-    setOrderStatusFilter(e.target.value);
-  };
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const pageSize = 7;
 
   const fetchOrders = async (params: IOrderPagedParameter | null) => {
     if (params == null) {
@@ -43,7 +38,7 @@ const ShopOrderList = () => {
         orderCode: '',
         status: '',
         pageNumber: 1,
-        pageSize: 10,
+        pageSize: pageSize,
       };
     }
 
@@ -54,7 +49,15 @@ const ShopOrderList = () => {
     }
   };
 
-  const columns: ColumnsType<IOrderDto> = [
+  const handleCancelOrder = async (id: string) => {
+    const response = await apiCancelOrderGhn([id]);
+    if (response.success) {
+      setRefresh(!refresh);
+      message.success('Hủy đơn thành công!');
+    }
+  };
+
+  const columns: ColumnsType<IOrderViewDto> = [
     {
       title: 'STT',
       dataIndex: 'no',
@@ -66,48 +69,84 @@ const ShopOrderList = () => {
       title: 'Mã đơn',
       dataIndex: 'clientOrderCode',
       key: 'clientOrderCode',
-      width: 120,
-      render: (value: string, record: IOrderDto) => {
+      width: 160,
+      render: (value: string, record: IOrderViewDto) => {
         return (
-          <Button type="link" onClick={() => handleViewOrderDetail(record.id)}>
-            {value} <SearchOutlined />
-          </Button>
+          <div onClick={() => handleViewOrderDetail(record.id)} style={{ cursor: 'pointer' }}>
+            <Button type="link">{value}</Button>
+            <OrderStatus
+              isPublished={record?.isPublished}
+              status={record?.status}
+              statusName={record?.statusName}
+              statusColor={record?.statusColor}
+            />
+            <span>{record?.fromPhone}</span>
+          </div>
         );
       },
     },
     {
-      title: 'Địa chỉ gửi',
-      dataIndex: 'fromAddress',
-      key: 'fromAddress',
+      title: 'Người nhận',
+      dataIndex: 'toName',
+      key: 'toName',
+      width: '200px',
+      render: (value: string, record: IOrderViewDto) => {
+        const dateFormatted = formatUtcToLocalTime(record?.created, revertDateFormatMap['day']);
+        return (
+          <div>
+            <div>{value}</div>
+            <div>{record?.toPhone}</div>
+            <div style={{ fontStyle: 'italic', fontSize: '12px' }}>Ngày tạo: {dateFormatted}</div>
+          </div>
+        );
+      },
     },
     {
-      title: 'Địa chỉ đến',
+      title: 'Địa chỉ nhận',
       dataIndex: 'toAddress',
       key: 'toAddress',
+      width: '200px',
+      render: (value: string, record: IOrderViewDto) => {
+        return (
+          <div>
+            <div>{value}</div>
+            <div>
+              {record?.toWardName} - {record?.toDistrictName}
+            </div>
+            <div>{record?.toProvinceName}</div>
+          </div>
+        );
+      },
     },
     {
-      title: 'Trọng lượng',
-      dataIndex: 'weight',
-      key: 'weight',
-      width: 'auto',
-      align: 'right',
-    },
-    {
-      title: 'COD',
+      title: 'Thu hộ',
       dataIndex: 'codAmount',
       key: 'codAmount',
       align: 'right',
       render: (value: number) => {
-        return <Price value={value} type="success" />;
+        return (
+          <div>
+            <div style={{ fontSize: '12px' }}>COD</div>
+            <Price style={{ fontWeight: 'bold' }} value={value} type="warning" />
+          </div>
+        );
       },
     },
     {
-      title: 'Giá trị đơn hàng',
+      title: 'Đơn hàng',
       dataIndex: 'insuranceValue',
       key: 'insuranceValue',
-      align: 'right',
-      render: (value: number) => {
-        return <Price value={value} />;
+      render: (value: number, record: IOrderViewDto) => {
+        return (
+          <div>
+            <div>
+              Trọng lượng: <NumberFormatter value={record?.weight} style="unit" unit="gram" />
+            </div>
+            <div>
+              Giá trị đơn hàng: <Price value={value} />
+            </div>
+          </div>
+        );
       },
     },
     {
@@ -116,15 +155,31 @@ const ShopOrderList = () => {
       key: 'deliveryFee',
       align: 'right',
       render: (value: number) => {
-        return <Price value={value} type="warning" />;
+        return <Price value={value} type="success" />;
+      },
+    },
+
+    {
+      title: 'Tùy chọn thanh toán',
+      dataIndex: 'paymentTypeName',
+      key: 'paymentTypeName',
+      align: 'left',
+      render: (value: string, record: IOrderViewDto) => {
+        return (
+          <div>
+            <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
+              {value}
+            </Tag>
+          </div>
+        );
       },
     },
     {
       title: 'Trạng thái',
       align: 'center',
-      render: (_: any, record: IOrderDto) => {
-        const text = record.isPublished ? 'Đã giao đơn vị vận chuyển' : 'Chờ xác nhận';
-        return <Tag color={record['isPublished'] === true ? 'green' : 'gray'}>{text}</Tag>;
+      render: (_: any, record: IOrderViewDto) => {
+        const text = record.isPublished ? record.statusName : record.status === 'waiting_confirm' ? 'Chờ xác nhận' : record.statusName;
+        return <Tag color={record.statusColor ?? 'gray'}>{text}</Tag>;
       },
     },
     {
@@ -132,24 +187,18 @@ const ShopOrderList = () => {
       key: 'action',
       width: 150,
       align: 'center' as const,
-      render: (_: any, record: IOrderDto) => {
-        if (record.isPublished) {
+      render: (_: any, record: IOrderViewDto) => {
+        if (record.status === 'waiting_confirm' || record.status === 'draft' || record.status === 'ready_to_pick') {
           return (
             <div key={record.id}>
-              <Button className="table-btn-action" size="small" onClick={commingSoon}>
+              <Button danger className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
                 Hủy đơn
               </Button>
             </div>
           );
         }
 
-        return (
-          <div key={record.id}>
-            <Button className="table-btn-action" size="small" onClick={commingSoon}>
-              Hủy đơn
-            </Button>
-          </div>
-        );
+        return <div key={record.id}></div>;
       },
     },
   ];
@@ -166,6 +215,8 @@ const ShopOrderList = () => {
     setTableFilters(filters);
   };
 
+  const handleSearchOrder = async () => {};
+
   useEffect(() => {
     if (Boolean(selectedSupplier) && Boolean(orderStatuses[selectedSupplier])) {
       setOrderStatusSection(orderStatuses[selectedSupplier as string]);
@@ -174,25 +225,27 @@ const ShopOrderList = () => {
     }
 
     const params: IOrderPagedParameter = {
-      pageNumber: tablePaginationConfig?.current as number,
-      pageSize: tablePaginationConfig?.pageSize as number,
+      pageNumber: (tablePaginationConfig?.current as number) ?? 1,
+      pageSize: (tablePaginationConfig?.pageSize as number) ?? pageSize,
       deliveryPartner: selectedSupplier,
       orderCode: '',
-      status: orderStatusFilter,
+      status: orderStatusFilter ?? '',
     };
 
     fetchOrders(params);
-  }, [selectedSupplier, tablePaginationConfig, orderStatusFilter]);
-
-  useEffect(() => {
-    fetchOrders(null);
-  }, []);
+  }, [selectedSupplier, tablePaginationConfig, orderStatusFilter, refresh]);
 
   return (
-    <Card>
+    <Card className="my-card-containter" title="Danh sách đơn hàng">
       <Row>
         <Col span={24}>
-          <Datatable columns={columns} dataSource={orderPagination} onChange={handleChangeTable} />
+          <Datatable
+            onSearch={handleSearchOrder}
+            showSearch
+            columns={columns}
+            dataSource={orderPagination}
+            onChange={handleChangeTable}
+          />
         </Col>
       </Row>
       <OrderDetailDialog data={orderDetail} />

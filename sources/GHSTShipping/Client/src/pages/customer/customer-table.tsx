@@ -4,14 +4,17 @@ import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 
 import { CheckCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Row, Table, Tag } from 'antd';
+import { Button, InputNumber, Row, Table, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 
-import { apiActiveShops, apiChangeAllowPublishOrder, apiGetShopDetail, apiGetShops } from '@/api/business.api';
+import { apiActiveShops, apiChangeOperationConfig, apiGetShopDetail, apiGetShops } from '@/api/business.api';
 import { dateFormatMap, revertDateFormatMap } from '@/components/core/table-column/type';
 
 import CustomerDetail from './customer-detail';
+import { render } from 'react-dom';
+import CommaDecimalDisplay from '@/components/core/CommaDecimalDisplay';
+import { IChangeOperationConfig } from '@/api/type';
 
 interface ShopDatatableDto {
   key: string;
@@ -44,7 +47,7 @@ const CustomerTable = () => {
 
   const columns = [
     {
-      title: 'No',
+      title: 'STT',
       dataIndex: 'no',
       key: 'no',
       width: 50,
@@ -70,7 +73,6 @@ const CustomerTable = () => {
       width: 150,
       render: (value: string, record: ShopDatatableDto) => {
         const dateFormatted = dayjs(value).format(revertDateFormatMap['day']);
-
         return <span>{dateFormatted}</span>;
       },
     },
@@ -97,6 +99,9 @@ const CustomerTable = () => {
       key: 'avgMonthlyCapacity',
       width: 180,
       align: 'right' as const,
+      render: (value: string) => {
+        return <CommaDecimalDisplay value={value} />;
+      },
     },
     {
       title: 'Kết nối đơn vị vận chuyển',
@@ -111,7 +116,7 @@ const CustomerTable = () => {
             </Button>
           );
         } else {
-          return "";
+          return '';
         }
       },
     },
@@ -166,15 +171,13 @@ const CustomerTable = () => {
 
   const handleViewDetail = async (id: string) => {
     const response = await apiGetShopDetail(id);
-
     if (response.success) {
       setCustomerDetail(response.data);
     }
   };
 
-  const handleChangeAllowPublishOrder = async (id: string) => {
-    const response = await apiChangeAllowPublishOrder(id);
-
+  const handleChangeAllowPublishOrder = async (payload: IChangeOperationConfig) => {
+    const response = await apiChangeOperationConfig(payload);
     if (response.success) {
       setCustomerDetail(response.data);
     }
@@ -202,10 +205,6 @@ const CustomerTable = () => {
       fetchShops();
     }
   }, [tablePaginationConfig, tableFilters, reloadTable]);
-
-  useEffect(() => {
-    fetchShops();
-  }, []);
 
   return (
     <Row>

@@ -19,6 +19,12 @@ export const datetimeFormatMap: DatetimeFormatMap = {
   second: 'YYYY-MM-DD HH:mm:ss',
 };
 
+export const revertdatetimeFormatMap: DatetimeFormatMap = {
+  hour: 'DD/MM/YYYY HH',
+  minute: 'DD/MM/YYYY HH:mm',
+  second: 'DD/MM/YYYY HH:mm:ss',
+};
+
 type DateFormatMap = {
   [x in DateType]: string;
 };

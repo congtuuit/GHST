@@ -1,13 +1,14 @@
-import type { PaginationResponse, ShopPricePlanDto } from '@/interface/business';
+import type { IPaginationResponse, PaginationResponse, ShopPricePlanDto } from '@/interface/business';
 import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Modal, Row, Table, Tag, Typography } from 'antd';
+import { Button, message, Modal, Row, Table, Tag, Typography } from 'antd';
 import { type FC, useEffect, useState } from 'react';
 
 import { apiDeleteShopPricePlan, apiGetShopPricePlanes } from '@/api/business.api';
 import { suppliers } from '@/constants/data';
+import Datatable from '@/components/core/datatable';
 
 const { confirm } = Modal;
 
@@ -20,7 +21,11 @@ interface ShopPricePlanDatatable {
   supplier: 'GHN' | 'SHOPEE EXPRESS' | 'J&T' | 'Best' | 'Viettel' | 'GHTK'; // Có thể giới hạn giá trị nếu cần
   privatePrice: number; // decimal in C# can be represented as number in TypeScript
   officialPrice: number; // decimal in C# can be represented as number in TypeScript
-  capacity: number; // decimal in C# can be represented as number in TypeScript
+  weight: number;
+  length: number;
+  width: number;
+  height: number;
+  convertedWeight: number;
 }
 
 interface PriceTableProps {
@@ -32,7 +37,7 @@ interface PriceTableProps {
 const PriceTable = (props: PriceTableProps) => {
   const { selectedShop, refreshTable, onEdit } = props;
   const [reloadTable, setReloadTable] = useState<boolean>(refreshTable);
-  const [pagination, setPagination] = useState<PaginationResponse>();
+  const [pagination, setPagination] = useState<IPaginationResponse<ShopPricePlanDatatable> | null>(null);
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
 
@@ -47,13 +52,11 @@ const PriceTable = (props: PriceTableProps) => {
     }
 
     let supplierQuery = '';
-
     if (Boolean(supplier)) {
       supplierQuery = supplier?.length > 0 ? supplier.join(',') : ''; // join the array into a comma-separated string
     }
 
     const { success, data } = await apiGetShopPricePlanes(shopId, supplierQuery, pageNumber, pageSize);
-
     if (success) {
       setPagination(data);
     }
@@ -61,7 +64,7 @@ const PriceTable = (props: PriceTableProps) => {
 
   const columns = [
     {
-      title: 'No',
+      title: 'STT',
       dataIndex: 'no',
       key: 'no',
       width: 50,
@@ -75,13 +78,27 @@ const PriceTable = (props: PriceTableProps) => {
       align: 'left' as const,
     },
     {
-      title: 'Shop Name',
+      title: 'Cửa hàng',
       dataIndex: 'shopName',
       key: 'shopName',
       align: 'left' as const,
+      width: 180,
     },
     {
-      title: 'Giá',
+      title: 'Đơn vị vận chuyển',
+      dataIndex: 'supplier',
+      key: 'supplier',
+      width: 180,
+      align: 'center' as const,
+      filters: suppliers.map(i => {
+        return {
+          text: i,
+          value: i,
+        };
+      }),
+    },
+    {
+      title: 'Giá riêng',
       dataIndex: 'privatePrice',
       key: 'privatePrice',
       align: 'right' as const,
@@ -115,28 +132,30 @@ const PriceTable = (props: PriceTableProps) => {
       },
     },
     {
-      title: 'Khối lượng',
-      dataIndex: 'capacity',
-      key: 'capacity',
+      title: 'Cân nặng',
+      dataIndex: 'weight',
+      key: 'weight',
       align: 'right' as const,
     },
     {
-      title: 'Đơn vị vận chuyển',
-      dataIndex: 'supplier',
-      key: 'supplier',
-      width: 180,
-      align: 'center' as const,
-      filters: suppliers.map(i => {
-        return {
-          text: i,
-          value: i,
-        };
-      }),
+      title: 'Dài x Rộng x Cao',
+      dataIndex: '_lxwxh',
+      key: '_lxwxh',
+      align: 'right' as const,
+      render: (value: string, record: ShopPricePlanDatatable) => {
+        return <span>{`${record.length}x${record.width}x${record.height}`}</span>;
+      },
+    },
+    {
+      title: 'Khối lượng chuyển đổi',
+      dataIndex: 'convertedWeight',
+      key: 'convertedWeight',
+      align: 'right' as const,
     },
     {
       title: 'Thao tác',
       key: 'action',
-      width: 150,
+      width: 200,
       align: 'center' as const,
       render: (_: any, record: ShopPricePlanDatatable) => {
         return (
@@ -177,7 +196,11 @@ const PriceTable = (props: PriceTableProps) => {
           supplier: record.supplier,
           privatePrice: record.privatePrice,
           officialPrice: record.officialPrice,
-          capacity: record.capacity,
+          weight: record.weight,
+          length: record.length,
+          width: record.width,
+          height: record.height,
+          convertedWeight: record.convertedWeight,
         } as ShopPricePlanDto,
         (success: boolean) => {
           if (success) {
@@ -189,15 +212,25 @@ const PriceTable = (props: PriceTableProps) => {
 
   const handleDelete = async (record: ShopPricePlanDatatable) => {
     const { id } = record;
-
     await apiDeleteShopPricePlan(id);
-
     setReloadTable(!reloadTable);
   };
 
   const handleChangeTable = (config: TablePaginationConfig, filters: Record<string, FilterValue | null>) => {
     setTablePaginationConfig(config);
     setTableFilters(filters);
+  };
+
+  const handleSelectedRows = (rows: ShopPricePlanDatatable[]) => {
+  };
+
+  const handleDeleteRows = async (rows: ShopPricePlanDatatable[]) => {
+    const ids = rows.map(i => i.id);
+    const response = await apiDeleteShopPricePlan(ids[0], ids);
+    if (response.success) {
+      message.success('Xoá thành công!');
+      setReloadTable(!reloadTable);
+    }
   };
 
   useEffect(() => {
@@ -234,18 +267,13 @@ const PriceTable = (props: PriceTableProps) => {
   }, [refreshTable]);
 
   return (
-    <Table
-      style={{ width: '100%', marginTop: '10px' }}
+    <Datatable
       columns={columns}
-      dataSource={pagination?.data as ShopPricePlanDatatable[]}
-      pagination={{
-        pageSize: pagination?.pageSize,
-        current: pagination?.pageNumber,
-        total: pagination?.count,
-      }}
-      rowKey="key"
-      scroll={{ x: 'max-content' }}
+      dataSource={pagination}
       onChange={handleChangeTable}
+      onSelectedRows={handleSelectedRows}
+      handleDeleteRows={handleDeleteRows}
+      mode="mutilple"
     />
   );
 };

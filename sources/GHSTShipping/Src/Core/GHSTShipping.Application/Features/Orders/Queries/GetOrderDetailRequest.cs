@@ -1,5 +1,6 @@
-﻿using Delivery.GHN;
-using Delivery.GHN.Models;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Delivery.GHN;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Wrappers;
@@ -23,7 +24,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         IShopRepository shopRepository,
         IGhnApiClient ghnApiClient,
         IPartnerConfigService partnerConfigService,
-        IAuthenticatedUserService authenticatedUserService
+        IAuthenticatedUserService authenticatedUserService,
+        MapperConfiguration mapperConfiguration
         ) : IRequestHandler<GetOrderDetailRequest, BaseResult<OrderDetailDto>>
     {
         public async Task<BaseResult<OrderDetailDto>> Handle(GetOrderDetailRequest request, CancellationToken cancellationToken)
@@ -37,12 +39,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             // Fetch the order details
             var order = await orderRepository
                 .Where(i => i.Id == request.OrderId)
-                .Select(i => new OrderDetailDto
-                {
-                    Id = i.Id,
-                    PrivateOrderCode = i.private_order_code,
-                    ClientOrderCode = i.ClientOrderCode
-                })
+                .ProjectTo<OrderDetailDto>(mapperConfiguration)
                 .FirstOrDefaultAsync(cancellationToken);
 
             // Early return if the order is not found
@@ -57,21 +54,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 return BaseResult<OrderDetailDto>.Ok(order);
             }
 
-            // Fetch user shop details
-            var userId = authenticatedUserService.UId;
-            var shop = await shopRepository
-                .Where(i => i.AccountId == userId)
-                .Select(i => new
-                {
-                    ShopId = i.Id,
-                    i.UniqueCode,
-                    i.AllowPublishOrder,
-                })
-                .FirstOrDefaultAsync(cancellationToken);
-
             // Fetch API config for the delivery partner (GHN)
-            var partnerConfig = await partnerConfigService.GetPartnerConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN);
-            var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey);
+            var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, order.ShopId.Value);
 
             // Fetch the delivery order details from GHN
             var apiResult = await ghnApiClient.DetailDeliveryOrderAsync(apiConfig, order.PrivateOrderCode);
@@ -79,7 +63,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             // Update order status if API call succeeds
             if (apiResult.Code == 200)
             {
-                order.Status = apiResult.Data.status;
+                //order.Status = apiResult.Data.status;
             }
 
             return BaseResult<OrderDetailDto>.Ok(order);

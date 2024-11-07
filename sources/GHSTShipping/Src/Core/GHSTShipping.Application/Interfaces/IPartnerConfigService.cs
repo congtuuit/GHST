@@ -7,11 +7,14 @@ using GHSTShipping.Application.Wrappers;
 using GHSTShipping.Application.DTOs.PartnerConfig;
 using System;
 using GHSTShipping.Application.DTOs.Shop;
+using Delivery.GHN.Models;
 
 namespace GHSTShipping.Application.Interfaces
 {
     public interface IPartnerConfigService
     {
+        Task<ApiConfig> GetApiConfigAsync(EnumDeliveryPartner enumDeliveryPartner, Guid shopId);
+
         Task<PartnerConfigDto> GetPartnerConfigAsync(EnumDeliveryPartner enumDeliveryPartner);
 
         Task<IEnumerable<PartnerConfigDto>> GetPartnerConfigsAsync(bool? isActivated = null);
