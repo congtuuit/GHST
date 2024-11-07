@@ -29,10 +29,11 @@
     "build-dev": "vite build --mode development",
     "build": "tsc && vite build",
     "build-fe": "yarn build && yarn move",
-    "build-be": "cd ../Src/Presentation/GHSTShipping.WebApi && dotnet publish -c Release -r win-x86 --self-contained false -o D:/deploy_ghst",
-    "cleanFiles": "node cleanFiles.js D:/deploy_ghst",
+    "build-be": "cd ../Src/Presentation/GHSTShipping.WebApi && dotnet publish -c Release -r win-x86 --self-contained false",
+    "cleanFiles": "node cleanFiles.js",
     "artifact": "node archiver.js D:/deploy_ghst deploy.zip",
-    "release": "node clean.js D:/deploy_ghst && yarn build-fe && yarn build-be && yarn cleanFiles"
+    "release": "node clean.js D:/deploy_ghst && yarn build-fe && yarn build-be -o D:/deploy_ghst && yarn cleanFiles D:/deploy_ghst",
+    "build:full": "yarn build-fe && yarn build-be -o ./../../../../../sources/GHSTShipping/Client/build"
   },
   "browserslist": {
     "production": [
