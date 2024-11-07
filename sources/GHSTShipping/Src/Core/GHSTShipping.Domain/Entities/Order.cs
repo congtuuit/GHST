@@ -126,6 +126,14 @@ namespace GHSTShipping.Domain.Entities
 
         public int? ToProvinceId { get; set; } = null;
 
+        /// <summary>
+        /// Input of shop
+        /// </summary>
+        public int RootWeight { get; set; }
+        public int RootLength { get; set; }
+        public int RootWidth { get; set; }
+        public int RootHeight { get; set; }
+
         public int Weight { get; set; }
         public int Length { get; set; }
         public int Width { get; set; }
@@ -201,9 +209,19 @@ namespace GHSTShipping.Domain.Entities
             this.CurrentStatus = OrderStatus.CANCEL;
         }
 
+        /// <summary>
+        /// Orderride delivery fee and recalculate converted weight
+        /// </summary>
+        /// <param name="fee"></param>
         public void OrrverideDeliveryFee(int fee)
         {
             this.CustomDeliveryFee = fee;
+            this.ConvertedWeight = this.Length * this.Width * this.Height;
+            this.CalculateWeight = this.ConvertedWeight;
+        }
+
+        public void CalcConvertedWeight()
+        {
             this.ConvertedWeight = this.Length * this.Width * this.Height;
             this.CalculateWeight = this.ConvertedWeight;
         }

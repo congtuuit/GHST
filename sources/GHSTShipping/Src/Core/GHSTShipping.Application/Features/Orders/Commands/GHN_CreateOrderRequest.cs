@@ -21,7 +21,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
     {
     }
 
-    public class CreateGhnOrderRequestHandler : IRequestHandler<GHN_CreateOrderRequest, BaseResult<CreateDeliveryOrderResponse>>
+    public class GHN_CreateOrderRequestHandler : IRequestHandler<GHN_CreateOrderRequest, BaseResult<CreateDeliveryOrderResponse>>
     {
         private readonly IShopRepository _shopRepository;
         private readonly IOrderRepository _orderRepository;
@@ -33,10 +33,10 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         private readonly IGhnApiClient _ghnApiClient;
         private readonly IMapper _mapper;
         private readonly IAuthenticatedUserService _authenticatedUserService;
-        private readonly ILogger<CreateGhnOrderRequestHandler> _logger;
+        private readonly ILogger<GHN_CreateOrderRequest> _logger;
         private readonly IMediator _mediator;
 
-        public CreateGhnOrderRequestHandler(
+        public GHN_CreateOrderRequestHandler(
             IShopRepository shopRepository,
             IOrderRepository orderRepository,
             IOrderHistoryRepository orderHistoryRepository,
@@ -47,7 +47,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             IGhnApiClient ghnApiClient,
             IMapper mapper,
             IAuthenticatedUserService authenticatedUserService,
-            ILogger<CreateGhnOrderRequestHandler> logger,
+            ILogger<GHN_CreateOrderRequest> logger,
             IMediator mediator)
         {
             _shopRepository = shopRepository;
@@ -153,7 +153,9 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             var shopId = shop.Id;
             var uniqueShopCode = shop.UniqueCode;
             var allowPublishOrder = shop.AllowPublishOrder;
-            var deliveryFeePlan = await CalculateDeliveryFeeAsync(request, shopId);
+
+            var convertedWeight = request.Length * request.Width * request.Height;
+            var deliveryFeePlan = await CalculateDeliveryFeeAsync(_unitOfWork, convertedWeight, shopId);
 
             var allowUsePartnerShopAddress = shop.AllowUsePartnerShopAddress;
             if (allowUsePartnerShopAddress)
@@ -245,6 +247,11 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 Coupon = request.Coupon,
                 PickShift = request.PickShift,
 
+                RootWeight = request.Weight,
+                RootLength = request.Length,
+                RootWidth = request.Width,
+                RootHeight = request.Height,
+
                 Weight = request.Weight,
                 Length = request.Length,
                 Width = request.Width,
@@ -297,11 +304,14 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             });
         }
 
-        private async Task<int> CalculateDeliveryFeeAsync(GHN_CreateOrderRequest request, Guid shopId)
+        public static async Task<int> CalculateDeliveryFeeAsync(
+            IUnitOfWork unitOfWork,
+            int convertedWeight,
+            Guid shopId)
         {
             string deliveryPartner = EnumSupplierConstants.GHN;
-            var calculateWeight = request.Length * request.Width * request.Height;
-            var result = await _unitOfWork.ShopPricePlanes
+            var calculateWeight = convertedWeight;
+            var result = await unitOfWork.ShopPricePlanes
                 .Where(i => i.ShopId == shopId && i.Supplier == deliveryPartner && i.ConvertedWeight > calculateWeight)
                 .OrderBy(i => i.ConvertedWeight)
                 .Select(i => i.OfficialPrice)
@@ -312,7 +322,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
         private void LogRequestData(GHN_CreateOrderRequest request)
         {
-            _logger.LogInformation("{Handler} - Data: {Data}", nameof(CreateGhnOrderRequestHandler), JsonConvert.SerializeObject(request));
+            _logger.LogInformation("{Handler} - Data: {Data}", nameof(GHN_CreateOrderRequest), JsonConvert.SerializeObject(request));
         }
 
         internal class ShopQueryDto
