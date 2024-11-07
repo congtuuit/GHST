@@ -84,27 +84,27 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 }
             }
 
-            // Filter by shopId
-            if (request.ShopId.HasValue)
-            {
-                query = query.Where(i => i.ShopId == request.ShopId);
-            }
-
-            // Filter by code
-            if (!string.IsNullOrWhiteSpace(request.OrderCode))
-            {
-                query = query.Where(o => o.ClientOrderCode.Contains(request.OrderCode) || request.OrderCode.Contains(o.ClientOrderCode));
-            }
-
-            // Filter by delivery partner
-            if (!string.IsNullOrWhiteSpace(request.DeliveryPartner))
-            {
-                query = query.Where(o => o.DeliveryPartner.Contains(request.DeliveryPartner));
-            }
-
             // Filter by status
             if (request.GroupStatus == OrderGroupStatus.Nhap)
             {
+                // Filter by shopId
+                if (request.ShopId.HasValue)
+                {
+                    query = query.Where(i => i.ShopId == request.ShopId);
+                }
+
+                // Filter by code
+                if (!string.IsNullOrWhiteSpace(request.OrderCode))
+                {
+                    query = query.Where(o => o.ClientOrderCode.Contains(request.OrderCode) || request.OrderCode.Contains(o.ClientOrderCode));
+                }
+
+                // Filter by delivery partner
+                if (!string.IsNullOrWhiteSpace(request.DeliveryPartner))
+                {
+                    query = query.Where(o => o.DeliveryPartner.Contains(request.DeliveryPartner));
+                }
+
                 query = query.Where(o => o.IsPublished == false || o.CurrentStatus == OrderStatus.WAITING_CONFIRM);
                 query = query.OrderByDescending(i => i.Created);
 
@@ -161,7 +161,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     }
                     if (request.FromDate.HasValue)
                     {
-                        searchParams.FromTime = DateTimeHelper.ConvertToUnixTimestamp( request.FromDate.Value);
+                        searchParams.FromTime = DateTimeHelper.ConvertToUnixTimestamp(request.FromDate.Value);
                     }
                     if (request.ToDate.HasValue)
                     {
@@ -171,26 +171,36 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     var ghnOrdersResponse = await ghnApiClient.SearchOrdersAsync(apiConfig, searchParams);
                     var (entityOrders, entityOrderItems) = await GHN_SyncOrderRequestHandler.ListOrderMappingAsync(ghnOrdersResponse, shopId, apiConfig, ghnApiClient);
 
-                    //// TODO open to optimize performance
-                    //Task.Run(() => JobSyncOrders(entityOrders, entityOrderItems));
 
-                    await GHN_SyncOrderRequestHandler.BatchSaveAsync(unitOfWork, entityOrders, entityOrderItems);
 
-                    var _orders = mapper.Map<List<OrderDto>>(entityOrders);
-                    var result = new PaginationResponseDto<OrderDto>(_orders, ghnOrdersResponse.Total, request.PageNumber, request.PageSize);
-
-                    int index = 0;
-                    foreach (var item in result.Data)
+                    if (entityOrders.Count > 0 || entityOrderItems.Count > 0)
                     {
-                        item.No = skipCount + index + 1;
-                        if (string.IsNullOrWhiteSpace(item.ClientOrderCode))
-                        {
-                            item.ClientOrderCode = item.PrivateOrderCode;
-                        }
-                        index++;
-                    }
+                        //// TODO open to optimize performance
+                        //Task.Run(() => JobSyncOrders(entityOrders, entityOrderItems));
 
-                    return BaseResult<PaginationResponseDto<OrderDto>>.Ok(result);
+                        await GHN_SyncOrderRequestHandler.BatchSaveAsync(unitOfWork, entityOrders, entityOrderItems);
+
+                        var _orders = mapper.Map<List<OrderDto>>(entityOrders);
+                        var result = new PaginationResponseDto<OrderDto>(_orders, ghnOrdersResponse.Total, request.PageNumber, request.PageSize);
+
+                        int index = 0;
+                        foreach (var item in result.Data)
+                        {
+                            item.No = skipCount + index + 1;
+                            if (string.IsNullOrWhiteSpace(item.ClientOrderCode))
+                            {
+                                item.ClientOrderCode = item.PrivateOrderCode;
+                            }
+                            index++;
+                        }
+
+                        return BaseResult<PaginationResponseDto<OrderDto>>.Ok(result);
+
+                    }
+                    else
+                    {
+                        return BaseResult<PaginationResponseDto<OrderDto>>.Ok(null);
+                    }
                 }
             }
 

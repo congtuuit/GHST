@@ -40,6 +40,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
   const [orderStatusFilter, setOrderStatusFilter] = useState<number>(orderStatusSection[0].value);
   const [supplierSelected, setSupplierSelected] = useState<string>(supplierKeys.GHN);
   const [shopDetail, setShopDetail] = useState<any>(null);
+  const [fetchingData, setFetchingData] = useState(false);
   const pageSize = 5;
 
   const fetchShopDetail = async () => {
@@ -50,6 +51,8 @@ const ShopOrders = (props: ShopOrdersProps) => {
   };
 
   const fetchOrders = async (params: IOrderPagedParameter | null) => {
+    setFetchingData(true);
+
     if (params == null) {
       params = {
         deliveryPartner: supplierSelected ?? '',
@@ -64,6 +67,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
     if (response.success) {
       setOrderPagination(response.data);
     }
+    setFetchingData(false);
   };
 
   const handleChangeTable = (config: TablePaginationConfig, filters: Record<string, FilterValue | null>) => {
@@ -118,8 +122,8 @@ const ShopOrders = (props: ShopOrdersProps) => {
       shopId: shopId,
       status: orderFilter?.status ?? '',
       deliveryPartner: supplierSelected ?? '',
-      pageNumber: 1,
-      pageSize: pageSize,
+      pageNumber: tablePaginationConfig?.current ?? 1,
+      pageSize: tablePaginationConfig?.pageSize ?? pageSize,
 
       groupStatus: orderStatusFilter,
       fromDate: orderFilter?.fromDate ?? null,
@@ -129,8 +133,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
       isCodFailedCollected: orderFilter?.isCodFailedCollected ?? '',
       isDocumentPod: orderFilter?.isDocumentPod ?? '',
     } as IOrderPagedParameter);
-
-  }, [shopId, supplierSelected, orderStatusFilter, orderFilter]);
+  }, [shopId, supplierSelected, orderStatusFilter, orderFilter, tablePaginationConfig]);
 
   useEffect(() => {
     fetchShopDetail();
@@ -281,13 +284,17 @@ const ShopOrders = (props: ShopOrdersProps) => {
           return <div key={record.id}></div>;
         }
 
-        return (
-          <div key={record.id}>
-            <Button danger className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
-              Hủy đơn
-            </Button>
-          </div>
-        );
+        if (record.status === 'ready_to_pick' || record.status === 'picking' || record.status === 'money_collect_picking') {
+          return (
+            <div key={record.id}>
+              <Button danger className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
+                Hủy đơn
+              </Button>
+            </div>
+          );
+        }
+
+        return <div key={record.id}></div>;
       },
     },
   ];
@@ -332,6 +339,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
           <Col span={24}>
             {/* Order list table */}
             <Datatable
+              loading={fetchingData}
               columns={columns}
               dataSource={orderPagination}
               onChange={handleChangeTable}

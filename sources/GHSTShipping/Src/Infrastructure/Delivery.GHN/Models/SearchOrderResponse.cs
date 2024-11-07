@@ -371,7 +371,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("finish_date")]
         [JsonPropertyName("finish_date")]
-        public DateTime FinishDate { get; set; }
+        public DateTime? FinishDate { get; set; }
 
         [JsonProperty("tag")]
         [JsonPropertyName("tag")]

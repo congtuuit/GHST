@@ -109,7 +109,7 @@ namespace GHSTShipping.Domain.DTOs
                     return "Đã hủy";
                 }
 
-                return Status;
+                return OrderStatus.GetStatusTranslation(Status);
             }
         }
 
@@ -137,7 +137,7 @@ namespace GHSTShipping.Domain.DTOs
                     return "red";
                 }
 
-                return Status;
+                return OrderStatus.GetStatusColor(Status);
             }
         }
 

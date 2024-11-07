@@ -18,6 +18,7 @@ interface DatatableProps<T> {
   handleDeleteRows?: (selectedRows: T[]) => void;
   mode?: 'single' | 'mutilple';
   headerBox?: ReactElement;
+  loading?: boolean;
 }
 
 const Datatable = <T extends object>({
@@ -30,6 +31,7 @@ const Datatable = <T extends object>({
   handleDeleteRows,
   mode = 'single',
   headerBox,
+  loading,
 }: DatatableProps<T>) => {
   const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
   const [selectedRows, setSelectedRows] = useState<T[]>([]);
@@ -66,6 +68,7 @@ const Datatable = <T extends object>({
 
       {mode === 'single' && (
         <Table
+          loading={loading}
           style={{ width: '100%' }}
           columns={columns}
           dataSource={dataSource?.data}
@@ -82,6 +85,7 @@ const Datatable = <T extends object>({
 
       {mode === 'mutilple' && (
         <Table
+          loading={loading}
           style={{ width: '100%' }}
           columns={columns}
           dataSource={dataSource?.data}
