@@ -2,14 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
 
-// Get the directory path and optional output file name from the command-line arguments
-const targetDirectory = process.argv[2];
-const outputFileName = `${getCurrentDateFormatted()}_${process.argv[3]}` || `${getCurrentDateFormatted()}_release.zip`;
-
-if (!targetDirectory) {
-  console.error('Please provide a target directory.');
-  process.exit(1);
-}
+// Get the directory path and options from the command-line arguments
+const args = process.argv.slice(2);
+const targetDirectory = args[0];
+let outputPath = null;
 
 // Helper function to format the current date as DDMMYYYY
 function getCurrentDateFormatted() {
@@ -20,10 +16,40 @@ function getCurrentDateFormatted() {
   return `${day}${month}${year}`;
 }
 
+// Helper function to parse command-line arguments
+function parseArgs() {
+  args.forEach((arg, index) => {
+    if (arg === '-o' && args[index + 1]) {
+      outputPath = args[index + 1];
+    }
+  });
+}
+
+// Run argument parsing
+parseArgs();
+
+if (!targetDirectory) {
+  console.error('Please provide a target directory.');
+  process.exit(1);
+}
+
+// Set the output file name and path
+const outputFileName = `${getCurrentDateFormatted()}_${path.basename(targetDirectory)}_release.zip`;
+outputPath = outputPath ? path.join(outputPath, outputFileName) : path.join(targetDirectory, outputFileName);
+
+// Function to ensure the output directory exists
+function ensureOutputDirectoryExists() {
+  const dir = path.dirname(outputPath);
+  if (!fs.existsSync(dir)) {
+    console.log(`Directory doesn't exist, creating: ${dir}`);
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
 // Function to compress the directory
 async function compressDirectory() {
-  // Create the output path in the same directory as the target folder
-  const outputPath = path.join(targetDirectory, outputFileName);
+  ensureOutputDirectoryExists(); // Make sure the output directory exists
+
   const output = fs.createWriteStream(outputPath);
   const archive = archiver('zip', { zlib: { level: 9 } }); // High compression level
 
