@@ -33,6 +33,14 @@ namespace GHSTShipping.Infrastructure.Persistence.Repositories
             dbContext.Entry(entity).State = EntityState.Modified;
         }
 
+        public void UpdateRange(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                dbContext.Entry(entity).State = EntityState.Modified;
+            }
+        }
+
         public void Delete(T entity)
         {
             dbContext.Set<T>().Attach(entity);

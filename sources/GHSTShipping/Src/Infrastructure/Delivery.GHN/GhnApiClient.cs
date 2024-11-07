@@ -582,7 +582,6 @@ namespace Delivery.GHN
 
         public async Task<SearchOrderResponse> SearchOrdersAsync(
             ApiConfig config,
-            string shopId,
             ShippingOrderSearchRequest request)
         {
             try
@@ -591,7 +590,7 @@ namespace Delivery.GHN
                 ConfigureHttpClient(config);
 
                 _httpClient.DefaultRequestHeaders.Add("referer", "https://khachhang.ghn.vn/");
-                _httpClient.DefaultRequestHeaders.Add("shopid", shopId);
+                _httpClient.DefaultRequestHeaders.Add("shopid", config.ShopId);
                 _httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
 
                 var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");

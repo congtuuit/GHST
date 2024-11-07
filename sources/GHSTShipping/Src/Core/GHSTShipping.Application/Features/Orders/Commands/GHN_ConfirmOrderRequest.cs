@@ -132,8 +132,9 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
                     await mediator.Send(new GHN_SyncOrderRequest
                     {
+                        ShopId = order.ShopId.Value,
                         PartnerOrderCode = order.private_order_code
-                    }, 
+                    },
                     cancellationToken);
 
                     return BaseResult.Ok();

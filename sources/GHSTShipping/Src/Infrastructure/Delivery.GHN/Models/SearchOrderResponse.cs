@@ -7,7 +7,7 @@ namespace Delivery.GHN.Models
     {
         [JsonProperty("data")]
         [JsonPropertyName("data")]
-        public List<OrderDataDto> Data { get; set; }
+        public List<GHN_SearchOrderDataDto> Data { get; set; }
 
         [JsonProperty("soc")]
         [JsonPropertyName("soc")]
@@ -23,7 +23,7 @@ namespace Delivery.GHN.Models
     {
     }
 
-    public class OrderDataDto
+    public class GHN_SearchOrderDataDto
     {
         [JsonProperty("ahamove_order_code")]
         [JsonPropertyName("ahamove_order_code")]
@@ -363,7 +363,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("data")]
         [JsonPropertyName("data")]
-        public OrderDataDto Data { get; set; }
+        public GHN_SearchOrderDataDto Data { get; set; }
 
         [JsonProperty("soc_id")]
         [JsonPropertyName("soc_id")]

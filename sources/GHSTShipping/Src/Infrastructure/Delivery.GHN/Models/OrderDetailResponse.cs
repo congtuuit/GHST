@@ -520,6 +520,10 @@ namespace Delivery.GHN.Models
         [JsonPropertyName("name")]
         public string? Name { get; set; }
 
+        [JsonProperty("code")]
+        [JsonPropertyName("code")]
+        public string? Code { get; set; }
+
         [JsonProperty("quantity")]
         [JsonPropertyName("quantity")]
         public int Quantity { get; set; }

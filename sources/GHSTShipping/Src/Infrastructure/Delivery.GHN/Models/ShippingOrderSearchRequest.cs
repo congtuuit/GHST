@@ -9,12 +9,12 @@ namespace Delivery.GHN.Models
 
         [JsonPropertyName("status")]
         public List<string> Status { get; set; } = new List<string>
-    {
-        "ready_to_pick", "picking", "money_collect_picking", "picked", "sorting", "storing",
-        "transporting", "delivering", "delivery_fail", "money_collect_delivering", "return",
-        "returning", "return_fail", "return_transporting", "return_sorting", "waiting_to_return",
-        "returned", "delivered", "cancel", "lost", "damage"
-    };
+        {
+            "ready_to_pick", "picking", "money_collect_picking", "picked", "sorting", "storing",
+            "transporting", "delivering", "delivery_fail", "money_collect_delivering", "return",
+            "returning", "return_fail", "return_transporting", "return_sorting", "waiting_to_return",
+            "returned", "delivered", "cancel", "lost", "damage"
+        };
 
         [JsonPropertyName("payment_type_id")]
         public List<int> PaymentTypeId { get; set; } = new List<int> { 1, 2, 11, 12 };
@@ -29,7 +29,7 @@ namespace Delivery.GHN.Models
         public int Offset { get; set; } = 0;
 
         [JsonPropertyName("limit")]
-        public int Limit { get; set; } = 100;
+        public int Limit { get; set; } = 20;
 
         [JsonPropertyName("option_value")]
         public string OptionValue { get; set; } = "";

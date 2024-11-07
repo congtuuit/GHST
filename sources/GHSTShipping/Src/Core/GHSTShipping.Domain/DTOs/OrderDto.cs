@@ -140,5 +140,7 @@ namespace GHSTShipping.Domain.DTOs
                 return Status;
             }
         }
+
+        public string PrivateOrderCode { get; set; }
     }
 }

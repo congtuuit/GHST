@@ -1,0 +1,7 @@
+.order-status-filter-containter .ant-radio-button-wrapper::before {
+    content: none;
+}
+
+.order-status-filter-containter .ant-radio-button-wrapper {
+    border-inline-start-width: 1px;
+}

@@ -77,3 +77,30 @@ export interface IOrderFilter {
     | 'da_huy'
     | 'that_lac_hong';
 }
+
+export interface IDeliveryStatus {
+  cancel: number;
+  damage: number;
+  delivered: number;
+  delivering: number;
+  delivery_fail: number;
+  draft: number;
+  draft_cancel: number;
+  exception: number;
+  lost: number;
+  money_collect_delivering: number;
+  money_collect_picking: number;
+  picked: number;
+  picking: number;
+  ready_to_pick: number;
+  return: number;
+  return_fail: number;
+  return_sorting: number;
+  return_transporting: number;
+  returned: number;
+  returning: number;
+  sorting: number;
+  storing: number;
+  transporting: number;
+  waiting_to_return: number;
+}

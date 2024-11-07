@@ -3,29 +3,21 @@ import type { IOrderDetail, IOrderDto, IOrderViewDto, ShopOrderViewDto } from '@
 import type { RadioChangeEvent, TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 import type { ColumnsType } from 'antd/lib/table';
-import { Button, Card, Col, message, Radio, Row, Select, Tag } from 'antd';
+import { Button, Card, Col, message, Radio, Row, Select, Tag, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import {
-  apiCancelOrderGhn,
-  apiConfirmOrderGhn,
-  apiCountOrderByStatus,
-  apiGetOrderDetail,
-  apiGetOrders,
-  apiGetShopDetail,
-  apiGetShopOrders,
-} from '@/api/business.api';
+import { apiCancelOrderGhn, apiConfirmOrderGhn, apiCountOrderByStatus, apiGetOrderDetail, apiGetOrders, apiGetShopDetail } from '@/api/business.api';
 import Datatable from '@/components/core/datatable';
-import { suppliers } from '@/constants/data';
+import { supplierKeys, suppliers } from '@/constants/data';
 import { formatUtcToLocalTime } from '@/utils/common';
-import { orderStatuses } from '../orderStatus';
 import OrderDetailDialog from './ghn/order-detail';
 import GoBackButton from '@/components/core/GoBackButton';
 import OrderStatus from './OrderStatus';
 import { revertDateFormatMap } from '@/components/core/table-column/type';
 import AdminOrderFilterWrapper from './AdminOrderFilterWrapper';
 import { useParams } from 'react-router-dom';
-import ghnOrderFilter from '@/features/order/ghnOrderFilter';
+import ghnOrderFilter, { FilterStatusOption } from '@/features/order/ghnOrderFilter';
+import './ShopOrder.css';
 
 const { Option } = Select;
 
@@ -33,19 +25,22 @@ interface ShopOrdersProps {
   shopId: string | undefined;
 }
 
-const orderStatusSection = new ghnOrderFilter().filterStatus;
+const _ghnOrderFilter = new ghnOrderFilter();
+const orderStatusSection = _ghnOrderFilter.filterStatus;
 
 const ShopOrders = (props: ShopOrdersProps) => {
   const { shopId } = useParams(); // Destructure shopId from useParams
   const { orderFilter } = useSelector(state => state.order);
 
+  const [groupStatusFilterOptions, setGroupStatusFilterOptions] = useState<FilterStatusOption[]>(orderStatusSection);
   const [orderPagination, setOrderPagination] = useState<IPaginationResponse<IOrderDto> | null>(null);
   const [orderDetail, setOrderDetail] = useState<IOrderDetail | undefined>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
-  const [orderStatusFilter, setOrderStatusFilter] = useState<string>(orderStatusSection[0].name);
-  const [supplierSelected, setSupplierSelected] = useState<string>();
+  const [orderStatusFilter, setOrderStatusFilter] = useState<number>(orderStatusSection[0].value);
+  const [supplierSelected, setSupplierSelected] = useState<string>(supplierKeys.GHN);
   const [shopDetail, setShopDetail] = useState<any>(null);
+  const pageSize = 5;
 
   const fetchShopDetail = async () => {
     const response = await apiGetShopDetail(shopId as string);
@@ -61,11 +56,9 @@ const ShopOrders = (props: ShopOrdersProps) => {
         orderCode: '',
         status: orderStatusFilter ?? '',
         pageNumber: tablePaginationConfig?.current ?? 1,
-        pageSize: tablePaginationConfig?.pageSize ?? 8,
+        pageSize: tablePaginationConfig?.pageSize ?? pageSize,
       };
     }
-
-    console.log('params ', params);
 
     const response = await apiGetOrders(params);
     if (response.success) {
@@ -108,8 +101,15 @@ const ShopOrders = (props: ShopOrdersProps) => {
   const fetchCountOrderByStatus = async (shopId: string) => {
     const response = await apiCountOrderByStatus(shopId);
     if (response.success) {
-      const data = JSON.parse(response.data);
-      console.log('response ', data);
+      const ghnResponse = JSON.parse(response.data);
+
+      if (ghnResponse.code === 200) {
+        const ghnResponseData = ghnResponse.data;
+        const __groupStatusFilterOptions = _ghnOrderFilter.reCalculateFilterStatusTotals(ghnResponseData);
+        console.log('data ', ghnResponseData);
+        console.log('__groupStatusFilterOptions ', __groupStatusFilterOptions);
+        setGroupStatusFilterOptions(__groupStatusFilterOptions);
+      }
     }
   };
 
@@ -118,7 +118,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
       shopId: shopId,
       deliveryPartner: supplierSelected ?? '',
       pageNumber: 1,
-      pageSize: 6,
+      pageSize: pageSize,
       status: orderStatusFilter,
     } as IOrderPagedParameter);
 
@@ -126,8 +126,10 @@ const ShopOrders = (props: ShopOrdersProps) => {
   }, [shopId, supplierSelected, orderStatusFilter]);
 
   useEffect(() => {
-    fetchCountOrderByStatus(shopId as string);
-  }, [shopId]);
+    if (supplierSelected === supplierKeys.GHN) {
+      fetchCountOrderByStatus(shopId as string);
+    }
+  }, [shopId, orderStatusFilter, supplierSelected]);
 
   const columns: ColumnsType<IOrderViewDto> = [
     {
@@ -286,9 +288,6 @@ const ShopOrders = (props: ShopOrdersProps) => {
         <Row>
           <Col span={6} style={{ display: 'flex' }}>
             <Select value={supplierSelected} onChange={setSupplierSelected} style={{ width: '100%' }} placeholder="Chọn đơn vị vận chuyển">
-              <Option key={'all'} value={''}>
-                Tất cả
-              </Option>
               {suppliers.map(i => (
                 <Option key={i} value={i}>
                   {i}
@@ -297,12 +296,21 @@ const ShopOrders = (props: ShopOrdersProps) => {
             </Select>
           </Col>
           <Col span={24} style={{ marginTop: '10px' }}>
-            {orderStatusSection && (
-              <Radio.Group onChange={(e: RadioChangeEvent) => setOrderStatusFilter(e.target.value)} value={orderStatusFilter}>
-                {orderStatusSection?.map((i, key) => {
+            {groupStatusFilterOptions.length > 0 && (
+              <Radio.Group
+                className="order-status-filter-containter"
+                style={{ display: 'flex', overflow: 'scroll', overflowY: 'hidden', overflowX: 'auto', width: '100%', whiteSpace: 'nowrap' }}
+                onChange={(e: RadioChangeEvent) => setOrderStatusFilter(e.target.value)}
+                value={orderStatusFilter}
+                optionType="button"
+              >
+                {groupStatusFilterOptions?.map((i, key) => {
                   return (
-                    <Radio.Button key={key} value={i.name}>
-                      {i.name} {i.total > 0 && `(${i.total})`}
+                    <Radio.Button key={key} value={i.value} style={{ width: 'fit-content', margin: '5px', borderRadius: '10px', fontSize: '16px' }}>
+                      {i.name}{' '}
+                      <Typography.Text strong type="danger">
+                        {i.total > 0 && `(${i.total})`}
+                      </Typography.Text>
                     </Radio.Button>
                   );
                 })}
@@ -310,13 +318,15 @@ const ShopOrders = (props: ShopOrdersProps) => {
             )}
           </Col>
 
-          {/* Order list table */}
-          <Datatable
-            columns={columns}
-            dataSource={orderPagination}
-            onChange={handleChangeTable}
-            headerBox={<AdminOrderFilterWrapper style={{ marginTop: '10px', marginBottom: '10px' }} styleContent={{ width: '200px' }} />}
-          />
+          <Col span={24}>
+            {/* Order list table */}
+            <Datatable
+              columns={columns}
+              dataSource={orderPagination}
+              onChange={handleChangeTable}
+              headerBox={<AdminOrderFilterWrapper style={{ marginTop: '10px', marginBottom: '10px' }} styleContent={{ width: '200px' }} />}
+            />
+          </Col>
 
           <OrderDetailDialog data={orderDetail} showSenderAddress={true} />
         </Row>

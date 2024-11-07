@@ -1,5 +1,6 @@
 using Delivery.GHN;
 using Delivery.GHN.Models;
+using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,7 @@ namespace GHSTShipping.WebApi.Controllers.v1
             foreach (var dictrict in response)
             {
                 var province = provinces.FirstOrDefault(i => i.ProvinceId == dictrict.ProvinceID);
-                if(province == null) continue;
+                if (province == null) continue;
 
                 dictrict.ProvinceName = province.ProvinceName;
             }
@@ -51,6 +52,26 @@ namespace GHSTShipping.WebApi.Controllers.v1
         {
             var response = await _ghnApiClient.GetWardAsync(apiConfig, districtId);
             return BaseResult<IEnumerable<WardResponse>>.Ok(response);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> SyncAddress()
+        {
+            var provinces = await _ghnApiClient.GetProvinceAsync(apiConfig);
+            var dictricts = await _ghnApiClient.GetDistrictAsync(apiConfig);
+            var response = dictricts.ToList();
+            foreach (var dictrict in response)
+            {
+                var province = provinces.FirstOrDefault(i => i.ProvinceId == dictrict.ProvinceID);
+                if (province == null) continue;
+
+                dictrict.ProvinceName = province.ProvinceName;
+            }
+
+            await JsonFileHelper.SaveDeliveryAddress<DistrictResponse>(response);
+
+            return Ok();
         }
     }
 }

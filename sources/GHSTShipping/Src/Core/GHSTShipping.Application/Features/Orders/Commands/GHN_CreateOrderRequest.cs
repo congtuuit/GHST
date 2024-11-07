@@ -218,7 +218,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 FromName = request.FromName,
                 FromPhone = request.FromPhone,
                 FromAddress = request.FromAddress,
-                FromWardId = request.FromWardId,
+                FromWardId = $"{request.FromWardId}",
                 FromWardName = request.FromWardName,
                 FromDistrictId = request.FromDistrictId,
                 FromDistrictName = request.FromDistrictName,
@@ -228,7 +228,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 ToName = request.ToName,
                 ToPhone = request.ToPhone,
                 ToAddress = request.ToAddress,
-                ToWardId = request.ToWardId,
+                ToWardId = $"{request.ToWardId}",
                 ToWardName = request.ToWardName,
                 ToDistrictId = request.ToDistrictId,
                 ToDistrictName = request.ToDistrictName,
@@ -292,6 +292,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
             await _mediator.Send(new GHN_SyncOrderRequest
             {
+                ShopId = entity.ShopId.Value,
                 PartnerOrderCode = entity.private_order_code
             });
         }

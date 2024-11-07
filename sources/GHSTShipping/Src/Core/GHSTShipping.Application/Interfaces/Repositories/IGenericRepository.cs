@@ -13,6 +13,7 @@ namespace GHSTShipping.Application.Interfaces.Repositories
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
         void Update(T entity);
+        void UpdateRange(IEnumerable<T> entities);
         void Delete(T entity);
         void HardDelete(T entity);
         void HardDeleteRange(IEnumerable<T> entities);

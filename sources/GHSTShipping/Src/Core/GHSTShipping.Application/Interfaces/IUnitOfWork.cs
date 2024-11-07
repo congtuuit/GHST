@@ -1,7 +1,5 @@
 using GHSTShipping.Application.Interfaces.Repositories;
-using GHSTShipping.Domain.DTOs;
 using GHSTShipping.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq;
 using System.Threading;
@@ -23,5 +21,6 @@ namespace GHSTShipping.Application.Interfaces
         IGenericRepository<ShopPricePlan> ShopPricePlanes { get; }
         IGenericRepository<ShopOrderCodeSequence> ShopOrderCodeSequences { get; }
         IGenericRepository<Order> Orders { get; }
+        IGenericRepository<OrderItem> OrderItems { get; }
     }
 }

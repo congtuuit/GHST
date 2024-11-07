@@ -105,7 +105,6 @@ namespace Delivery.GHN
 
         Task<SearchOrderResponse> SearchOrdersAsync(
             ApiConfig config,
-            string shopId,
             ShippingOrderSearchRequest request);
 
         Task<string> CountOrderByStatusAsync(ApiConfig config);

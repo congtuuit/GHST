@@ -43,8 +43,6 @@ const Datatable = <T extends object>({
     setSelectedRows([]);
   }, [dataSource]);
 
-  console.log('headerBox ', headerBox);
-
   return (
     <div style={{ width: '100%' }}>
       {showSearch || headerBox ? (

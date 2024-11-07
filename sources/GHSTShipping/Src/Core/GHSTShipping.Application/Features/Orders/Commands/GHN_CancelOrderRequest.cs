@@ -86,6 +86,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                         {
                             await mediator.Send(new GHN_SyncOrderRequest
                             {
+                                ShopId = shopId.Value,
                                 PartnerOrderCode = orderCode
                             },
                             cancellationToken);

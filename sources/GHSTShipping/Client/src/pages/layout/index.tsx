@@ -138,7 +138,7 @@ const LayoutPage: FC = () => {
             />
           </Drawer>
         )}
-        <Content className="layout-page-content">
+        <Content className="layout-page-content" style={{ overflow: 'auto' }}>
           {/* HIDE TAGS OF TAB VIEW HISTORY */}
           {/* <TagsView /> */}
 

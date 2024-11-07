@@ -27,6 +27,21 @@ const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data, showSenderAddress
     setOrderDetail(undefined);
   };
 
+  const displayAddress = (address?: string, wardName?: string, disctrictName?: string, provinceName?: string) => {
+    let fullAddress = address ?? "";
+    if(Boolean(wardName)) {
+      fullAddress += ", " + wardName;
+    }
+    if(Boolean(disctrictName)) {
+      fullAddress += ", " + disctrictName;
+    }
+    if(Boolean(provinceName)) {
+      fullAddress += ", " + provinceName;
+    }
+
+    return fullAddress;
+  };
+
   useEffect(() => {
     if (Boolean(data)) {
       setOrderDetail(data);
@@ -72,7 +87,7 @@ const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data, showSenderAddress
               <Text strong>Số điện thoại: </Text> <Text>{data?.fromPhone}</Text>
               <br />
               <Text strong>Địa chỉ: </Text>
-              <Text>{`${data?.fromAddress}, ${data?.fromWardName}, ${data?.fromDistrictName}, ${data?.fromProvinceName}`}</Text>
+              <Text>{`${displayAddress(data?.fromAddress, data?.fromWardName, data?.fromDistrictName, data?.fromProvinceName)}`}</Text>
             </Col>
           )}
 
@@ -84,7 +99,7 @@ const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data, showSenderAddress
             <Text strong>Số điện thoại: </Text> <Text>{data?.toPhone}</Text>
             <br />
             <Text strong>Địa chỉ: </Text>
-            <Text>{`${data?.toAddress}, ${data?.toWardName}, ${data?.toDistrictName}, ${data?.toProvinceName}`}</Text>
+            <Text>{`${displayAddress(data?.toAddress, data?.toWardName, data?.toDistrictName, data?.toProvinceName)}`}</Text>
           </Col>
 
           {/* Thông tin Vận chuyển và Thanh toán */}

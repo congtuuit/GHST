@@ -18,7 +18,7 @@ namespace GHSTShipping.Domain.Entities
         /// <summary>
         /// System customer shop id
         /// </summary>
-        public Guid? ShopId { get; set; }
+        public Guid? ShopId { get; set; } // NEED TO MAPPING
         public virtual Shop Shop { get; set; }
 
         [MaxLength(200)]
@@ -31,19 +31,24 @@ namespace GHSTShipping.Domain.Entities
         /// <summary>
         /// Delivery fee with price rules
         /// </summary>
-        public int DeliveryFee { get; set; }
+        public int DeliveryFee { get; set; } // NEED TO MAPPING
 
         /// <summary>
         /// Delivery fee has been orverried and just display on Admin
         /// </summary>
-        public int CustomDeliveryFee { get; private set; }
+        public int CustomDeliveryFee { get; private set; } // NEED TO MAPPING
 
-        public DateTime? PublishDate { get; set; }
+        public DateTime? PublishDate { get; set; } // NEED TO MAPPING
+
+        public DateTime? LastSyncDate { get; set; }
         #endregion
 
         #region GHN
         [MaxLength(500)]
         public string? Note { get; set; }
+
+        [MaxLength(100)]
+        public string? ReturnName { get; set; }
 
         [MaxLength(100)]
         public string? ReturnPhone { get; set; }
@@ -83,7 +88,8 @@ namespace GHSTShipping.Domain.Entities
         [MaxLength(100)]
         public string FromWardName { get; set; } = null!;
 
-        public int? FromWardId { get; set; }
+        [MaxLength(100)]
+        public string FromWardId { get; set; }
 
         [MaxLength(100)]
         public string FromDistrictName { get; set; } = null!;
@@ -107,7 +113,8 @@ namespace GHSTShipping.Domain.Entities
         [MaxLength(100)]
         public string ToWardName { get; set; } = null!;
 
-        public int? ToWardId { get; set; }
+        [MaxLength(100)]
+        public string ToWardId { get; set; }
 
         [MaxLength(100)]
         public string ToDistrictName { get; set; } = null!;
@@ -123,6 +130,11 @@ namespace GHSTShipping.Domain.Entities
         public int Length { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+
+        [Obsolete]
+        public long ConvertedWeight { get; set; }
+        [Obsolete]
+        public long CalculateWeight { get; set; }
         public List<OrderItem> Items { get; set; } = new List<OrderItem>();
 
         public int CodAmount { get; set; }
@@ -192,6 +204,8 @@ namespace GHSTShipping.Domain.Entities
         public void OrrverideDeliveryFee(int fee)
         {
             this.CustomDeliveryFee = fee;
+            this.ConvertedWeight = this.Length * this.Width * this.Height;
+            this.CalculateWeight = this.ConvertedWeight;
         }
 
         public void PrivateUpdateFromPartner(
