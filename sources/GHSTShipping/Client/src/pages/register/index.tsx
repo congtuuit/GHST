@@ -1,6 +1,6 @@
 import type { RuleObject } from 'antd/lib/form';
 import type { StoreValue } from 'antd/lib/form/interface';
-import { Button, Card, Col, Form, Input, message, Row, Typography } from 'antd';
+import { Button, Card, Col, Form, Input, message, Row, Select, Typography } from 'antd';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiRegisterShop } from '@/api/auth.api';
@@ -11,7 +11,7 @@ export interface IRegisterFormValues {
   email: string;
   phoneNumber: string;
   shopName: string;
-  avgMonthlyYield: number;
+  avgMonthlyYield: string;
   password: string;
   confirmPassword: string;
   bankName: string;
@@ -99,14 +99,20 @@ const RegisterPage: React.FC = () => {
             </Form.Item>
 
             <Form.Item
-              label="Doanh thu trung bình hàng tháng"
+              label="Qui mô vận chuyển"
               name="avgMonthlyYield"
               rules={[
-                { required: true, message: 'Vui lòng nhập doanh thu trung bình hàng tháng' },
-                { type: 'number', message: 'Doanh thu phải là số', transform: value => Number(value) },
+                { required: true, message: 'Vui lòng chọn qui mô vận chuyển' },
               ]}
             >
-              <Input placeholder="Nhập doanh thu trung bình" type="number" />
+              <Select defaultValue="Không có nhu cầu thường xuyên" options={[
+                { value: 'Không có nhu cầu thường xuyên', label: 'Không có nhu cầu thường xuyên' },
+                { value: 'Dưới 150 ĐH/tháng', label: 'Dưới 150 ĐH/tháng' },
+                { value: 'Từ 150 - dưới 900 ĐH/tháng', label: 'Từ 150 - dưới 900 ĐH/tháng' },
+                { value: 'Từ 900 - dưới 3.000 ĐH/tháng', label: 'Từ 900 - dưới 3.000 ĐH/tháng' },
+                { value: 'Từ 3.000 - dưới 6.000 ĐH/tháng', label: 'Từ 3.000 - dưới 6.000 ĐH/tháng' },
+                { value: 'Từ 6.000 ĐH/tháng trở lên', label: 'Từ 6.000 ĐH/tháng trở lên' },
+              ]} />
             </Form.Item>
 
             <Form.Item label="Tên ngân hàng" name="bankName" rules={[{ required: true, message: 'Vui lòng nhập tên ngân hàng' }]}>
@@ -133,7 +139,7 @@ const RegisterPage: React.FC = () => {
 
         {/* Nút Đăng ký */}
         <Form.Item>
-          <Button type="primary" htmlType="submit" block style={{minHeight: "25px"}}>
+          <Button type="primary" htmlType="submit" block style={{ minHeight: '25px' }}>
             Đăng ký
           </Button>
         </Form.Item>

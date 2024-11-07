@@ -37,6 +37,11 @@ namespace GHSTShipping.Application.Services
                 })
                 .FirstOrDefaultAsync();
 
+            if (partnerConfig == null)
+            {
+                return null;
+            }
+
             var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey, partnerConfig.PartnerShopId);
 
             return apiConfig;

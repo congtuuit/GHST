@@ -15,7 +15,7 @@ namespace GHSTShipping.Application.Features.Users.Commands
     {
         public string ShopName { get; set; }
 
-        public decimal AvgMonthlyYield { get; set; }
+        public string AvgMonthlyYield { get; set; }
 
         public string BankName { get; set; }
 

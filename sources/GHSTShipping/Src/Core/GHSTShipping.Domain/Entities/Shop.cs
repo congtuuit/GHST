@@ -16,7 +16,7 @@ namespace GHSTShipping.Domain.Entities
         [MaxLength(200)]
         public string Name { get; set; }
 
-        public decimal AvgMonthlyYield { get; set; }
+        public string AvgMonthlyYield { get; set; }
 
         [MaxLength(200)]
         public string PhoneNumber { get; set; }
@@ -67,7 +67,7 @@ namespace GHSTShipping.Domain.Entities
         {
         }
 
-        public Shop(Guid accountId, string name, string phoneNumber, decimal avgMonthlyYield, DateTime registerDate)
+        public Shop(Guid accountId, string name, string phoneNumber, string avgMonthlyYield, DateTime registerDate)
         {
             this.AccountId = accountId;
             this.Name = name;

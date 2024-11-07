@@ -1,9 +1,7 @@
-﻿using Delivery.GHN.Models;
-using GHSTShipping.Application.DTOs.Shop;
+﻿using GHSTShipping.Application.DTOs.Shop;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Interfaces.UserInterfaces;
-using GHSTShipping.Application.Services;
 using GHSTShipping.Application.Wrappers;
 using GHSTShipping.Domain.DTOs;
 using GHSTShipping.Domain.Enums;
@@ -97,12 +95,13 @@ namespace GHSTShipping.Application.Features.Shops.Queries
 
                 // Get current GHN shop Id has been connected
                 var ghnConfig = await _partnerConfigService.GetApiConfigAsync(EnumDeliveryPartner.GHN, shop.Id);
-                shop.CurrentGhnShopId = ghnConfig.ShopId;
+                if (ghnConfig != null)
+                {
+                    shop.CurrentGhnShopId = ghnConfig.ShopId;
+                }
             }
 
             return BaseResult<ShopViewDetailDto>.Ok(shop);
         }
-
-
     }
 }
