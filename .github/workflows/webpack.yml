@@ -1,29 +1,32 @@
-name: NodeJS with Webpack
+name: Build and Deploy to Plesk via FTP
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x]
-
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
 
-    - name: Build
-      run: |
-        cd "./sources/GHSTShipping/Client"
-        yarn
-        yarn build-dev
+      - name: Install and Build
+        run: |
+          cd "./sources/GHSTShipping/Client"
+          yarn install
+          yarn build
+
+      - name: Upload build artifacts via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        with:
+          ftp-server: ${{ secrets.FTP_SERVER }}
+          ftp-username: ${{ secrets.FTP_USERNAME }}
+          ftp-password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: "./sources/GHSTShipping/Client/dist"
+          server-dir: "/httpdocs/deploy_demo"
