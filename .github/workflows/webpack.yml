@@ -18,15 +18,4 @@ jobs:
 
       - name: Install and Build
         run: |
-          cd "./sources/GHSTShipping/Client"
-          yarn install
-          yarn build
-
-      - name: Upload build artifacts via FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.3.0
-        with:
-          ftp-server: ${{ secrets.FTP_SERVER }}
-          ftp-username: ${{ secrets.FTP_USERNAME }}
-          ftp-password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: "./sources/GHSTShipping/Client/dist"
-          server-dir: "/"
+          echo ${{ secrets.FTP_SERVER }}
