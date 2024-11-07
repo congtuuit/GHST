@@ -1,6 +1,6 @@
 import { Button, DatePicker, Popover, Space } from 'antd';
 import React, { useState, CSSProperties, useEffect } from 'react';
-import OrderFilter from './ghn/OrderFilter';
+import OrderFilter, { OrderFilterState } from './ghn/OrderFilter';
 import { DownOutlined } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
 import { setOrderFilter } from '@/features/order/orderSlice';
@@ -30,6 +30,14 @@ const AdminOrderFilterWrapper: React.FC<AdminOrderFilterWrapperProps> = (props: 
     setToDate(date);
   };
 
+  const onFilterChange = (filter: OrderFilterState) => {
+    dispatch(
+      setOrderFilter({
+        ...filter,
+      }),
+    );
+  };
+
   useEffect(() => {
     dispatch(
       setOrderFilter({
@@ -37,11 +45,16 @@ const AdminOrderFilterWrapper: React.FC<AdminOrderFilterWrapperProps> = (props: 
         toDate: toDate,
       }),
     );
-  }, []);
+  }, [fromDate, toDate]);
 
   return (
     <Space direction="horizontal" style={style}>
-      <Popover content={<OrderFilter style={styleContent} />} trigger="click" open={open} onOpenChange={handleOpenChange}>
+      <Popover
+        content={<OrderFilter onFilterChange={onFilterChange} style={styleContent} />}
+        trigger="click"
+        open={open}
+        onOpenChange={handleOpenChange}
+      >
         <Button type="text" onClick={() => setOpen(!open)}>
           Lọc hiển thị <DownOutlined />
         </Button>

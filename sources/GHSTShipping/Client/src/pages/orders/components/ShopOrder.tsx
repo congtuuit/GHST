@@ -54,7 +54,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
       params = {
         deliveryPartner: supplierSelected ?? '',
         orderCode: '',
-        status: orderStatusFilter ?? '',
+        groupStatus: orderStatusFilter ?? '',
         pageNumber: tablePaginationConfig?.current ?? 1,
         pageSize: tablePaginationConfig?.pageSize ?? pageSize,
       };
@@ -116,14 +116,25 @@ const ShopOrders = (props: ShopOrdersProps) => {
   useEffect(() => {
     fetchOrders({
       shopId: shopId,
+      status: orderFilter?.status ?? '',
       deliveryPartner: supplierSelected ?? '',
       pageNumber: 1,
       pageSize: pageSize,
-      status: orderStatusFilter,
+
+      groupStatus: orderStatusFilter,
+      fromDate: orderFilter?.fromDate ?? null,
+      toDate: orderFilter?.toDate ?? null,
+      paymentTypeId: orderFilter?.paymentTypeId ?? '',
+      isPrint: orderFilter?.isPrint ?? '',
+      isCodFailedCollected: orderFilter?.isCodFailedCollected ?? '',
+      isDocumentPod: orderFilter?.isDocumentPod ?? '',
     } as IOrderPagedParameter);
 
+  }, [shopId, supplierSelected, orderStatusFilter, orderFilter]);
+
+  useEffect(() => {
     fetchShopDetail();
-  }, [shopId, supplierSelected, orderStatusFilter]);
+  }, [shopId]);
 
   useEffect(() => {
     if (supplierSelected === supplierKeys.GHN) {

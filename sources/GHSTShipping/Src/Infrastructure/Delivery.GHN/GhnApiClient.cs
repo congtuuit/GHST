@@ -593,7 +593,8 @@ namespace Delivery.GHN
                 _httpClient.DefaultRequestHeaders.Add("shopid", config.ShopId);
                 _httpClient.DefaultRequestHeaders.Add("x-request-id", Guid.NewGuid().ToString());
 
-                var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+                var query = JsonConvert.SerializeObject(request);
+                var content = new StringContent(query, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.SEARCH, content);
 
                 // Read the response content

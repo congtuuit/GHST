@@ -27,6 +27,15 @@ export interface IOrderPagedParameter extends IPaginationRequestParameter {
   deliveryPartner?: string | undefined;
   orderCode?: string | undefined;
   status?: string | number| undefined;
+  shopId?: string;
+
+  groupStatus?: number | undefined;
+  fromDate?: Date | null;
+  toDate?: Date | null;
+  paymentTypeId?: number;
+  isPrint?: boolean;
+  isCodFailedCollected?: boolean;
+  isDocumentPod?: boolean;
 }
 
 export interface ShopPricePlanDto {

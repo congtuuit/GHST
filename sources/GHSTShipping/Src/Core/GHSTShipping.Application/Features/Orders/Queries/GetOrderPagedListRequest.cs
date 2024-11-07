@@ -5,6 +5,7 @@ using Delivery.GHN.Constants;
 using GHSTShipping.Application.DTOs;
 using GHSTShipping.Application.Extensions;
 using GHSTShipping.Application.Features.Orders.Commands;
+using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Parameters;
@@ -32,7 +33,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         public bool? IsPrint { get; set; }
         public bool? IsCodFailedCollected { get; set; }
         public bool? IsDocumentPod { get; set; }
-        public OrderGroupStatus Status { get; set; }
+        public OrderGroupStatus GroupStatus { get; set; }
+        public string Status { get; set; }
 
         /// <summary>
         /// The partner order code like codeA,codeB,...
@@ -101,7 +103,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             }
 
             // Filter by status
-            if (request.Status == OrderGroupStatus.Nhap)
+            if (request.GroupStatus == OrderGroupStatus.Nhap)
             {
                 query = query.Where(o => o.IsPublished == false || o.CurrentStatus == OrderStatus.WAITING_CONFIRM);
                 query = query.OrderByDescending(i => i.Created);
@@ -124,7 +126,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 if (request.DeliveryPartner == EnumDeliveryPartner.GHN.GetCode())
                 {
                     var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, shopId);
-                    var searchStatus = request.Status.GetDetails();
+                    var searchStatus = request.GroupStatus.GetDetails();
                     var searchParams = new Delivery.GHN.Models.ShippingOrderSearchRequest
                     {
                         Status = searchStatus,
@@ -156,6 +158,14 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     if (!string.IsNullOrWhiteSpace(request.OrderCode))
                     {
                         searchParams.OptionValue = request.OrderCode;
+                    }
+                    if (request.FromDate.HasValue)
+                    {
+                        searchParams.FromTime = DateTimeHelper.ConvertToUnixTimestamp( request.FromDate.Value);
+                    }
+                    if (request.ToDate.HasValue)
+                    {
+                        searchParams.ToTime = DateTimeHelper.ConvertToUnixTimestamp(request.ToDate.Value);
                     }
 
                     var ghnOrdersResponse = await ghnApiClient.SearchOrdersAsync(apiConfig, searchParams);

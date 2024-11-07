@@ -7,11 +7,12 @@ interface OrderFilterProps {
   onFilterChange?: (filters: OrderFilterState) => void;
 }
 
-interface OrderFilterState {
-  status: string;
-  startDate: string;
-  endDate: string;
-  customerName: string;
+export interface OrderFilterState {
+  status?: string;
+  paymentTypeId?: number | null;
+  isPrint?: boolean | null;
+  isCodFailedCollected?: boolean;
+  isDocumentPod?: boolean;
 }
 
 const OrderStatusOptions = [
@@ -33,7 +34,6 @@ const ReturnFailedOptions = [
   { value: true, label: 'Có thu được tiền' },
   { value: false, label: 'Không thu được tiền' },
 ];
-
 const ReturnDocsOptions = [
   { value: '', label: 'Tất cả' },
   { value: true, label: 'Đã thu hồi được chứng từ' },
@@ -46,18 +46,10 @@ const ServiceTypeOptions = [
 ];
 
 const OrderFilter: React.FC<OrderFilterProps> = ({ style, onFilterChange }) => {
-  const [filters, setFilters] = useState<OrderFilterState>({
-    status: '',
-    startDate: '',
-    endDate: '',
-    customerName: '',
-  });
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    const updatedFilters = { ...filters, [name]: value };
-    setFilters(updatedFilters);
-    onFilterChange && onFilterChange(updatedFilters);
+  const [form] = Form.useForm();
+  const handleOnChangeForm = () => {
+    const formValues: OrderFilterState = form.getFieldsValue();
+    onFilterChange && onFilterChange(formValues);
   };
 
   const formItemStyle = {
@@ -66,24 +58,24 @@ const OrderFilter: React.FC<OrderFilterProps> = ({ style, onFilterChange }) => {
   };
 
   return (
-    <Form className="order-filter" layout="vertical" style={style}>
-      <Form.Item name="orderStatus" label="Trạng thái" {...formItemStyle}>
+    <Form form={form} className="order-filter" layout="vertical" style={style} onFieldsChange={() => handleOnChangeForm()}>
+      <Form.Item name="status" label="Trạng thái" {...formItemStyle}>
         <Select defaultValue="" options={OrderStatusOptions} />
       </Form.Item>
 
-      <Form.Item name="orderPaymentType" label="Tùy chọn thanh toán" {...formItemStyle}>
+      <Form.Item name="paymentTypeId" label="Tùy chọn thanh toán" {...formItemStyle}>
         <Select defaultValue="" options={PaymentTypeOptions} />
       </Form.Item>
 
-      <Form.Item name="isDeliveryReceiptPrint" label="In đơn vận" {...formItemStyle}>
+      <Form.Item name="isPrint" label="In đơn vận" {...formItemStyle}>
         <Select defaultValue="" options={OrderPrintedOptions} />
       </Form.Item>
 
-      <Form.Item name="isGotReturnAmount" label="Giao thất bại - thu tiền" {...formItemStyle}>
+      <Form.Item name="isCodFailedCollected" label="Giao thất bại - thu tiền" {...formItemStyle}>
         <Select defaultValue="" options={ReturnFailedOptions} />
       </Form.Item>
 
-      <Form.Item name="isRetrieveDocuments" label="Thu hồi chứng từ" {...formItemStyle}>
+      <Form.Item name="isDocumentPod" label="Thu hồi chứng từ" {...formItemStyle}>
         <Select defaultValue="" options={ReturnDocsOptions} />
       </Form.Item>
 

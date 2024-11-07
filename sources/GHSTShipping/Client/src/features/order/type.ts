@@ -1,3 +1,4 @@
+import { OrderFilterState } from '@/pages/orders/components/ghn/OrderFilter';
 import { Dayjs } from 'dayjs';
 
 export interface IOrderItem {
@@ -58,15 +59,9 @@ export interface IOrder {
   items: IOrderItem[]; // Danh sách sản phẩm | Bắt buộc
 }
 
-export interface IOrderFilter {
-  fromDate: Dayjs | null;
-  toDate: Dayjs | null;
-  orderStatus?: string;
-  orderPaymentType?: number;
-  isDeliveryReceiptPrint?: boolean;
-  isGotReturnAmount?: boolean;
-  isRetrieveDocuments?: boolean;
-  serviceTypeId?: number;
+export interface IOrderFilter extends OrderFilterState {
+  fromDate?: Dayjs | null;
+  toDate?: Dayjs | null;
   groupStatus?:
     | 'nhap'
     | 'cho_ban_giao'
