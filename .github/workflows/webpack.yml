@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    environment: FTP_SERVER 
     runs-on: ubuntu-latest
 
     steps:
