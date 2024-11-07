@@ -29,4 +29,4 @@ jobs:
           ftp-username: ${{ secrets.FTP_USERNAME }}
           ftp-password: ${{ secrets.FTP_PASSWORD }}
           local-dir: "./sources/GHSTShipping/Client/dist"
-          server-dir: "/httpdocs/deploy_demo"
+          server-dir: "/"
