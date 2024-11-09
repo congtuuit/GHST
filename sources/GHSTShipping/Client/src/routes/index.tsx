@@ -16,6 +16,8 @@ import OrdersPage from '@/pages/orders';
 import CreateOrderPage from '@/pages/orders/CreateOrderPage';
 import RegisterPage from '@/pages/register';
 import ResetPasswordPage from '@/pages/reset-password';
+import LogViewerPage from '@/pages/system/LogViewer';
+
 
 import WrapperRouteComponent from './config';
 import AdminViewShopOrders from '@/pages/orders/AdminViewShopOrders';
@@ -56,6 +58,10 @@ const routeList: RouteObject[] = [
   {
     path: '/reset-password',
     element: <WrapperRouteComponent element={<ResetPasswordPage />} titleId="title.resetPassword" auth={false} />,
+  },
+  {
+    path: '/system/logs',
+    element: <WrapperRouteComponent element={<LogViewerPage />} titleId="title.resetPassword" auth={true} />,
   },
   {
     path: '/',
