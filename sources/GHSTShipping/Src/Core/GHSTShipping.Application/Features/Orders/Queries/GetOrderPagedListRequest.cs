@@ -63,10 +63,10 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         {
             var userId = authenticatedUser.UId;
             var isAdmin = authenticatedUser.Type == AccountTypeConstants.ADMIN;
-            var shopId = request.ShopId.Value;
             int skipCount = (request.PageNumber - 1) * request.PageSize;
-
             var query = unitOfWork.Orders.All();
+
+            var shopId = Guid.Empty;
             if (!isAdmin)
             {
                 var shop = await shopRepository.Where(i => i.AccountId == userId)
@@ -82,10 +82,16 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 {
                     return BaseResult<PaginationResponseDto<OrderDto>>.Ok(new PaginationResponseDto<OrderDto>(new System.Collections.Generic.List<OrderDto>(), 0, request.PageNumber, request.PageSize));
                 }
+
+                shopId = shop.ShopId;
+            }
+            else
+            {
+                shopId = request.ShopId.Value;
             }
 
             // Filter by status
-            if (request.GroupStatus == OrderGroupStatus.Nhap)
+            if (request.GroupStatus == OrderGroupStatus.Nhap || request.GroupStatus == OrderGroupStatus.ChoXacNhan)
             {
                 // Filter by shopId
                 if (request.ShopId.HasValue)
@@ -105,7 +111,22 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     query = query.Where(o => o.DeliveryPartner.Contains(request.DeliveryPartner));
                 }
 
-                query = query.Where(o => o.IsPublished == false || o.CurrentStatus == OrderStatus.WAITING_CONFIRM);
+                if (isAdmin)
+                {
+                    if (request.GroupStatus == OrderGroupStatus.Nhap)
+                    {
+                        query = query.Where(o => o.IsPublished == false && o.CurrentStatus == OrderStatus.DRAFT);
+                    }
+                    else
+                    {
+                        query = query.Where(o => o.IsPublished == false && o.CurrentStatus == OrderStatus.WAITING_CONFIRM);
+                    }
+                }
+                else
+                {
+                    query = query.Where(o => o.IsPublished == false);
+                }
+
                 query = query.OrderByDescending(i => i.Created);
 
                 PaginationResponseDto<OrderDto> pagingResult = await query

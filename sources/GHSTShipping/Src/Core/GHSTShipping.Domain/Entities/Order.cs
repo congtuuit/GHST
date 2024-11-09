@@ -216,8 +216,6 @@ namespace GHSTShipping.Domain.Entities
         public void OrrverideDeliveryFee(int fee)
         {
             this.CustomDeliveryFee = fee;
-            this.ConvertedWeight = this.Length * this.Width * this.Height;
-            this.CalculateWeight = this.ConvertedWeight;
         }
 
         public void CalcConvertedWeight()

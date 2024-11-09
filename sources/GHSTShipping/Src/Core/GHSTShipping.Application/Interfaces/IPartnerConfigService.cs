@@ -34,6 +34,11 @@ namespace GHSTShipping.Application.Interfaces
         /// <returns></returns>
         Task<BaseResult> UpdateShopConfigAsync(UpdateShopDeliveryConfigRequest request);
 
+        /// <summary>
+        /// Assumption 1 store connect to 1 delivery config 
+        /// </summary>
+        /// <param name="shopId"></param>
+        /// <returns></returns>
         Task<IEnumerable<ShopConfigDto>> GetShopConfigsAsync(Guid shopId);
 
         Task<IEnumerable<GhnShopDetailDto>> GetGhnShopDetailDtos(PartnerConfigDto partnerConfig, string phoneNumber = null);

@@ -320,7 +320,8 @@ namespace Delivery.GHN
                 _httpClient.DefaultRequestHeaders.Remove("ShopId");
                 _httpClient.DefaultRequestHeaders.Add("ShopId", shopId); // Add ShopId header
 
-                var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+                var payload = JsonConvert.SerializeObject(request);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(ApiEndpoints.CREATE_DRAFT_ORDER, content);
 
                 // Read the response content

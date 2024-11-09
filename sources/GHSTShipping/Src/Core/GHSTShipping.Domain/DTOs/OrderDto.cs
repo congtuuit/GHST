@@ -9,7 +9,7 @@ namespace GHSTShipping.Domain.DTOs
         public bool IsPublished { get; set; }
         public DateTime? PublishDate { get; set; }
 
-        public DateTime Created {  get; set; }
+        public DateTime Created { get; set; }
 
         public Guid Id { get; set; }
         public Guid? ShopId { get; set; }
@@ -31,6 +31,14 @@ namespace GHSTShipping.Domain.DTOs
         public string ToWardName { get; set; }
         public string ToDistrictName { get; set; }
         public string ToProvinceName { get; set; }
+
+        /// <summary>
+        /// Input of shop
+        /// </summary>
+        public int RootWeight { get; set; }
+        public int RootLength { get; set; }
+        public int RootWidth { get; set; }
+        public int RootHeight { get; set; }
 
         public int Weight { get; set; }
         public int Length { get; set; }
@@ -142,5 +150,41 @@ namespace GHSTShipping.Domain.DTOs
         }
 
         public string PrivateOrderCode { get; set; }
+
+        public string RootDisplaySize
+        {
+            get
+            {
+                string displaySize = $"{RootLength}x{RootWidth}x{RootHeight}";
+                return displaySize;
+            }
+        }
+
+        public int RootConvertedWeight
+        {
+            get
+            {
+                int convertedWeight = RootLength * RootWidth * RootHeight;
+                return convertedWeight;
+            }
+        }
+
+        public string DisplaySize
+        {
+            get
+            {
+                string displaySize = $"{Length}x{Width}x{Height}";
+                return displaySize;
+            }
+        }
+
+        public int ConvertedWeight
+        {
+            get
+            {
+                int convertedWeight = Length * Width * Height;
+                return convertedWeight;
+            }
+        }
     }
 }

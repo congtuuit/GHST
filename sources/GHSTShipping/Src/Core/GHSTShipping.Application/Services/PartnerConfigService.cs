@@ -173,6 +173,11 @@ namespace GHSTShipping.Application.Services
             return BaseResult.Ok();
         }
 
+        /// <summary>
+        /// Assumption 1 store connect to 1 delivery config 
+        /// </summary>
+        /// <param name="shopId"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ShopConfigDto>> GetShopConfigsAsync(Guid shopId)
         {
             var configs = await shopPartnerConfigRepository

@@ -54,10 +54,19 @@ export interface IOrderViewDto {
   toDistrictName: string;
   toProvinceName: string;
 
+  rootWeight: number;
+  rootLength: number;
+  rootWidth: number;
+  rootHeight: number;
+  rootDisplaySize: string;
+  rootConvertedWeight: number;
+
   weight: number;
   length: number;
   width: number;
   height: number;
+  displaySize: string;
+  convertedWeight: number;
 
   codAmount: number;
   insuranceValue: number;
@@ -73,3 +82,10 @@ export interface IOrderViewDto {
   created: string;
 }
 
+export interface IUpdateOrderRequest {
+  orderId?: string;
+  weight?: number;
+  length?: number;
+  width?: number;
+  height?: number;
+}

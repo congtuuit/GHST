@@ -74,6 +74,7 @@ export interface IOrderFilter extends OrderFilterState {
 }
 
 export interface IDeliveryStatus {
+  waiting_confirm: number;
   cancel: number;
   damage: number;
   delivered: number;

@@ -9,12 +9,14 @@ export interface IOrderState {
   orders: any[];
   shop: ShopOrderViewDto | null;
   orderFilter?: IOrderFilter;
+  confirmOrderQueue: string[];
 }
 
 const initialState: IOrderState = {
   order: null,
   orders: [],
   shop: null,
+  confirmOrderQueue: [],
 };
 
 const orderSlice = createSlice({
@@ -36,8 +38,17 @@ const orderSlice = createSlice({
         ...action.payload,
       };
     },
+    addConfirmOrderToQueue(state, action: PayloadAction<string[]>) {
+      let _array = [...state.confirmOrderQueue, ...action.payload]
+      const uniqueArray = [...new Set(_array)];
+      state.confirmOrderQueue = [...uniqueArray];
+    },
+    removeConfirmOrderToQueue(state, action: PayloadAction<string>) {
+      const values = state.confirmOrderQueue.filter(item => item !== action.payload);
+      state.confirmOrderQueue = [...values];
+    },
   },
 });
 
-export const { setOrder, clearOrder, setShopInfo, setOrderFilter } = orderSlice.actions;
+export const { setOrder, clearOrder, setShopInfo, setOrderFilter, addConfirmOrderToQueue, removeConfirmOrderToQueue } = orderSlice.actions;
 export default orderSlice.reducer;

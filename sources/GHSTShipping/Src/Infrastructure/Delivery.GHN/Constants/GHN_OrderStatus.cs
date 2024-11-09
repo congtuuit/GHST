@@ -7,6 +7,12 @@ namespace Delivery.GHN.Constants
     [JsonConverter(typeof(JsonStringEnumConverter))] // Enables JSON conversion with custom strings
     public enum GHN_OrderStatus
     {
+        /// <summary>
+        /// Custom status
+        /// </summary>
+        [EnumMember(Value = "waiting_confirm")]
+        WaitingConfirm,
+
         [EnumMember(Value = "ready_to_pick")]
         ReadyToPick,
 
@@ -147,6 +153,12 @@ namespace Delivery.GHN.Constants
                         GHN_OrderStatus.Damage.ToStringValue(),
                     };
 
+                case OrderGroupStatus.ChoXacNhan:
+                    return new List<string>
+                    {
+                        GHN_OrderStatus.WaitingConfirm.ToStringValue(),
+                    };
+
                 default:
                     return new List<string>();
             }
@@ -155,6 +167,8 @@ namespace Delivery.GHN.Constants
 
     public enum OrderGroupStatus
     {
+
+
         [EnumMember(Value = "nhap")]
         Nhap,
 
@@ -178,6 +192,9 @@ namespace Delivery.GHN.Constants
 
         [EnumMember(Value = "that_lac_hong")]
         ThatLacHong,
+
+        [EnumMember(Value = "ChoXacNhan")]
+        ChoXacNhan = 99,
     }
 
 

@@ -2,6 +2,7 @@ import { GHN_OrderStatus } from './contants';
 import { IDeliveryStatus } from './type';
 
 const OrderGroupStatus = {
+  ChoXacNhan: 99,
   Nhap: 0,
   ChoBanGiao: 1,
   DaBanGiaoDangGiao: 2,
@@ -10,7 +11,7 @@ const OrderGroupStatus = {
   HoanTat: 5,
   DaHuy: 6,
   ThatLacHong: 7,
-}
+};
 
 export type FilterStatusOption = {
   name: string;
@@ -23,11 +24,17 @@ class ghnOrderFilter {
   status: string[] = Object.values(GHN_OrderStatus);
   filterStatus: FilterStatusOption[] = [
     {
-      name: 'Nháp',
-      value: OrderGroupStatus.Nhap,
+      name: 'Chờ xác nhận',
+      value: OrderGroupStatus.ChoXacNhan,
       total: 0,
-      children: ['draft'],
+      children: ['waiting_confirm'],
     },
+    // {
+    //   name: 'Nháp',
+    //   value: OrderGroupStatus.Nhap,
+    //   total: 0,
+    //   children: ['draft'],
+    // },
     {
       name: 'Chờ bàn giao',
       value: OrderGroupStatus.ChoBanGiao,
@@ -73,8 +80,6 @@ class ghnOrderFilter {
   ];
 
   reCalculateFilterStatusTotals = (status: IDeliveryStatus) => {
-    console.log("status[key] ", status)
-
     return this.filterStatus.map(category => {
       return {
         ...category,

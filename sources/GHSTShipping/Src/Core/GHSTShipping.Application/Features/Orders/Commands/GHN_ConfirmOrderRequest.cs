@@ -38,6 +38,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     Id = i.Id,
                     CurrentStatus = i.CurrentStatus,
                     PartnerShopId = i.PartnerShopId,
+                    ShopId = i.ShopId,
 
                     PickShift = i.PickShift,
                     ServiceTypeId = i.ServiceTypeId,
@@ -59,10 +60,12 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     ToDistrictName = i.ToDistrictName,
                     ToWardId = i.ToWardId,
                     ToWardName = i.ToWardName,
+
                     Weight = i.Weight,
                     Length = i.Length,
                     Width = i.Width,
                     Height = i.Height,
+
                     CodAmount = i.CodAmount,
                     InsuranceValue = i.InsuranceValue,
                     RequiredNote = i.RequiredNote,
@@ -81,6 +84,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     Items = i.Items.Select(oi => new OrderItem
                     {
                         Id = oi.Id,
+                        OrderId = oi.OrderId,
                         Name = oi.Name,
                         Quantity = oi.Quantity,
                         Code = oi.Code,
@@ -93,17 +97,23 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 })
                 .FirstOrDefaultAsync();
 
-            if (order == null)
+            if (order == null || order.CurrentStatus != OrderStatus.DRAFT && order.CurrentStatus != OrderStatus.WAITING_CONFIRM)
             {
                 return BaseResult.Failure(new Error(ErrorCode.NotFound, "Không tìm thấy đơn hàng"));
             }
+
+            using var transaction = await unitOfWork.BeginTransactionAsync();
 
             try
             {
                 // Send order to GHN
                 var createDeliveryOrderRequest = mapper.Map<CreateDeliveryOrderRequest>(order);
                 var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, order.ShopId.Value);
-                var createOrder = await ghnApiClient.CreateDeliveryOrderAsync(apiConfig, order.PartnerShopId, createDeliveryOrderRequest);
+
+                /// DEBUG
+                //var createOrder = await ghnApiClient.CreateDeliveryOrderAsync(apiConfig, order.PartnerShopId, createDeliveryOrderRequest);
+                var createOrder = await ghnApiClient.CreateDraftDeliveryOrderAsync(apiConfig, order.PartnerShopId, createDeliveryOrderRequest);
+
                 if (createOrder.Code == 200)
                 {
                     var orderPublished = createOrder.Data;
@@ -137,6 +147,8 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     },
                     cancellationToken);
 
+                    await transaction.CommitAsync(cancellationToken);
+
                     return BaseResult.Ok();
                 }
                 else
@@ -146,6 +158,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync(cancellationToken);
             }
 
             return BaseResult.Failure(new Error(ErrorCode.Exception, "Xảy ra lỗi, vui lòng thử lại!"));

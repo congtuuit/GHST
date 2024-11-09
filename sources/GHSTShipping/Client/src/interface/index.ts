@@ -20,3 +20,7 @@ export interface IPaginationRequestParameter {
   pageNumber: number;
   pageSize: number;
 }
+
+export interface IShopOrderParameter extends IPaginationRequestParameter {
+  shopId?: string;
+}

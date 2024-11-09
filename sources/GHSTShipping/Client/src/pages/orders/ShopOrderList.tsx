@@ -11,24 +11,24 @@ import { useSelector } from 'react-redux';
 import { apiCancelOrderGhn, apiGetOrderDetail, apiGetOrders } from '@/api/business.api';
 import Datatable from '@/components/core/datatable';
 import Price from '@/components/core/price';
-import { formatUtcToLocalTime } from '@/utils/common';
+import { debounce, formatUtcToLocalTime } from '@/utils/common';
 import OrderDetailDialog from './components/ghn/order-detail';
 import { orderStatuses } from './orderStatus';
 import NumberFormatter from '@/components/core/NumberFormatter';
 import OrderStatus from './components/OrderStatus';
 import { revertDateFormatMap } from '@/components/core/table-column/type';
-import OrderFilter from './components/ghn/OrderFilter';
 
 const ShopOrderList = () => {
   const { session } = useSelector(state => state.user);
   const [selectedSupplier, setSelectedSupplier] = useState<string>('');
   const [orderStatusSection, setOrderStatusSection] = useState<IOrderStatus[]>();
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>();
-  const [orderPagination, setOrderPagination] = useState<IPaginationResponse<IOrderDto> | null>(null);
+  const [orderPagination, setOrderPagination] = useState<IPaginationResponse<IOrderViewDto> | null>(null);
   const [orderDetail, setOrderDetail] = useState<IOrderDetail | undefined>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
   const [refresh, setRefresh] = useState<boolean>(false);
+  const [searchOrderCodes, setSearchOrderCodes] = useState<string>('');
   const pageSize = 7;
 
   const fetchOrders = async (params: IOrderPagedParameter | null) => {
@@ -215,7 +215,9 @@ const ShopOrderList = () => {
     setTableFilters(filters);
   };
 
-  const handleSearchOrder = async () => {};
+  const handleSearchOrder = debounce(changedValues => {
+    setSearchOrderCodes(changedValues);
+  }, 300);
 
   useEffect(() => {
     if (Boolean(selectedSupplier) && Boolean(orderStatuses[selectedSupplier])) {
@@ -228,24 +230,18 @@ const ShopOrderList = () => {
       pageNumber: (tablePaginationConfig?.current as number) ?? 1,
       pageSize: (tablePaginationConfig?.pageSize as number) ?? pageSize,
       deliveryPartner: selectedSupplier,
-      orderCode: '',
+      orderCode: searchOrderCodes ?? '',
       status: orderStatusFilter ?? '',
     };
 
     fetchOrders(params);
-  }, [selectedSupplier, tablePaginationConfig, orderStatusFilter, refresh]);
+  }, [selectedSupplier, tablePaginationConfig, orderStatusFilter, refresh, searchOrderCodes]);
 
   return (
     <Card className="my-card-containter" title="Danh sách đơn hàng">
       <Row>
         <Col span={24}>
-          <Datatable
-            onSearch={handleSearchOrder}
-            showSearch
-            columns={columns}
-            dataSource={orderPagination}
-            onChange={handleChangeTable}
-          />
+          <Datatable onSearch={handleSearchOrder} showSearch columns={columns} dataSource={orderPagination} onChange={handleChangeTable} />
         </Col>
       </Row>
       <OrderDetailDialog data={orderDetail} />

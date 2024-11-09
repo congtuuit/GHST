@@ -157,10 +157,16 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             var convertedWeight = request.Length * request.Width * request.Height;
             var deliveryFeePlan = await CalculateDeliveryFeeAsync(_unitOfWork, convertedWeight, shopId);
 
+            // Handle orverride sender address using shop address got from deliery partner
             var allowUsePartnerShopAddress = shop.AllowUsePartnerShopAddress;
             if (allowUsePartnerShopAddress)
             {
-
+                var shopDeliveryConfigs = await _partnerConfigService.GetShopConfigsAsync(shopId);
+                var shopDeliveryConfig = shopDeliveryConfigs.FirstOrDefault();
+                request.FromAddress = shopDeliveryConfig.Address;
+                request.FromWardName = shopDeliveryConfig.WardName;
+                request.FromDistrictName = shopDeliveryConfig.DistrictName;
+                request.FromProvinceName = shopDeliveryConfig.ProvinceName;
             }
 
             var order = CreateOrderEntity(
@@ -168,6 +174,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 shop,
                 deliveryFeePlan,
                 partnerShopId);
+            order.CalcConvertedWeight();
             order.OrrverideDeliveryFee(order.DeliveryFee);
             order.GenerateOrderCode(await _orderCodeSequenceService.GenerateOrderCodeAsync(shopId), uniqueShopCode);
             await _orderRepository.AddAsync(order);

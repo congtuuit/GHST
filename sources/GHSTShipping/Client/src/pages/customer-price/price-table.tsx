@@ -221,10 +221,10 @@ const PriceTable = (props: PriceTableProps) => {
     setTableFilters(filters);
   };
 
-  const handleSelectedRows = (rows: ShopPricePlanDatatable[]) => {
+  const handleSelectedRows = (rows: any[]) => {
   };
 
-  const handleDeleteRows = async (rows: ShopPricePlanDatatable[]) => {
+  const handleDeleteRows = async (rows: any[]) => {
     const ids = rows.map(i => i.id);
     const response = await apiDeleteShopPricePlan(ids[0], ids);
     if (response.success) {
@@ -273,7 +273,7 @@ const PriceTable = (props: PriceTableProps) => {
       onChange={handleChangeTable}
       onSelectedRows={handleSelectedRows}
       handleDeleteRows={handleDeleteRows}
-      mode="mutilple"
+      mode="multiple"
     />
   );
 };

@@ -9,10 +9,13 @@ import dayjs, { Dayjs } from 'dayjs';
 interface AdminOrderFilterWrapperProps {
   style?: CSSProperties;
   styleContent?: CSSProperties;
+  selectedRows?: number;
+  handleConfirmOrders?: () => void;
+  handleRefresh?: () => void;
 }
 
 const AdminOrderFilterWrapper: React.FC<AdminOrderFilterWrapperProps> = (props: AdminOrderFilterWrapperProps) => {
-  const { style, styleContent } = props;
+  const { style, styleContent, selectedRows, handleConfirmOrders, handleRefresh } = props;
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const [fromDate, setFromDate] = useState<Dayjs | null>(dayjs().subtract(1, 'month').startOf('month'));
@@ -37,6 +40,10 @@ const AdminOrderFilterWrapper: React.FC<AdminOrderFilterWrapperProps> = (props: 
       }),
     );
   };
+
+  const onConfirmOrders=()=> {
+    handleConfirmOrders && handleConfirmOrders();
+  }
 
   useEffect(() => {
     dispatch(
@@ -65,6 +72,13 @@ const AdminOrderFilterWrapper: React.FC<AdminOrderFilterWrapperProps> = (props: 
       <div>
         Đến <DatePicker value={toDate} onChange={handleChangeToDate} placeholder="Chọn ngày" format="DD/MM/YYYY" />
       </div>
+
+      <Button onClick={handleConfirmOrders} type="primary" disabled={!selectedRows || selectedRows <= 0}>
+        Xác nhận {selectedRows && selectedRows > 0 ? `(${selectedRows}) đơn` : ''}
+      </Button>
+      <Button onClick={handleRefresh} type="default">
+        Làm mới
+      </Button>
     </Space>
   );
 };

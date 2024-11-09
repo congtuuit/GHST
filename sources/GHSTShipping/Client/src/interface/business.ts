@@ -30,8 +30,8 @@ export interface IOrderPagedParameter extends IPaginationRequestParameter {
   shopId?: string;
 
   groupStatus?: number | undefined;
-  fromDate?: Date | null;
-  toDate?: Date | null;
+  fromDate?: Date | '';
+  toDate?: Date | '';
   paymentTypeId?: number;
   isPrint?: boolean;
   isCodFailedCollected?: boolean;

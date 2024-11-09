@@ -2,7 +2,7 @@ import type { IPaginationResponse } from '@/interface/business';
 import type { FilterValue, TableRowSelection } from 'antd/es/table/interface';
 import type { TablePaginationConfig } from 'antd/lib/table';
 import { Table, Input, Col, Button, Row } from 'antd';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 
 const { Search } = Input;
@@ -10,103 +10,115 @@ const { Search } = Input;
 interface DatatableProps<T> {
   columns: any[];
   dataSource: IPaginationResponse<T> | null;
-  onChange?: (pagination: TablePaginationConfig, filters: Record<string, FilterValue | null>, sorter: any) => void; // Ensure proper typing for onChange
-  onSearch?: () => void;
+  onChange?: (pagination: TablePaginationConfig, filters: Record<string, FilterValue | null>, sorter: any) => void;
+  onSearch?: (value: string) => void;
   showSearch?: boolean;
   rowSelection?: TableRowSelection<T>;
   onSelectedRows?: (selectedRows: T[]) => void;
   handleDeleteRows?: (selectedRows: T[]) => void;
-  mode?: 'single' | 'mutilple';
+  mode?: 'single' | 'multiple';
   headerBox?: ReactElement;
   loading?: boolean;
+  ref?: React.Ref<DatatableRef>;
 }
 
-const Datatable = <T extends object>({
-  columns,
-  dataSource,
-  onChange,
-  onSearch,
-  onSelectedRows,
-  showSearch,
-  handleDeleteRows,
-  mode = 'single',
-  headerBox,
-  loading,
-}: DatatableProps<T>) => {
-  const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
-  const [selectedRows, setSelectedRows] = useState<T[]>([]);
+export interface DatatableRef {
+  clearSelectedRows: () => void;
+}
 
-  const handleSelectedRows = (rows: T[]) => {
-    setSelectedRows(rows);
-    onSelectedRows && onSelectedRows(rows);
-  };
+const Datatable = forwardRef(
+  <T extends object>(
+    {
+      columns,
+      dataSource,
+      onChange,
+      onSearch,
+      onSelectedRows,
+      showSearch = false,
+      handleDeleteRows,
+      mode = 'single',
+      headerBox,
+      loading = false,
+    }: DatatableProps<T>,
+    ref: React.Ref<DatatableRef>,
+  ) => {
+    const [selectedRows, setSelectedRows] = useState<T[]>([]);
 
-  useEffect(() => {
-    setSelectedRows([]);
-  }, [dataSource]);
+    const handleSelectedRows = (rows: T[]) => {
+      setSelectedRows(rows);
+      onSelectedRows?.(rows);
+    };
 
-  return (
-    <div style={{ width: '100%' }}>
-      {showSearch || headerBox ? (
-        <Row>
-          {headerBox && headerBox}
-          {showSearch && (
+    // Hàm để xóa các hàng đã chọn
+    const clearSelectedRows = () => {
+      setSelectedRows([]);
+    };
+
+    // Expose clearSelectedRows method using forwardRef
+    useImperativeHandle(ref, () => ({
+      clearSelectedRows,
+    }));
+
+    useEffect(() => {
+      setSelectedRows([]);
+    }, [dataSource]);
+
+    const renderSearchBox = () => (
+      <Row gutter={16}>
+        {headerBox && <Col>{headerBox}</Col>}
+        {showSearch && (
+          <Col span={24}>
             <Col span={8}>
-              <Search placeholder="Nhập để tìm kiếm" onSearch={onSearch} enterButton />
+              <Search placeholder="Nhập để tìm kiếm" onChange={e => onSearch && onSearch(e.target.value)} onSearch={onSearch} enterButton />
             </Col>
-          )}
-        </Row>
-      ) : (
-        <></>
-      )}
+          </Col>
+        )}
+      </Row>
+    );
 
-      {mode === 'mutilple' && selectedRows.length > 0 && (
-        <Button style={{ marginTop: '20px', marginBottom: '10px' }} danger onClick={() => handleDeleteRows && handleDeleteRows(selectedRows ?? [])}>
+    const renderDeleteButton = () =>
+      mode === 'multiple' &&
+      selectedRows.length > 0 &&
+      handleDeleteRows && (
+        <Button style={{ marginTop: 20, marginBottom: 10 }} danger onClick={() => handleDeleteRows(selectedRows)}>
           <DeleteOutlined /> {`Xóa ${selectedRows.length} mục`}
         </Button>
-      )}
+      );
 
-      {mode === 'single' && (
-        <Table
-          loading={loading}
-          style={{ width: '100%' }}
-          columns={columns}
-          dataSource={dataSource?.data}
-          rowKey={record => (record as any).id || (record as any).key} // Replace with the correct key field from your data
-          scroll={{ x: 'max-content' }}
-          pagination={{
-            pageSize: dataSource?.pageSize || 10, // Default value if undefined
-            current: dataSource?.pageNumber || 1, // Default value if undefined
-            total: dataSource?.count || 0, // Default value if undefined
-          }}
-          onChange={onChange}
-        />
-      )}
+    const tablePagination = {
+      pageSize: dataSource?.pageSize || 10,
+      current: dataSource?.pageNumber || 1,
+      total: dataSource?.count || 0,
+    };
 
-      {mode === 'mutilple' && (
-        <Table
-          loading={loading}
-          style={{ width: '100%' }}
-          columns={columns}
-          dataSource={dataSource?.data}
-          rowKey={record => (record as any).id || (record as any).key} // Replace with the correct key field from your data
-          scroll={{ x: 'max-content' }}
-          pagination={{
-            pageSize: dataSource?.pageSize || 10, // Default value if undefined
-            current: dataSource?.pageNumber || 1, // Default value if undefined
-            total: dataSource?.count || 0, // Default value if undefined
-          }}
-          onChange={onChange}
-          rowSelection={{
-            type: selectionType,
-            onChange(_, selectedRows) {
-              handleSelectedRows(selectedRows);
-            },
-          }}
-        />
-      )}
-    </div>
-  );
-};
+    const renderTable = () => (
+      <Table
+        loading={loading}
+        columns={columns}
+        dataSource={dataSource?.data}
+        rowKey={record => (record as any).id || (record as any).key}
+        scroll={{ x: 'max-content' }}
+        pagination={tablePagination}
+        onChange={onChange}
+        rowSelection={
+          mode === 'multiple'
+            ? {
+                type: 'checkbox',
+                onChange: (_, selectedRows) => handleSelectedRows(selectedRows),
+              }
+            : undefined
+        }
+      />
+    );
+
+    return (
+      <div style={{ width: '100%' }}>
+        {(showSearch || headerBox) && renderSearchBox()}
+        {renderDeleteButton()}
+        {renderTable()}
+      </div>
+    );
+  },
+);
 
 export default Datatable;

@@ -17,6 +17,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
 {
     public class GetOrdersGroupByShopRequest : PaginationRequestParameter, IRequest<BaseResult<PaginationResponseDto<ShopViewReportDto>>>
     {
+        public Guid? ShopId { get; set; }
     }
 
     public class ShopViewReportDto
@@ -39,8 +40,13 @@ namespace GHSTShipping.Application.Features.Orders.Queries
 
         public async Task<BaseResult<PaginationResponseDto<ShopViewReportDto>>> Handle(GetOrdersGroupByShopRequest request, CancellationToken cancellationToken)
         {
-            var paginationResponse = await _shopRepository
-                .Where(i => i.IsVerified)
+            var query = _shopRepository.Where(i => i.IsVerified);
+            if (request.ShopId.HasValue)
+            {
+                query = query.Where(i => i.Id == request.ShopId);
+            }
+
+            var paginationResponse = await query
                 .Select(i => new ShopViewReportDto
                 {
                     Id = i.Id,

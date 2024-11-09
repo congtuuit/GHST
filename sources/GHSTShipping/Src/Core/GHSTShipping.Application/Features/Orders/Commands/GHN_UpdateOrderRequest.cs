@@ -31,6 +31,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 .Select(i => new Domain.Entities.Order
                 {
                     Id = i.Id,
+                    ShopId = i.ShopId,
                     CurrentStatus = i.CurrentStatus,
                     PartnerShopId = i.PartnerShopId,
 
@@ -47,11 +48,23 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             }
 
             orderRepository.Modify(order);
-            order.Length = request.Length;
-            order.Width = request.Width;
-            order.Height = request.Height;
-            order.Weight = request.Weight;
+            if (request.Length > 0) {
+                order.Length = request.Length;
+            }
+            if (request.Width > 0)
+            {
+                order.Width = request.Width;
+            }
+            if (request.Height > 0)
+            {
+                order.Height = request.Height;
+            }
+            if (request.Weight > 0)
+            {
+                order.Weight = request.Weight;
+            }
 
+            order.CalcConvertedWeight();
             var convertedWeight = (int)order.ConvertedWeight;
             var price = await GHN_CreateOrderRequestHandler.CalculateDeliveryFeeAsync(unitOfWork, convertedWeight, order.ShopId.Value);
             order.OrrverideDeliveryFee(price);

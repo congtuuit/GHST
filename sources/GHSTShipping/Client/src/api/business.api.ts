@@ -1,4 +1,4 @@
-import type { IPaginationRequestParameter, PageData } from '@/interface';
+import type { IPaginationRequestParameter, IShopOrderParameter, PageData } from '@/interface';
 import type {
   BuniesssUser,
   ICreateDeliveryOrderRequest,
@@ -8,7 +8,7 @@ import type {
   PaginationResponse,
   ShopPricePlanDto,
 } from '@/interface/business';
-import type { IOrderDetail, IOrderDto, ShopOrderViewDto } from '@/interface/order/order.interface';
+import type { IOrderDetail, IOrderDto, IOrderViewDto, IUpdateOrderRequest, ShopOrderViewDto } from '@/interface/order/order.interface';
 import type { IOrderMetadata, IShopViewDetailDto, IUpdateShopDeliveryConfigRequest } from '@/interface/shop';
 import type { IDeliveryConfigDto } from '@/pages/delivery-config';
 
@@ -53,7 +53,7 @@ export const apiGetOrders = (params: IOrderPagedParameter) => {
   // Build query string
   const queryString = buildQueryString(params);
 
-  return request<IPaginationResponse<IOrderDto>>('get', `/orders/list?${queryString}`);
+  return request<IPaginationResponse<IOrderViewDto>>('get', `/orders/list?${queryString}`);
 };
 
 export const apiGetOrderDetail = (orderId: string | undefined) => {
@@ -87,9 +87,10 @@ export const apiCreateDeliveryConfig = (payload: any) => request('post', `/confi
 
 export const apiUpdateShopDeliveryConfig = (payload: IUpdateShopDeliveryConfigRequest) => request('put', `/configs/shop`, payload);
 export const apiGetOrderMetaData = () => request<IOrderMetadata>('get', `/orders/metadata`);
-export const apiGetShopOrders = (params: IPaginationRequestParameter) => {
+export const apiGetShopOrders = (params: IShopOrderParameter) => {
   const queryString = buildQueryString(params);
   return request<IPaginationResponse<ShopOrderViewDto>>('get', `/orders/group-by-shops?${queryString}`);
 };
 export const apiConfirmOrderGhn = (orderId: string) => request('put', `/orders/ghn/confirm/${orderId}`);
 export const apiCountOrderByStatus = (shopId: string) => request('get', `/orders/ghn/count-order-by-status/${shopId}`);
+export const apiUpdateGhnOrder = (payload: IUpdateOrderRequest) => request('put', `/orders/ghn/update`, payload);
