@@ -21,7 +21,7 @@ const VietNameBankSelector = (props: VietNameBankSelectorProps) => {
       options={vietNameBanks?.map(i => {
         return {
           value: i.name,
-          label: i.name,
+          label: i.name + ` (${i.shortName})`,
         };
       })}
     />

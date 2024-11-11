@@ -42,6 +42,8 @@ namespace GHSTShipping.Application.Features.Users.Commands
 
                     if (shop != null)
                     {
+                        authenResult.Data.ShopId = shop.Id;
+
                         if (shop.IsVerified)
                         {
                             authenResult.Data.IsVerified = true;

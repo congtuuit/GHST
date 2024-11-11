@@ -66,7 +66,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             int skipCount = (request.PageNumber - 1) * request.PageSize;
             var query = unitOfWork.Orders.All();
 
-            var shopId = Guid.Empty;
+            Guid? shopId = null;
             if (!isAdmin)
             {
                 var shop = await shopRepository.Where(i => i.AccountId == userId)
@@ -87,16 +87,19 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             }
             else
             {
-                shopId = request.ShopId.Value;
+                if (request.ShopId.HasValue)
+                {
+                    shopId = request.ShopId.Value;
+                }
             }
 
             // Filter by status
             if (request.GroupStatus == OrderGroupStatus.Nhap || request.GroupStatus == OrderGroupStatus.ChoXacNhan)
             {
                 // Filter by shopId
-                if (request.ShopId.HasValue)
+                if (shopId.HasValue)
                 {
-                    query = query.Where(i => i.ShopId == request.ShopId);
+                    query = query.Where(i => i.ShopId == shopId);
                 }
 
                 // Filter by code
@@ -144,9 +147,17 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             }
             else
             {
-                if (request.DeliveryPartner == EnumDeliveryPartner.GHN.GetCode())
+                bool isGhnQuery = false;
+                if (shopId.HasValue)
                 {
-                    var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, shopId);
+                    var shopConfig = await partnerConfigService.GetShopConfigsAsync(shopId.Value);
+                    var deliveryPartner = shopConfig.FirstOrDefault()?.DeliveryPartner;
+                    isGhnQuery = deliveryPartner == EnumDeliveryPartner.GHN;
+                }
+
+                if (request.DeliveryPartner == EnumDeliveryPartner.GHN.GetCode() || isGhnQuery)
+                {
+                    var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, shopId.Value);
                     var searchStatus = request.GroupStatus.GetDetails();
                     var searchParams = new Delivery.GHN.Models.ShippingOrderSearchRequest
                     {
@@ -190,9 +201,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     }
 
                     var ghnOrdersResponse = await ghnApiClient.SearchOrdersAsync(apiConfig, searchParams);
-                    var (entityOrders, entityOrderItems) = await GHN_SyncOrderRequestHandler.ListOrderMappingAsync(ghnOrdersResponse, shopId, apiConfig, ghnApiClient);
-
-
+                    var (entityOrders, entityOrderItems) = await GHN_SyncOrderRequestHandler.ListOrderMappingAsync(ghnOrdersResponse, shopId.Value, apiConfig, ghnApiClient);
 
                     if (entityOrders.Count > 0 || entityOrderItems.Count > 0)
                     {

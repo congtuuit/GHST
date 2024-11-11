@@ -18,6 +18,7 @@ export interface LoginResult {
   jwToken: string;
   phoneNumber: string;
   fullName: string;
+  shopId: string;
 }
 
 export interface LogoutParams {

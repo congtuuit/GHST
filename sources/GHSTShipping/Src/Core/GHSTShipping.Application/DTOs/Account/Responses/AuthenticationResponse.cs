@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GHSTShipping.Application.DTOs.Account.Responses
@@ -13,5 +14,6 @@ namespace GHSTShipping.Application.DTOs.Account.Responses
 
         public string FullName { get; set; }
         public string PhoneNumber { get; set; }
+        public Guid? ShopId { get; set; }
     }
 }

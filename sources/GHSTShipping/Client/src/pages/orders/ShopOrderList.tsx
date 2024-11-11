@@ -5,10 +5,10 @@ import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 import type { ColumnsType } from 'antd/lib/table';
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Card, Col, message, Row, Tag, Typography } from 'antd';
+import { Button, Card, Col, message, Radio, Row, Tag, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { apiCancelOrderGhn, apiGetOrderDetail, apiGetOrders } from '@/api/business.api';
+import { apiCancelOrderGhn, apiCountOrderByStatus, apiGetOrderDetail, apiGetOrders, apiGetShopOrders } from '@/api/business.api';
 import Datatable from '@/components/core/datatable';
 import Price from '@/components/core/price';
 import { debounce, formatUtcToLocalTime } from '@/utils/common';
@@ -17,18 +17,31 @@ import { orderStatuses } from './orderStatus';
 import NumberFormatter from '@/components/core/NumberFormatter';
 import OrderStatus from './components/OrderStatus';
 import { revertDateFormatMap } from '@/components/core/table-column/type';
+import ghnOrderFilter, { FilterStatusOption } from '@/features/order/ghnOrderFilter';
+import { RadioChangeEvent } from 'antd/lib';
+import AdminOrderFilterWrapper from './components/AdminOrderFilterWrapper';
+
+const _ghnOrderFilter = new ghnOrderFilter();
+const orderStatusSection = _ghnOrderFilter.filterStatus;
 
 const ShopOrderList = () => {
+  const { orderFilter, confirmOrderQueue } = useSelector(state => state.order);
   const { session } = useSelector(state => state.user);
+  const shopId = session?.shopId;
+
   const [selectedSupplier, setSelectedSupplier] = useState<string>('');
-  const [orderStatusSection, setOrderStatusSection] = useState<IOrderStatus[]>();
-  const [orderStatusFilter, setOrderStatusFilter] = useState<string>();
+  const [orderStatusFilter, setOrderStatusFilter] = useState<number>(orderStatusSection[0].value);
   const [orderPagination, setOrderPagination] = useState<IPaginationResponse<IOrderViewDto> | null>(null);
   const [orderDetail, setOrderDetail] = useState<IOrderDetail | undefined>();
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
   const [tableFilters, setTableFilters] = useState<Record<string, FilterValue | null>>();
   const [refresh, setRefresh] = useState<boolean>(false);
   const [searchOrderCodes, setSearchOrderCodes] = useState<string>('');
+  const [groupStatusFilterOptions, setGroupStatusFilterOptions] = useState<FilterStatusOption[]>(orderStatusSection);
+  const [selectedOrders, setSelectedOrders] = useState<IOrderViewDto[]>([]);
+  const [reloadTable, setReloadTable] = useState(false);
+  const [fetchingData, setFetchingData] = useState(false);
+
   const pageSize = 7;
 
   const fetchOrders = async (params: IOrderPagedParameter | null) => {
@@ -41,12 +54,13 @@ const ShopOrderList = () => {
         pageSize: pageSize,
       };
     }
-
+    setFetchingData(true);
     const response = await apiGetOrders(params);
-
     if (response.success) {
       setOrderPagination(response.data);
     }
+
+    setFetchingData(false);
   };
 
   const handleCancelOrder = async (id: string) => {
@@ -219,29 +233,110 @@ const ShopOrderList = () => {
     setSearchOrderCodes(changedValues);
   }, 300);
 
-  useEffect(() => {
-    if (Boolean(selectedSupplier) && Boolean(orderStatuses[selectedSupplier])) {
-      setOrderStatusSection(orderStatuses[selectedSupplier as string]);
-    } else {
-      setOrderStatusSection([]);
+  const fetchCountOrderByStatus = async (shopId: string) => {
+    let totalDraftOrder = 0;
+    const __ = await apiGetShopOrders({
+      pageSize: 1,
+      pageNumber: 1,
+      shopId: shopId,
+    });
+
+    if (__.success) {
+      totalDraftOrder = __.data.data[0].totalDraftOrder;
     }
 
-    const params: IOrderPagedParameter = {
-      pageNumber: (tablePaginationConfig?.current as number) ?? 1,
-      pageSize: (tablePaginationConfig?.pageSize as number) ?? pageSize,
-      deliveryPartner: selectedSupplier,
-      orderCode: searchOrderCodes ?? '',
-      status: orderStatusFilter ?? '',
-    };
+    const response = await apiCountOrderByStatus(shopId);
+    if (response.success) {
+      const ghnResponse = JSON.parse(response.data);
+      if (ghnResponse.code === 200) {
+        const ghnResponseData = ghnResponse.data;
+        ghnResponseData['waiting_confirm'] = totalDraftOrder;
+        const __groupStatusFilterOptions = _ghnOrderFilter.reCalculateFilterStatusTotals(ghnResponseData);
+        setGroupStatusFilterOptions(__groupStatusFilterOptions);
+      }
+    }
+  };
 
-    fetchOrders(params);
-  }, [selectedSupplier, tablePaginationConfig, orderStatusFilter, refresh, searchOrderCodes]);
+  // useEffect(() => {
+  //   const params: IOrderPagedParameter = {
+  //     pageNumber: (tablePaginationConfig?.current as number) ?? 1,
+  //     pageSize: (tablePaginationConfig?.pageSize as number) ?? pageSize,
+  //     deliveryPartner: selectedSupplier,
+  //     orderCode: searchOrderCodes ?? '',
+  //     status: orderStatusFilter ?? '',
+  //   };
+
+  //   fetchOrders(params);
+  // }, [selectedSupplier, tablePaginationConfig, orderStatusFilter, refresh, searchOrderCodes]);
+
+  useEffect(() => {
+    if (shopId) {
+      fetchCountOrderByStatus(shopId as string);
+    }
+  }, [shopId, orderStatusFilter]);
+
+  useEffect(() => {
+    fetchOrders({
+      status: orderFilter?.status ?? '',
+      pageNumber: tablePaginationConfig?.current ?? 1,
+      pageSize: tablePaginationConfig?.pageSize ?? pageSize,
+      orderCode: searchOrderCodes ?? '',
+
+      groupStatus: orderStatusFilter,
+      fromDate: orderFilter?.fromDate ?? '',
+      toDate: orderFilter?.toDate ?? '',
+      paymentTypeId: orderFilter?.paymentTypeId ?? '',
+      isPrint: orderFilter?.isPrint ?? '',
+      isCodFailedCollected: orderFilter?.isCodFailedCollected ?? '',
+      isDocumentPod: orderFilter?.isDocumentPod ?? '',
+    } as IOrderPagedParameter);
+  }, [orderStatusFilter, orderFilter, tablePaginationConfig, reloadTable, searchOrderCodes]);
 
   return (
     <Card className="my-card-containter" title="Danh sách đơn hàng">
       <Row>
+        <Col span={24} style={{ marginTop: '10px' }}>
+          {groupStatusFilterOptions.length > 0 && (
+            <Radio.Group
+              className="order-status-filter-containter"
+              style={{ display: 'flex', overflow: 'scroll', overflowY: 'hidden', overflowX: 'auto', width: '100%', whiteSpace: 'nowrap' }}
+              onChange={(e: RadioChangeEvent) => setOrderStatusFilter(e.target.value)}
+              value={orderStatusFilter}
+              optionType="button"
+            >
+              {groupStatusFilterOptions?.map((i, key) => {
+                return (
+                  <Radio.Button key={key} value={i.value} style={{ width: 'fit-content', margin: '5px', borderRadius: '10px', fontSize: '16px' }}>
+                    {i.name}
+                    <Typography.Text strong type="danger">
+                      {i.total > 0 && `(${i.total})`}
+                    </Typography.Text>
+                  </Radio.Button>
+                );
+              })}
+            </Radio.Group>
+          )}
+        </Col>
+
         <Col span={24}>
-          <Datatable onSearch={handleSearchOrder} showSearch columns={columns} dataSource={orderPagination} onChange={handleChangeTable} />
+          <Datatable
+            showSearch
+            loading={fetchingData}
+            columns={columns}
+            dataSource={orderPagination}
+            onSearch={handleSearchOrder}
+            onChange={handleChangeTable}
+            headerBox={
+              <div>
+                <AdminOrderFilterWrapper
+                  style={{ marginTop: '10px', marginBottom: '10px' }}
+                  styleContent={{ width: '200px' }}
+                  selectedRows={selectedOrders.length}
+                  handleRefresh={() => setReloadTable(!reloadTable)}
+                />
+              </div>
+            }
+          />
         </Col>
       </Row>
       <OrderDetailDialog data={orderDetail} />

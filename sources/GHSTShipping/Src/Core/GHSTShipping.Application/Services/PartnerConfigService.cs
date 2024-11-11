@@ -186,6 +186,7 @@ namespace GHSTShipping.Application.Services
                 {
                     ShopId = i.ShopId,
                     PartnerConfigId = i.PartnerConfigId,
+                    DeliveryPartner = i.PartnerConfig.DeliveryPartner,
                     PartnerShopId = i.PartnerShopId,
                     ClientPhone = i.ClientPhone,
                     Address = i.Address,

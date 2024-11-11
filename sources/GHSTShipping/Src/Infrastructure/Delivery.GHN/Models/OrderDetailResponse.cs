@@ -211,7 +211,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("pickup_time")]
         [JsonPropertyName("pickup_time")]
-        public DateTime PickupTime { get; set; }
+        public DateTime? PickupTime { get; set; }
 
         [JsonProperty("items")]
         [JsonPropertyName("items")]
@@ -255,7 +255,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("updated_date")]
         [JsonPropertyName("updated_date")]
-        public DateTime UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
 
         [JsonProperty("updated_warehouse")]
         [JsonPropertyName("updated_warehouse")]
@@ -279,7 +279,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("created_date")]
         [JsonPropertyName("created_date")]
-        public DateTime CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
 
         [JsonProperty("status")]
         [JsonPropertyName("status")]
@@ -315,11 +315,11 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("leadtime")]
         [JsonPropertyName("leadtime")]
-        public DateTime Leadtime { get; set; }
+        public DateTime? Leadtime { get; set; }
 
         [JsonProperty("order_date")]
         [JsonPropertyName("order_date")]
-        public DateTime OrderDate { get; set; }
+        public DateTime? OrderDate { get; set; }
 
         [JsonProperty("data")]
         [JsonPropertyName("data")]
@@ -331,7 +331,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("finish_date")]
         [JsonPropertyName("finish_date")]
-        public DateTime FinishDate { get; set; }
+        public DateTime? FinishDate { get; set; }
 
         [JsonProperty("tag")]
         [JsonPropertyName("tag")]
@@ -359,7 +359,7 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("updated_date_pick_shift")]
         [JsonPropertyName("updated_date_pick_shift")]
-        public DateTime UpdatedDatePickShift { get; set; }
+        public DateTime? UpdatedDatePickShift { get; set; }
 
         [JsonProperty("transaction_ids")]
         [JsonPropertyName("transaction_ids")]
@@ -569,18 +569,18 @@ namespace Delivery.GHN.Models
 
         [JsonProperty("updated_date")]
         [JsonPropertyName("updated_date")]
-        public DateTime UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
     }
 
     public class PickupShiftDto
     {
         [JsonProperty("from_time")]
         [JsonPropertyName("from_time")]
-        public DateTime FromTime { get; set; }
+        public DateTime? FromTime { get; set; }
 
         [JsonProperty("to_time")]
         [JsonPropertyName("to_time")]
-        public DateTime ToTime { get; set; }
+        public DateTime? ToTime { get; set; }
     }
 
     public class ReturnLocationDto

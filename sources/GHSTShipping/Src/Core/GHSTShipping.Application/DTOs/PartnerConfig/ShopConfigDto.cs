@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GHSTShipping.Domain.Enums;
+using System;
 
 namespace GHSTShipping.Application.DTOs.PartnerConfig
 {
@@ -7,6 +8,7 @@ namespace GHSTShipping.Application.DTOs.PartnerConfig
         public Guid ShopId { get; set; }
 
         public Guid PartnerConfigId { get; set; }
+        public EnumDeliveryPartner? DeliveryPartner { get; set; }
 
         public string PartnerShopId { get; set; }
 
