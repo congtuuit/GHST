@@ -88,4 +88,5 @@ export interface IUpdateOrderRequest {
   length?: number;
   width?: number;
   height?: number;
+  convertRate?: number;
 }

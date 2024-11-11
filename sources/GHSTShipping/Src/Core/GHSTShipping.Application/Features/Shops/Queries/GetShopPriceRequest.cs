@@ -5,7 +5,6 @@ using GHSTShipping.Application.Parameters;
 using GHSTShipping.Application.Wrappers;
 using GHSTShipping.Domain.DTOs;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading;
@@ -50,6 +49,7 @@ namespace GHSTShipping.Application.Features.Shops.Queries
                     OfficialPrice = i.OfficialPrice,
                     PrivatePrice = i.PrivatePrice,
                     Supplier = i.Supplier,
+                    ConvertRate = i.ConvertRate,
                 })
                 .OrderBy(i => i.ConvertedWeight)
                 .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);

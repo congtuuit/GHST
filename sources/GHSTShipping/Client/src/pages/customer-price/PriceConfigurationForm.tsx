@@ -67,9 +67,9 @@ const PriceConfigurationForm = (props: PriceConfigurationFormProps) => {
 
   const handleFormChange = () => {
     const formValues = form.getFieldsValue();
-    const { mode, length, width, height } = formValues;
+    const { mode, length, width, height, convertRate } = formValues;
     if (mode === 'mutilple') {
-      const _convertedWeight = (length ?? 0) * (width ?? 0) * (height ?? 0);
+      const _convertedWeight = ((length ?? 0) * (width ?? 0) * (height ?? 0)) / (convertRate ?? 1);
       setCurrentConvertedWeight(_convertedWeight);
     }
   };
@@ -130,6 +130,11 @@ const PriceConfigurationForm = (props: PriceConfigurationFormProps) => {
             <Col span={12}>
               <Form.Item label="Cao" name="height" rules={[{ required: true, message: 'Vui lòng nhập!' }]}>
                 <InputNumber placeholder="Nhập giá trị" min={0} style={{ width: '100%' }} step="1" type="number" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item initialValue={1} label="Tỉ lệ chuyển đổi" name="convertRate" rules={[{ required: true, message: 'Vui lòng nhập!' }]}>
+                <InputNumber placeholder="Nhập giá trị" min={1} style={{ width: '100%' }} step="1" type="number" />
               </Form.Item>
             </Col>
 

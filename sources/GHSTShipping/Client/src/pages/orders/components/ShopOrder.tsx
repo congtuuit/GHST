@@ -158,6 +158,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
       length: newValues.length,
       width: newValues.width,
       height: newValues.height,
+      convertRate: newValues.convertRate,
     };
     const response = await apiUpdateGhnOrder(payload);
     if (response.success) {

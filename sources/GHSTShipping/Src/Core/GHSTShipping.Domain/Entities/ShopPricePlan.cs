@@ -18,10 +18,10 @@ namespace GHSTShipping.Domain.Entities
         public string Supplier { get; set; }
 
         [Precision(18, 2)]
-        public decimal PrivatePrice { get; set; }
+        public long PrivatePrice { get; set; }
 
         [Precision(18, 2)]
-        public decimal OfficialPrice { get; set; }
+        public long OfficialPrice { get; set; }
 
         [Precision(18, 2)]
         public int Weight { get; set; }
@@ -37,11 +37,34 @@ namespace GHSTShipping.Domain.Entities
 
         public int ConvertedWeight { get; set; }
 
+        public int ConvertRate { get; set; } = 1;
+
         public virtual Shop Shop { get; set; }
 
         public ShopPricePlan() { }
 
-        public ShopPricePlan(Guid shopId, string supplier, decimal privatePrice, decimal officialPrice, int weight, int length, int width, int height)
+        /// <summary>
+        /// Auto calc CalcConvertedWeight
+        /// </summary>
+        /// <param name="shopId"></param>
+        /// <param name="supplier"></param>
+        /// <param name="privatePrice"></param>
+        /// <param name="officialPrice"></param>
+        /// <param name="weight"></param>
+        /// <param name="length"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="convertedRate"></param>
+        public ShopPricePlan(
+            Guid shopId,
+            string supplier,
+            long privatePrice,
+            long officialPrice,
+            int weight,
+            int length,
+            int width,
+            int height,
+            int convertedRate)
         {
             ShopId = shopId;
             Supplier = supplier;
@@ -51,11 +74,22 @@ namespace GHSTShipping.Domain.Entities
             Length = length;
             Width = width;
             Height = height;
+            this.ConvertRate = convertedRate;
 
-            this.ConvertedWeight = length * width * height;
+            this.CalcConvertedWeight();
         }
 
-        public ShopPricePlan(Guid shopId, string supplier, decimal privatePrice, decimal officialPrice, int weight, int length, int width, int height, int convertedWeight)
+        public ShopPricePlan(
+            Guid shopId,
+            string supplier,
+            long privatePrice,
+            long officialPrice,
+            int weight,
+            int length,
+            int width,
+            int height,
+            int convertedRate,
+            int convertedWeight)
         {
             ShopId = shopId;
             Supplier = supplier;
@@ -65,19 +99,27 @@ namespace GHSTShipping.Domain.Entities
             Length = length;
             Width = width;
             Height = height;
+            ConvertRate = convertedRate;
 
             this.ConvertedWeight = convertedWeight;
         }
 
         public int CalcConvertedWeight()
         {
-            this.ConvertedWeight = this.Length * this.Width * this.Height;
+            this.ConvertedWeight = (this.Length * this.Width * this.Height) / this.ConvertRate;
             return this.ConvertedWeight;
         }
 
-        public int CalcConvertedWeight(int length, int width, int height)
+        /// <summary>
+        /// Công thức tính, áp dụng cho ghi đè
+        /// </summary>
+        /// <param name="length"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public int CalcConvertedWeight(int length, int width, int height, int rate)
         {
-            return length * width * height;
+            return (length * width * height) / rate;
         }
     }
 }

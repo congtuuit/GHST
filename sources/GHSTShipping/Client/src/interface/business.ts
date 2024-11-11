@@ -49,6 +49,7 @@ export interface ShopPricePlanDto {
   width: number;
   height: number;
   convertedWeight: number;
+  convertRate: number;
 }
 
 export interface ICreateDeliveryOrderRequest {

@@ -18,6 +18,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         public int Length { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public int ConvertRate { get; set; } = 1;
     }
 
     public class GHN_UpdateOrderRequestHandler(
@@ -39,6 +40,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     Width = i.Width,
                     Height = i.Height,
                     Weight = i.Weight,
+                    ConvertRate = i.ConvertRate
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

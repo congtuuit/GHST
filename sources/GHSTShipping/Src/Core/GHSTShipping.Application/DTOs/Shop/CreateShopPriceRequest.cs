@@ -13,9 +13,9 @@ namespace GHSTShipping.Application.DTOs.Shop
         /// </summary>
         public string Supplier { get; set; }
 
-        public decimal PrivatePrice { get; set; }
+        public long PrivatePrice { get; set; }
 
-        public decimal OfficialPrice { get; set; }
+        public long OfficialPrice { get; set; }
 
 
         public int Weight { get; set; }
@@ -25,6 +25,8 @@ namespace GHSTShipping.Application.DTOs.Shop
         public int Width { get; set; }
 
         public int Height { get; set; }
+
+        public int ConvertRate { get; set; } = 1;
 
         /// <summary>
         /// single | mutilple

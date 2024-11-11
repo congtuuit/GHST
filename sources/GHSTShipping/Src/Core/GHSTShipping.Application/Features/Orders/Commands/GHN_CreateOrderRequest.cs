@@ -36,6 +36,11 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         private readonly ILogger<GHN_CreateOrderRequest> _logger;
         private readonly IMediator _mediator;
 
+        /// <summary>
+        /// Convert rate for weight from length, width and height
+        /// </summary>
+        const int CONVERT_RATE = 1;
+
         public GHN_CreateOrderRequestHandler(
             IShopRepository shopRepository,
             IOrderRepository orderRepository,
@@ -154,7 +159,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             var uniqueShopCode = shop.UniqueCode;
             var allowPublishOrder = shop.AllowPublishOrder;
 
-            var convertedWeight = request.Length * request.Width * request.Height;
+            var convertedWeight = new ShopPricePlan().CalcConvertedWeight(request.Length, request.Width, request.Height, CONVERT_RATE);
             var deliveryFeePlan = await CalculateDeliveryFeeAsync(_unitOfWork, convertedWeight, shopId);
 
             // Handle orverride sender address using shop address got from deliery partner
@@ -194,7 +199,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         private Order CreateOrderEntity(
             GHN_CreateOrderRequest request,
             ShopQueryDto shop,
-            int deliveryFeePlan,
+            long deliveryFeePlan,
             string partnerShopId)
         {
             var shopId = shop.Id;
@@ -258,11 +263,13 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 RootLength = request.Length,
                 RootWidth = request.Width,
                 RootHeight = request.Height,
+                RootConvertRate = CONVERT_RATE,
 
                 Weight = request.Weight,
                 Length = request.Length,
                 Width = request.Width,
                 Height = request.Height,
+                ConvertRate = CONVERT_RATE,
                 Items = request.Items.Select(i => new OrderItem
                 {
                     Name = i.Name,
@@ -311,13 +318,13 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             });
         }
 
-        public static async Task<int> CalculateDeliveryFeeAsync(
+        public static async Task<long> CalculateDeliveryFeeAsync(
             IUnitOfWork unitOfWork,
-            int convertedWeight,
+            long convertedWeight,
             Guid shopId)
         {
             string deliveryPartner = EnumSupplierConstants.GHN;
-            var orderConvertedWeight = convertedWeight;
+            long orderConvertedWeight = convertedWeight;
 
             var nearestPrice = await unitOfWork.ShopPricePlanes
                 .Where(i => i.ShopId == shopId && i.Supplier == deliveryPartner)
@@ -327,7 +334,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
             var result = nearestPrice;
 
-            return (int)result;
+            return result;
         }
 
         private void LogRequestData(GHN_CreateOrderRequest request)

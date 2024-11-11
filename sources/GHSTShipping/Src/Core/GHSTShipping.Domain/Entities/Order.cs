@@ -31,12 +31,12 @@ namespace GHSTShipping.Domain.Entities
         /// <summary>
         /// Delivery fee with price rules
         /// </summary>
-        public int DeliveryFee { get; set; } // NEED TO MAPPING
+        public long DeliveryFee { get; set; } // NEED TO MAPPING
 
         /// <summary>
         /// Delivery fee has been orverried and just display on Admin
         /// </summary>
-        public int CustomDeliveryFee { get; private set; } // NEED TO MAPPING
+        public long CustomDeliveryFee { get; private set; } // NEED TO MAPPING
 
         public DateTime? PublishDate { get; set; } // NEED TO MAPPING
 
@@ -133,11 +133,15 @@ namespace GHSTShipping.Domain.Entities
         public int RootLength { get; set; }
         public int RootWidth { get; set; }
         public int RootHeight { get; set; }
+        public int RootConvertRate { get; set; }
+
 
         public int Weight { get; set; }
         public int Length { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public int ConvertRate { get; set; }
+
 
         [Obsolete]
         public long ConvertedWeight { get; set; }
@@ -213,15 +217,16 @@ namespace GHSTShipping.Domain.Entities
         /// Orderride delivery fee and recalculate converted weight
         /// </summary>
         /// <param name="fee"></param>
-        public void OrrverideDeliveryFee(int fee)
+        public void OrrverideDeliveryFee(long fee)
         {
             this.CustomDeliveryFee = fee;
         }
 
         public void CalcConvertedWeight()
         {
-            this.ConvertedWeight = this.Length * this.Width * this.Height;
-            this.CalculateWeight = this.ConvertedWeight;
+            var convertedWeight = new ShopPricePlan().CalcConvertedWeight(this.Length, this.Width, this.Height, this.ConvertRate);
+            this.ConvertedWeight = convertedWeight;
+            this.CalculateWeight = convertedWeight;
         }
 
         public void PrivateUpdateFromPartner(

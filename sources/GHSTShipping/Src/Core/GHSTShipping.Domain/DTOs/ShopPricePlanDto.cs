@@ -6,6 +6,7 @@ namespace GHSTShipping.Domain.DTOs
 {
     public class ShopPricePlanDto
     {
+
         public int No { get; set; }
 
         public Guid Id { get; set; }
@@ -34,5 +35,19 @@ namespace GHSTShipping.Domain.DTOs
         public int Height { get; set; }
 
         public int ConvertedWeight { get; set; }
+
+        private int _convertRate;
+
+        public int ConvertRate
+        {
+            get
+            {
+                return _convertRate == 0 ? 1 : _convertRate;
+            }
+            set
+            {
+                _convertRate = value;
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ using GHSTShipping.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GHSTShipping.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241111144001_AddConvertRateToPricePlance")]
+    partial class AddConvertRateToPricePlance
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,9 +45,6 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)");
 
-                    b.Property<int>("ConvertRate")
-                        .HasColumnType("int");
-
                     b.Property<long>("ConvertedWeight")
                         .HasColumnType("bigint");
 
@@ -62,14 +62,14 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<long>("CustomDeliveryFee")
-                        .HasColumnType("bigint");
+                    b.Property<int>("CustomDeliveryFee")
+                        .HasColumnType("int");
 
                     b.Property<int?>("DeliverStationId")
                         .HasColumnType("int");
 
-                    b.Property<long>("DeliveryFee")
-                        .HasColumnType("bigint");
+                    b.Property<int>("DeliveryFee")
+                        .HasColumnType("int");
 
                     b.Property<string>("DeliveryPartner")
                         .HasMaxLength(100)
@@ -183,9 +183,6 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                     b.Property<string>("ReturnWardName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("RootConvertRate")
-                        .HasColumnType("int");
 
                     b.Property<int>("RootHeight")
                         .HasColumnType("int");
@@ -662,13 +659,13 @@ namespace GHSTShipping.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("int");
 
-                    b.Property<long>("OfficialPrice")
+                    b.Property<decimal>("OfficialPrice")
                         .HasPrecision(18, 2)
-                        .HasColumnType("bigint");
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<long>("PrivatePrice")
+                    b.Property<decimal>("PrivatePrice")
                         .HasPrecision(18, 2)
-                        .HasColumnType("bigint");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("ShopId")
                         .HasColumnType("uniqueidentifier");

@@ -45,10 +45,10 @@ namespace GHSTShipping.Application.Features.Shops.Commands
             if (request.Mode == "mutilple")
             {
                 var currentPrice = request.OfficialPrice;
-                var currentConvertedWeight = new ShopPricePlan().CalcConvertedWeight(request.Length, request.Width, request.Height);
+                var fixedConvertedWeight = new ShopPricePlan().CalcConvertedWeight(request.Length, request.Width, request.Height, request.ConvertRate);
                 var maxConvertedWeight = request.MaxConvertedWeight;
                 int loop = 0;
-                while (maxConvertedWeight > currentConvertedWeight)
+                while (maxConvertedWeight > fixedConvertedWeight)
                 {
                     if (loop >= MAX_LOOP)
                     {
@@ -64,7 +64,8 @@ namespace GHSTShipping.Application.Features.Shops.Commands
                        request.Length,
                        request.Width,
                        request.Height,
-                       currentConvertedWeight
+                       request.ConvertRate,
+                       fixedConvertedWeight
                     );
 
                     shopPricePlanes.Add(pricePlan);
@@ -73,7 +74,7 @@ namespace GHSTShipping.Application.Features.Shops.Commands
                     currentPrice += request.StepPrice;
 
                     // Next converted weight
-                    currentConvertedWeight += request.StepWeight;
+                    fixedConvertedWeight += request.StepWeight;
 
                     loop++;
                 }
@@ -88,7 +89,8 @@ namespace GHSTShipping.Application.Features.Shops.Commands
                     request.Weight,
                     request.Length,
                     request.Width,
-                    request.Height
+                    request.Height,
+                    request.ConvertRate
                     ));
             }
 
@@ -143,6 +145,7 @@ namespace GHSTShipping.Application.Features.Shops.Commands
                     pricePlan.Length = request.Length;
                     pricePlan.Width = request.Width;
                     pricePlan.Height = request.Height;
+                    pricePlan.ConvertRate = request.ConvertRate;
                     pricePlan.CalcConvertedWeight();
 
                     await unitOfWork.SaveChangesAsync(cancellationToken);

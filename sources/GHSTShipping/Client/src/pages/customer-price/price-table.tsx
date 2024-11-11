@@ -1,31 +1,20 @@
-import type { IPaginationResponse, PaginationResponse, ShopPricePlanDto } from '@/interface/business';
+import type { IPaginationResponse, ShopPricePlanDto } from '@/interface/business';
 import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
-
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, message, Modal, Row, Table, Tag, Typography } from 'antd';
-import { type FC, useEffect, useState } from 'react';
-
+import { Button, message, Modal, Typography } from 'antd';
+import { useEffect, useState } from 'react';
 import { apiDeleteShopPricePlan, apiGetShopPricePlanes } from '@/api/business.api';
 import { suppliers } from '@/constants/data';
 import Datatable from '@/components/core/datatable';
+import NumberFormatter from '@/components/core/NumberFormatter';
 
 const { confirm } = Modal;
 
-interface ShopPricePlanDatatable {
+interface ShopPricePlanDatatable extends ShopPricePlanDto {
   no: number;
-  id: string; // Guid in C# can be represented as a string in TypeScript
-  shopId: string; // Guid in C# can be represented as a string in TypeScript
   shopName: string;
   shopUniqueCode: string;
-  supplier: 'GHN' | 'SHOPEE EXPRESS' | 'J&T' | 'Best' | 'Viettel' | 'GHTK'; // Có thể giới hạn giá trị nếu cần
-  privatePrice: number; // decimal in C# can be represented as number in TypeScript
-  officialPrice: number; // decimal in C# can be represented as number in TypeScript
-  weight: number;
-  length: number;
-  width: number;
-  height: number;
-  convertedWeight: number;
 }
 
 interface PriceTableProps {
@@ -132,26 +121,39 @@ const PriceTable = (props: PriceTableProps) => {
       },
     },
     {
+      title: 'Khối lượng chuyển đổi',
+      dataIndex: 'convertedWeight',
+      key: 'convertedWeight',
+      align: 'right' as const,
+      render: (value: number) => {
+        return <NumberFormatter value={value} />;
+      },
+    },
+    {
       title: 'Cân nặng',
       dataIndex: 'weight',
       key: 'weight',
       align: 'right' as const,
+      render: (value: number) => {
+        return <NumberFormatter value={value} unit="gram" style="unit" />;
+      },
     },
     {
       title: 'Dài x Rộng x Cao',
       dataIndex: '_lxwxh',
       key: '_lxwxh',
-      align: 'right' as const,
+      align: 'center' as const,
       render: (value: string, record: ShopPricePlanDatatable) => {
-        return <span>{`${record.length}x${record.width}x${record.height}`}</span>;
+        return (
+          <div>
+            <span>{`(${record.length}x${record.width}x${record.height})`}</span>
+            <hr />
+            <div>{`${record.convertRate}`}</div>
+          </div>
+        );
       },
     },
-    {
-      title: 'Khối lượng chuyển đổi',
-      dataIndex: 'convertedWeight',
-      key: 'convertedWeight',
-      align: 'right' as const,
-    },
+
     {
       title: 'Thao tác',
       key: 'action',
@@ -201,6 +203,7 @@ const PriceTable = (props: PriceTableProps) => {
           width: record.width,
           height: record.height,
           convertedWeight: record.convertedWeight,
+          convertRate: record.convertRate,
         } as ShopPricePlanDto,
         (success: boolean) => {
           if (success) {
@@ -212,7 +215,7 @@ const PriceTable = (props: PriceTableProps) => {
 
   const handleDelete = async (record: ShopPricePlanDatatable) => {
     const { id } = record;
-    await apiDeleteShopPricePlan(id);
+    await apiDeleteShopPricePlan(id as string);
     setReloadTable(!reloadTable);
   };
 
@@ -221,8 +224,7 @@ const PriceTable = (props: PriceTableProps) => {
     setTableFilters(filters);
   };
 
-  const handleSelectedRows = (rows: any[]) => {
-  };
+  const handleSelectedRows = (rows: any[]) => {};
 
   const handleDeleteRows = async (rows: any[]) => {
     const ids = rows.map(i => i.id);

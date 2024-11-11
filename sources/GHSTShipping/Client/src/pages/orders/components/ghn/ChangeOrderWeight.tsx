@@ -45,6 +45,10 @@ const ChangeOrderWeight: React.FC<ChangeOrderWeightProps> = ({ order, onSubmit, 
         <Form.Item label="Chiều cao mới" name="height" rules={[{ required: true, message: 'Vui lòng nhập chiều cao mới' }]}>
           <InputNumber min={1} placeholder="Nhập chiều cao mới" style={{ width: '100%' }} />
         </Form.Item>
+
+        <Form.Item label="Tỉ lệ quy đổi" name="convertRate" rules={[{ required: true, message: 'Vui lòng nhập' }]}>
+          <InputNumber min={1} placeholder="Nhập giá trị" style={{ width: '100%' }} />
+        </Form.Item>
       </Form>
     </Modal>
   );
