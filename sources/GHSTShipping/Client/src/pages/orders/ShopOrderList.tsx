@@ -168,7 +168,16 @@ const ShopOrderList = () => {
       dataIndex: 'deliveryFee',
       key: 'deliveryFee',
       align: 'right',
-      render: (value: number) => {
+      render: (value: number, record: IOrderViewDto) => {
+        if (record.status === 'waiting_confirm') {
+          return (
+            <div>
+              <div>Tạm tính</div>
+              <Price value={value} type="success" />
+            </div>
+          );
+        }
+
         return <Price value={value} type="success" />;
       },
     },

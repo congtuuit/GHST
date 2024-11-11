@@ -69,6 +69,12 @@ namespace GHSTShipping.Domain.Entities
             this.ConvertedWeight = convertedWeight;
         }
 
+        public int CalcConvertedWeight()
+        {
+            this.ConvertedWeight = this.Length * this.Width * this.Height;
+            return this.ConvertedWeight;
+        }
+
         public int CalcConvertedWeight(int length, int width, int height)
         {
             return length * width * height;

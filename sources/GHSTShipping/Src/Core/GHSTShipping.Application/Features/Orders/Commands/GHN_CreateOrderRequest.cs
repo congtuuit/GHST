@@ -317,12 +317,15 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             Guid shopId)
         {
             string deliveryPartner = EnumSupplierConstants.GHN;
-            var calculateWeight = convertedWeight;
-            var result = await unitOfWork.ShopPricePlanes
-                .Where(i => i.ShopId == shopId && i.Supplier == deliveryPartner && i.ConvertedWeight > calculateWeight)
-                .OrderBy(i => i.ConvertedWeight)
+            var orderConvertedWeight = convertedWeight;
+
+            var nearestPrice = await unitOfWork.ShopPricePlanes
+                .Where(i => i.ShopId == shopId && i.Supplier == deliveryPartner)
+                .OrderBy(i => Math.Abs(i.ConvertedWeight - orderConvertedWeight))
                 .Select(i => i.OfficialPrice)
                 .FirstOrDefaultAsync();
+
+            var result = nearestPrice;
 
             return (int)result;
         }

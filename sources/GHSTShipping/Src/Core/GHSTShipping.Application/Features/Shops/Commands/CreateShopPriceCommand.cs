@@ -143,6 +143,7 @@ namespace GHSTShipping.Application.Features.Shops.Commands
                     pricePlan.Length = request.Length;
                     pricePlan.Width = request.Width;
                     pricePlan.Height = request.Height;
+                    pricePlan.CalcConvertedWeight();
 
                     await unitOfWork.SaveChangesAsync(cancellationToken);
                     await transaction.CommitAsync(cancellationToken);
