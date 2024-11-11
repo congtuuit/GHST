@@ -18,6 +18,7 @@ import { useGuide } from '../guide/useGuide';
 import HeaderComponent from './header';
 import MenuComponent from './menu';
 import TagsView from './tagView';
+import VersionNumber from './VersionNumber';
 
 const { Sider, Content } = Layout;
 const WIDTH = 992;
@@ -147,6 +148,7 @@ const LayoutPage: FC = () => {
           </Suspense>
         </Content>
       </Layout>
+      <VersionNumber />
     </Layout>
   );
 };

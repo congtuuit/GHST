@@ -33,7 +33,8 @@
     "cleanFiles": "node cleanFiles.js D:/deploy_ghst",
     "artifact": "node archiver.js D:/deploy_ghst -o D:/artifact",
     "release": "node clean.js D:/deploy_ghst && yarn build-fe && yarn build-be && yarn cleanFiles",
-    "publish:zip": "yarn release && yarn artifact"
+    "update-version": "node update-release-version.js",
+    "publish:zip": "yarn update-version && yarn release && yarn artifact"
   },
   "browserslist": {
     "production": [
