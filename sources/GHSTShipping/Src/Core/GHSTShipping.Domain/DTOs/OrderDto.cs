@@ -15,7 +15,7 @@ namespace GHSTShipping.Domain.DTOs
         public Guid? ShopId { get; set; }
         public string ShopName { get; set; }
         public string DeliveryPartner { get; set; }
-        public int DeliveryFee { get; set; }
+        public long DeliveryFee { get; set; }
 
         public string ClientOrderCode { get; set; }
         public string FromName { get; set; }

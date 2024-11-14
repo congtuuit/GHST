@@ -1,4 +1,5 @@
 ﻿using GHSTShipping.Application.DTOs.Shop;
+using GHSTShipping.Application.Features.Configs.Queries;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Wrappers;
@@ -23,6 +24,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
     public class GetOrderMetadataResponse
     {
         public List<DeliveryConfigDto> DeliveryConfigs { get; set; }
+        public List<ShopDeliveryPricePlaneDto> DeliveryPricePlanes { get; set; }
 
         public class DeliveryConfigDto
         {
@@ -49,19 +51,22 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         private readonly IShopPartnerConfigRepository _shopPartnerConfigRepository;
         private readonly IPartnerConfigRepository _partnerConfigRepository;
         private readonly IPartnerConfigService _partnerConfigService;
+        private readonly IMediator _mediator;
 
         public GetOrderMetadataRequestHandler(
             IAuthenticatedUserService authenticatedUser,
             IShopRepository shopRepository,
             IShopPartnerConfigRepository shopPartnerConfigRepository,
             IPartnerConfigRepository partnerConfigRepository,
-            IPartnerConfigService partnerConfigService)
+            IPartnerConfigService partnerConfigService,
+            IMediator mediator)
         {
             _authenticatedUserService = authenticatedUser;
             _shopRepository = shopRepository;
             _shopPartnerConfigRepository = shopPartnerConfigRepository;
             _partnerConfigRepository = partnerConfigRepository;
             _partnerConfigService = partnerConfigService;
+            _mediator = mediator;
         }
 
         public async Task<BaseResult<GetOrderMetadataResponse>> Handle(GetOrderMetadataRequest request, CancellationToken cancellationToken)
@@ -130,9 +135,16 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 results.Add(deliveryConfigDto);
             }
 
+            var deliveryPricePlanes = await _mediator.Send(new GetShopDeliveryPricePlanesRequest
+            {
+                ShopId = shop.Id,
+                IsActivated = true,
+            });
+
             var response = new GetOrderMetadataResponse()
             {
-                DeliveryConfigs = results
+                DeliveryConfigs = results,
+                DeliveryPricePlanes = deliveryPricePlanes
             };
 
             return BaseResult<GetOrderMetadataResponse>.Ok(response);

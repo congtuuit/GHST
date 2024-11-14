@@ -28,13 +28,13 @@
     "move": "node move.js \"dist\" \"../Src/Presentation/GHSTShipping.WebApi/wwwroot\"",
     "build-dev": "vite build --mode development",
     "build": "tsc && vite build",
-    "build-fe": "yarn build && yarn move",
+    "build-fe": "yarn update-version && yarn build && yarn move",
     "build-be": "cd ../Src/Presentation/GHSTShipping.WebApi && dotnet publish -c Release -r win-x86 --self-contained false -o D:/deploy_ghst",
     "cleanFiles": "node cleanFiles.js D:/deploy_ghst",
     "artifact": "node archiver.js D:/deploy_ghst -o D:/artifact",
     "release": "node clean.js D:/deploy_ghst && yarn build-fe && yarn build-be && yarn cleanFiles",
     "update-version": "node update-release-version.js",
-    "publish:zip": "yarn update-version && yarn release && yarn artifact"
+    "publish:zip": "yarn release && yarn artifact"
   },
   "browserslist": {
     "production": [

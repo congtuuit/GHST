@@ -12,7 +12,7 @@ namespace GHSTShipping.Infrastructure.Persistence.Repositories
 {
     public class GenericRepository<T>(DbContext dbContext) : IGenericRepository<T> where T : AuditableBaseEntity
     {
-        public virtual async Task<T> GetByIdAsync(long id)
+        public virtual async Task<T> GetByIdAsync(Guid id)
         {
             return await dbContext.Set<T>().FindAsync(id);
         }

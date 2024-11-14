@@ -14,9 +14,5 @@
 		<ProjectReference Include="..\..\Infrastructure\Delivery.GHN\Delivery.GHN.csproj" />
 		<ProjectReference Include="..\GHSTShipping.Domain\GHSTShipping.Domain.csproj" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="DTOs\Orders\" />
-	  <Folder Include="Features\Configs\Queries\" />
-	</ItemGroup>
 
 </Project>

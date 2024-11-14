@@ -7,6 +7,7 @@ using GHSTShipping.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using GHSTShipping.Application.DTOs.Orders;
 
 namespace GHSTShipping.WebApi.Controllers.v1
 {
@@ -77,6 +78,14 @@ namespace GHSTShipping.WebApi.Controllers.v1
             var response = await Mediator.Send(new GHN_CountOrderByStatusRequest() { ShopId = shopId });
 
             return BaseResult<string>.Ok(response);
+        }
+
+        [HttpPost("calculate-shipping-cost")]
+        public async Task<BaseResult<OrderShippingCostDto>> CalculateShippingCost([FromBody] GHN_OrderShippingCostCalcRequest request)
+        {
+            var result = await Mediator.Send(request);
+
+            return BaseResult<OrderShippingCostDto>.Ok(result);
         }
 
     }

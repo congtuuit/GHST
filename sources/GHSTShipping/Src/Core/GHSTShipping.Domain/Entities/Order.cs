@@ -190,6 +190,8 @@ namespace GHSTShipping.Domain.Entities
         [MaxLength(100)]
         public string CurrentStatus { get; set; }
 
+        public Guid? DeliveryPricePlaneId { get; set; }
+
 
         public void GenerateOrderCode(long sequenceCode, string prefix)
         {
@@ -220,13 +222,6 @@ namespace GHSTShipping.Domain.Entities
         public void OrrverideDeliveryFee(long fee)
         {
             this.CustomDeliveryFee = fee;
-        }
-
-        public void CalcConvertedWeight()
-        {
-            var convertedWeight = new ShopPricePlan().CalcConvertedWeight(this.Length, this.Width, this.Height, this.ConvertRate);
-            this.ConvertedWeight = convertedWeight;
-            this.CalculateWeight = convertedWeight;
         }
 
         public void PrivateUpdateFromPartner(

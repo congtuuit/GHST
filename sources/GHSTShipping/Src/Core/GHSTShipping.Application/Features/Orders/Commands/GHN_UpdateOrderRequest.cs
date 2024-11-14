@@ -23,7 +23,8 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
     public class GHN_UpdateOrderRequestHandler(
         IUnitOfWork unitOfWork,
-        IOrderRepository orderRepository
+        IOrderRepository orderRepository,
+        IMediator mediator
         ) : IRequestHandler<GHN_UpdateOrderRequest, BaseResult>
     {
         public async Task<BaseResult> Handle(GHN_UpdateOrderRequest request, CancellationToken cancellationToken)
@@ -35,6 +36,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     ShopId = i.ShopId,
                     CurrentStatus = i.CurrentStatus,
                     PartnerShopId = i.PartnerShopId,
+                    DeliveryPricePlaneId = i.DeliveryPricePlaneId,
 
                     Length = i.Length,
                     Width = i.Width,
@@ -66,12 +68,18 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 order.Weight = request.Weight;
             }
 
-            order.CalcConvertedWeight();
-            var convertedWeight = (int)order.ConvertedWeight;
-            var price = await GHN_CreateOrderRequestHandler.CalculateDeliveryFeeAsync(unitOfWork, convertedWeight, order.ShopId.Value);
-            order.OrrverideDeliveryFee(price);
+            var pricePlan = await mediator.Send(new GHN_OrderShippingCostCalcRequest
+            {
+                ShopDeliveryPricePlaneId = order.DeliveryPricePlaneId.Value,
+                Height = order.Height,
+                Length = order.Length,
+                Width = order.Width,
+                Weight = order.Weight,
+            });
+            
+            order.OrrverideDeliveryFee(pricePlan.ShippingCost);
 
-            await unitOfWork.SaveChangesAsync();
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return BaseResult.Ok();
         }

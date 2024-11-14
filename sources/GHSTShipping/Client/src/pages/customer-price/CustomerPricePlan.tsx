@@ -4,14 +4,13 @@ import type { FC } from 'react';
 import './index.css';
 
 import { ReloadOutlined } from '@ant-design/icons';
-import { Button, Card, Col, message, Row, Select, Tabs } from 'antd';
+import { Button, Card, Col, message, Row, Select } from 'antd';
 import { useEffect, useState } from 'react';
 
 import { apiCreateShopPricePlan, apiGetShops } from '@/api/business.api';
 
 import PriceTable from './price-table';
 import PriceConfigurationForm from './PriceConfigurationForm';
-import SystemDeliveryPricePlane from './SystemDeliveryPricePlane';
 
 const { Option } = Select;
 
@@ -20,7 +19,7 @@ interface Shop {
   shopName: string;
 }
 
-const CustomerPricePage: FC = () => {
+const CustomerPricePlan: FC = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const [selectedShop, setSelectedShop] = useState<string | undefined>(undefined);
   const [refreshTable, setRefreshTable] = useState<boolean>(false);
@@ -74,17 +73,37 @@ const CustomerPricePage: FC = () => {
   };
 
   return (
-    <Card>
-      <Tabs defaultActiveKey="1">
-        <Tabs.TabPane tab="Bảng giá chung" key="1">
-          <SystemDeliveryPricePlane />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Bảng giá khách hàng" key="2">
-          <p>Bảng giá khách hàng</p>
-        </Tabs.TabPane>
-      </Tabs>
-    </Card>
+    <div>
+      <Row style={{ flexFlow: 'row-reverse', marginBottom: '10px' }}>
+        <Col span={12}>
+          <span>Chọn Shop / Khách hàng</span>
+          <Select
+            value={selectedShop}
+            onChange={handleChange}
+            style={{ width: '100%' }} // Adjust width as needed
+            placeholder="Chọn khách hàng"
+          >
+            {shops.map(shop => (
+              <Option key={shop.shopId} value={shop.shopId}>
+                {shop.shopName}
+              </Option>
+            ))}
+          </Select>
+        </Col>
+      </Row>
+      <Row>
+        <Card title="Cấu hình bảng giá" style={{ width: '100%' }}>
+          <PriceConfigurationForm onSubmit={handleUpdatePriceConfig} data={updateShopPricePlan} />
+          <Button onClick={() => setRefreshTable(!refreshTable)}>
+            <ReloadOutlined /> Làm mới
+          </Button>
+          <Row>
+            <PriceTable refreshTable={refreshTable} selectedShop={selectedShop} onEdit={handleEdit} />
+          </Row>
+        </Card>
+      </Row>
+    </div>
   );
 };
 
-export default CustomerPricePage;
+export default CustomerPricePlan;

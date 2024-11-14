@@ -48,10 +48,8 @@ function updateEnvVersion(version) {
 }
 
 // Get the version from the command line arguments or generate one
-const userProvidedVersion = process.argv[2];
-const version = userProvidedVersion && /^\d+$/.test(userProvidedVersion)
-  ? userProvidedVersion
-  : generateVersionFromDate();
+//const userProvidedVersion = process.argv[2];
+const version = generateVersionFromDate();
 
 // Run the update
 updateEnvVersion(version);

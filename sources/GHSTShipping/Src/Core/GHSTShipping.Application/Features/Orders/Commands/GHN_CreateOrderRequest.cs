@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Delivery.GHN;
 using Delivery.GHN.Models;
+using GHSTShipping.Application.DTOs.Orders;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Wrappers;
@@ -19,6 +20,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 {
     public class GHN_CreateOrderRequest : CreateDeliveryOrderRequest, IRequest<BaseResult<CreateDeliveryOrderResponse>>
     {
+        public Guid ShopDeliveryPricePlaneId { get; set; }
     }
 
     public class GHN_CreateOrderRequestHandler : IRequestHandler<GHN_CreateOrderRequest, BaseResult<CreateDeliveryOrderResponse>>
@@ -159,8 +161,14 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             var uniqueShopCode = shop.UniqueCode;
             var allowPublishOrder = shop.AllowPublishOrder;
 
-            var convertedWeight = new ShopPricePlan().CalcConvertedWeight(request.Length, request.Width, request.Height, CONVERT_RATE);
-            var deliveryFeePlan = await CalculateDeliveryFeeAsync(_unitOfWork, convertedWeight, shopId);
+            var deliveryFeePlan = await _mediator.Send(new GHN_OrderShippingCostCalcRequest()
+            {
+                ShopDeliveryPricePlaneId = request.ShopDeliveryPricePlaneId,
+                Height = request.Height,
+                Length = request.Length,
+                Weight = request.Weight,
+                Width = request.Width
+            });
 
             // Handle orverride sender address using shop address got from deliery partner
             var allowUsePartnerShopAddress = shop.AllowUsePartnerShopAddress;
@@ -179,7 +187,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 shop,
                 deliveryFeePlan,
                 partnerShopId);
-            order.CalcConvertedWeight();
+
             order.OrrverideDeliveryFee(order.DeliveryFee);
             order.GenerateOrderCode(await _orderCodeSequenceService.GenerateOrderCodeAsync(shopId), uniqueShopCode);
             await _orderRepository.AddAsync(order);
@@ -199,7 +207,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         private Order CreateOrderEntity(
             GHN_CreateOrderRequest request,
             ShopQueryDto shop,
-            long deliveryFeePlan,
+            OrderShippingCostDto deliveryFeePlan,
             string partnerShopId)
         {
             var shopId = shop.Id;
@@ -209,12 +217,14 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
             return new Order
             {
+                DeliveryPricePlaneId = request.ShopDeliveryPricePlaneId,
+
                 PartnerShopId = partnerShopId,
                 ShopId = shopId,
                 UniqueCode = uniqueShopCode,
                 IsPublished = allowPublishOrder ? true : false,
                 DeliveryPartner = EnumSupplierConstants.GHN,
-                DeliveryFee = deliveryFeePlan,
+                DeliveryFee = deliveryFeePlan.ShippingCost,
                 PublishDate = allowPublishOrder ? DateTime.UtcNow : null,
                 CurrentStatus = allowPublishOrder ? OrderStatus.READY_TO_PICK : OrderStatus.WAITING_CONFIRM,
                 Note = request.Note,
@@ -316,25 +326,6 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 ShopId = entity.ShopId.Value,
                 PartnerOrderCode = entity.private_order_code
             });
-        }
-
-        public static async Task<long> CalculateDeliveryFeeAsync(
-            IUnitOfWork unitOfWork,
-            long convertedWeight,
-            Guid shopId)
-        {
-            string deliveryPartner = EnumSupplierConstants.GHN;
-            long orderConvertedWeight = convertedWeight;
-
-            var nearestPrice = await unitOfWork.ShopPricePlanes
-                .Where(i => i.ShopId == shopId && i.Supplier == deliveryPartner)
-                .OrderBy(i => Math.Abs(i.ConvertedWeight - orderConvertedWeight))
-                .Select(i => i.OfficialPrice)
-                .FirstOrDefaultAsync();
-
-            var result = nearestPrice;
-
-            return result;
         }
 
         private void LogRequestData(GHN_CreateOrderRequest request)
