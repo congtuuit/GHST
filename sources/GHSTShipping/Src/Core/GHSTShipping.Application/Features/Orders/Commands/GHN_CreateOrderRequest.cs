@@ -2,6 +2,7 @@
 using Delivery.GHN;
 using Delivery.GHN.Models;
 using GHSTShipping.Application.DTOs.Orders;
+using GHSTShipping.Application.Features.Configs.Queries;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Wrappers;
@@ -20,7 +21,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 {
     public class GHN_CreateOrderRequest : CreateDeliveryOrderRequest, IRequest<BaseResult<CreateDeliveryOrderResponse>>
     {
-        public Guid ShopDeliveryPricePlaneId { get; set; }
+        public Guid? ShopDeliveryPricePlaneId { get; set; }
     }
 
     public class GHN_CreateOrderRequestHandler : IRequestHandler<GHN_CreateOrderRequest, BaseResult<CreateDeliveryOrderResponse>>
@@ -73,12 +74,36 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
         public async Task<BaseResult<CreateDeliveryOrderResponse>> Handle(GHN_CreateOrderRequest request, CancellationToken cancellationToken)
         {
+            if (request.ShopDeliveryPricePlaneId.HasValue == false)
+            {
+                return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.AccessDenied, "Vui lòng chọn bảng giá!"));
+            }
+
             LogRequestData(request);
 
             var shop = await GetShopDetailsAsync(cancellationToken);
             if (shop == null || !shop.IsVerified)
             {
                 return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.AccessDenied, "Cửa hàng chưa được kích hoạt, vui lòng liên hệ Admin"));
+            }
+
+            // validate price plane
+            var shopDeliveryPricePlanes = await _mediator.Send(new GetShopDeliveryPricePlanesRequest
+            {
+                ShopId = shop.Id,
+            });
+
+            if (shopDeliveryPricePlanes.Success)
+            {
+                var validPricePlane = shopDeliveryPricePlanes.Data.FirstOrDefault(i => i.Id == request.ShopDeliveryPricePlaneId);
+                if (validPricePlane == null)
+                {
+                    return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.AccessDenied, "Bảng giá không hợp lệ, vui lòng kiểm tra lại!"));
+                }
+            }
+            else
+            {
+                return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.AccessDenied, "Bảng giá không hợp lệ, vui lòng kiểm tra lại!"));
             }
 
             var deliveryConfig = await GetDeliveryConfigAsync(shop.Id, cancellationToken);
@@ -163,7 +188,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
             var deliveryFeePlan = await _mediator.Send(new GHN_OrderShippingCostCalcRequest()
             {
-                ShopDeliveryPricePlaneId = request.ShopDeliveryPricePlaneId,
+                ShopDeliveryPricePlaneId = request.ShopDeliveryPricePlaneId.Value,
                 Height = request.Height,
                 Length = request.Length,
                 Weight = request.Weight,

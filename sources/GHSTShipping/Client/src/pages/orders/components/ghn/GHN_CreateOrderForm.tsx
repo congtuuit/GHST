@@ -10,11 +10,11 @@ import { setOrder } from '@/features/order/orderSlice'; // Adjust the path accor
 import { debounce } from '@/utils/common';
 import { getItemWithExpiry, setItemWithExpiry } from '@/utils/common';
 import { IPickShift } from '@/interface/business';
-import './style.css';
-import { fakeOrder } from './create-fake-data';
 import { DeliveredProcedureOutlined } from '@ant-design/icons';
 import OrderBuilder from '@/features/order/order.builder';
 import { IOrder } from '@/features/order/type';
+import './style.css';
+import { DeliveryPricePlaneFormDto } from '@/interface/shop';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -33,10 +33,11 @@ type Item = {
 
 interface FormOrderGhnProps {
   isActivated: boolean;
+  deliveryPricePlanes?: DeliveryPricePlaneFormDto[];
 }
 
-const FormOrderGhn = (props: FormOrderGhnProps) => {
-  const { isActivated } = props;
+const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
+  const { isActivated, deliveryPricePlanes = [] } = props;
   const dispatch = useDispatch();
   const session = useSelector(state => state?.user?.session);
   const [pickShifts, setPickShifts] = useState<IPickShift[]>([]);
@@ -159,6 +160,12 @@ const FormOrderGhn = (props: FormOrderGhnProps) => {
     fetchPickShifts();
   }, []);
 
+  useEffect(() => {
+    if (deliveryPricePlanes && deliveryPricePlanes.length > 0) {
+      form.setFieldValue('shopDeliveryPricePlaneId', deliveryPricePlanes[0]?.id);
+    }
+  }, [deliveryPricePlanes]);
+
   const CreateOrderButton = () => {
     return (
       <Button htmlType="button" type="primary" onClick={handleFormSubmit} style={{ marginBottom: '10px', marginTop: '10px', float: 'right' }}>
@@ -171,7 +178,29 @@ const FormOrderGhn = (props: FormOrderGhnProps) => {
     <div style={{ maxHeight: '83vh', overflowY: 'auto' }}>
       <Form layout="vertical" form={form} onValuesChange={handleValuesChange} disabled={!isActivated}>
         <Card style={{ marginBottom: '16px' }}>
-          <Row>
+          <Row gutter={[16, 16]}>
+            <Col span={12}>
+              <Form.Item
+                label="Bảng giá"
+                name="shopDeliveryPricePlaneId"
+                valuePropName="value"
+                getValueFromEvent={value => [value]}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Vui lòng chọn bảng giá',
+                  },
+                ]}
+              >
+                <Select placeholder="Chọn bảng giá">
+                  {deliveryPricePlanes.map(i => (
+                    <Option key={i.id} value={i.id}>
+                      {i.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
             <Col span={12}>
               <Form.Item
                 label="Ca lấy hàng"
@@ -285,4 +314,4 @@ const FormOrderGhn = (props: FormOrderGhnProps) => {
   );
 };
 
-export default FormOrderGhn;
+export default GHN_CreateOrderForm;

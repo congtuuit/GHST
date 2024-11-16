@@ -1,8 +1,10 @@
 ﻿using GHSTShipping.Application.DTOs.Orders;
 using GHSTShipping.Application.Interfaces.Repositories;
+using GHSTShipping.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,9 +31,38 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         public async Task<OrderShippingCostDto> Handle(GHN_OrderShippingCostCalcRequest request, CancellationToken cancellationToken)
         {
             // Lấy thông tin bảng giá theo ShopDeliveryPricePlaneId
-            var pricePlane = await _repository
-                .Where(x => x.Id == request.ShopDeliveryPricePlaneId && x.IsActivated)
+            var validPricePlane = await _repository
+                .Where(x => x.Id == request.ShopDeliveryPricePlaneId)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.RelatedToDeliveryPricePlaneId,
+                })
                 .FirstOrDefaultAsync(cancellationToken);
+
+            if (validPricePlane == null)
+            {
+                throw new Exception("Không tìm thấy bảng giá cho ShopDeliveryPricePlaneId đã cung cấp.");
+            }
+
+            var pricePlane = await _repository.Where(i => i.Id == validPricePlane.RelatedToDeliveryPricePlaneId)
+                    .Select(i => new DeliveryPricePlane
+                    {
+                        Id = i.Id,
+                        ShopId = i.ShopId,
+                        Name = i.Name,
+                        MinWeight = i.MinWeight,
+                        MaxWeight = i.MaxWeight,
+                        PublicPrice = i.PublicPrice,
+                        PrivatePrice = i.PrivatePrice,
+                        StepPrice = i.StepPrice,
+                        StepWeight = i.StepWeight,
+                        LimitInsurance = i.LimitInsurance,
+                        InsuranceFeeRate = i.InsuranceFeeRate,
+                        ReturnFeeRate = i.ReturnFeeRate,
+                        ConvertWeightRate = i.ConvertWeightRate,
+                    })
+                    .FirstOrDefaultAsync();
 
             if (pricePlane == null)
             {

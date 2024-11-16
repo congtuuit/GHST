@@ -1,13 +1,13 @@
 import { Card, Col } from 'antd';
 import { useEffect, useState } from 'react';
 import { supplierKeys } from '@/constants/data';
-import FormOrderGhn from './components/ghn/form-order.ghn';
+import GHN_CreateOrderForm from './components/ghn/GHN_CreateOrderForm';
 import { apiGetOrderMetaData } from '@/api/business.api';
 import { IOrderMetadata } from '@/interface/shop';
 
 const CreateOrderPage = () => {
   const [isActiveGhnForm, setIsActiveGhnForm] = useState<boolean>(false);
-  const [_, setCreateOrderMetadata] = useState<IOrderMetadata>();
+  const [orderMeataData, setCreateOrderMetadata] = useState<IOrderMetadata>();
 
   const fetchCreateOrderMetadata = async () => {
     const response = await apiGetOrderMetaData();
@@ -27,10 +27,12 @@ const CreateOrderPage = () => {
     fetchCreateOrderMetadata();
   }, []);
 
+  console.log('orderMeataData ', orderMeataData);
+
   return (
     <Card className="my-card-containter" title="Tạo đơn hàng">
       <Col span={24}>
-        <FormOrderGhn isActivated={isActiveGhnForm} />
+        <GHN_CreateOrderForm isActivated={isActiveGhnForm} deliveryPricePlanes={orderMeataData?.deliveryPricePlanes} />
       </Col>
     </Card>
   );

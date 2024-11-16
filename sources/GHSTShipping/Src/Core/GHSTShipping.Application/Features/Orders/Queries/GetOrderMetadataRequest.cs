@@ -138,7 +138,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             var deliveryPricePlanes = await _mediator.Send(new GetShopDeliveryPricePlanesRequest
             {
                 ShopId = shop.Id,
-                IsActivated = true,
+                //IsActivated = true, // TODO allow enable or disable delivery config price
             });
 
             var response = new GetOrderMetadataResponse()

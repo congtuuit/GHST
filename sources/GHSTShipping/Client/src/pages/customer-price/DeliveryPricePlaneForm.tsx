@@ -1,24 +1,8 @@
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Form, Input, InputNumber, Button, Switch, Space, Card, Row, Col, FormInstance } from 'antd';
+import { DeliveryPricePlaneFormDto } from '@/interface/shop';
 
-export interface DeliveryPricePlaneFormDto {
-  id?: string;
-  shopId?: string;
-  name: string;
-  minWeight: number;
-  maxWeight: number;
-  publicPrice: number;
-  privatePrice: number;
-  stepPrice: number;
-  stepWeight: number;
-  limitInsurance: number;
-  insuranceFeeRate: number;
-  returnFeeRate: number;
-  convertWeightRate: number;
-  isActivated: boolean;
 
-  parentId?: string;
-}
 
 interface DeliveryPricePlaneFormProps {
   onSubmit: (values: DeliveryPricePlaneFormDto) => void;
