@@ -144,7 +144,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             var response = new GetOrderMetadataResponse()
             {
                 DeliveryConfigs = results,
-                DeliveryPricePlanes = deliveryPricePlanes
+                DeliveryPricePlanes = deliveryPricePlanes.Data
             };
 
             return BaseResult<GetOrderMetadataResponse>.Ok(response);

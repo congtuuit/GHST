@@ -1,28 +1,53 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Table, Button, Modal, notification, Space, message } from 'antd';
+import { useState, useEffect, useRef } from 'react';
+import { Table, Button, Modal, Space, message, Select } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import DeliveryPricePlaneForm, { DeliveryPricePlaneFormDto } from './DeliveryPricePlaneForm';
+import { DeliveryPricePlaneFormDto } from './DeliveryPricePlaneForm';
 import { request } from '@/api/base/request';
 import NumberFormatter from '@/components/core/NumberFormatter';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 const { confirm } = Modal;
 
-const SystemDeliveryPricePlane: React.FC = () => {
-  const formRef = useRef<any>();
+interface ShopDeliveryPricePlaneProps {
+  shopId: string | undefined;
+}
 
-  const [data, setData] = useState<DeliveryPricePlaneFormDto[]>([]);
+const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
+  const { shopId } = props;
+
+  const formRef = useRef<any>();
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [pricePlanceEditData, setPricePlanceEditData] = useState<DeliveryPricePlaneFormDto>();
+  const [remainPricePlanes, setRemainPricePlanes] = useState<DeliveryPricePlaneFormDto[]>([]);
+  const [shopPricePlanes, setShopPricePlanes] = useState<DeliveryPricePlaneFormDto[]>([]);
+
+  const [selectedPricePlaneId, setSelectedPricePlaneId] = useState<string>('');
 
   // Fetch danh sách DeliveryPricePlanes
   const fetchDeliveryPricePlanes = async () => {
-    setLoading(true);
     try {
-      const response = await request('get', '/DeliveryPricePlane/List');
-      setData(response.data || []);
+      setLoading(true); // Đảm bảo set loading trước khi bắt đầu fetch dữ liệu
+
+      // Thực hiện 2 request đồng thời
+      const [response2, response] = await Promise.all([
+        request('get', `/DeliveryPricePlane/List?ShopId=${shopId}`),
+        request('get', `/DeliveryPricePlane/List`),
+      ]);
+
+      let _shopPricePlanes: DeliveryPricePlaneFormDto[] = [];
+      if (response2.success) {
+        _shopPricePlanes = response2.data.filter((i: DeliveryPricePlaneFormDto) => i.shopId === shopId);
+        setShopPricePlanes(_shopPricePlanes);
+      }
+
+      if (response.success) {
+        const shopPricePlaneIds = new Set(_shopPricePlanes.map((x: DeliveryPricePlaneFormDto) => x.parentId));
+        const _remainPricePlanes = response.data.filter((i: DeliveryPricePlaneFormDto) => !shopPricePlaneIds.has(i.id));
+        setRemainPricePlanes(_remainPricePlanes);
+      }
     } catch (error) {
+      console.error('Lỗi:', error);
       message.error('Lỗi khi tải dữ liệu');
     } finally {
       setLoading(false);
@@ -53,6 +78,24 @@ const SystemDeliveryPricePlane: React.FC = () => {
         },
         onCancel() {},
       });
+    }
+  };
+
+  const handleSelectChange = (value: any) => {
+    setSelectedPricePlaneId(value);
+  };
+
+  const handleAssignDeliveryPricePlaneToShop = async () => {
+    const req = {
+      shopId: shopId,
+      deliveryPricePlaneIds: [selectedPricePlaneId],
+    };
+
+    const response = await request('post', '/DeliveryPricePlane/Assign', req);
+    console.log('response ', response);
+    if (response.success) {
+      fetchDeliveryPricePlanes();
+      message.success('Thêm thành công');
     }
   };
 
@@ -157,14 +200,10 @@ const SystemDeliveryPricePlane: React.FC = () => {
     {
       title: 'Thao tác',
       key: 'action',
-      width: 200,
       align: 'center' as const,
       render: (_: any, record: DeliveryPricePlaneFormDto) => {
         return (
           <div key={record.id}>
-            <Button className="table-btn-action" size="small" onClick={() => handleEditPricePlane(record)}>
-              <EditOutlined /> Sửa
-            </Button>
             <Button danger className="table-btn-action" size="small" onClick={() => handleDeletePricePlane(record)}>
               <DeleteOutlined />
             </Button>
@@ -177,26 +216,31 @@ const SystemDeliveryPricePlane: React.FC = () => {
   return (
     <div>
       <Space style={{ marginBottom: 16 }}>
-        <Button
-          type="primary"
-          onClick={() => {
-            setIsModalVisible(true);
-            setPricePlanceEditData({} as DeliveryPricePlaneFormDto);
-          }}
-        >
-          Thêm mới
+        <Select
+          onChange={handleSelectChange}
+          placeholder="Chọn bảng giá..."
+          style={{ width: '300px' }}
+          value={selectedPricePlaneId}
+          options={remainPricePlanes?.map(i => {
+            return {
+              value: i.id,
+              label: i.name,
+            };
+          })}
+        ></Select>
+        <Button disabled={selectedPricePlaneId === ''} type="primary" onClick={handleAssignDeliveryPricePlaneToShop}>
+          Thêm
+        </Button>
+
+        <Button type="dashed" onClick={fetchDeliveryPricePlanes}>
+          Làm mới
         </Button>
       </Space>
 
       {/* Bảng danh sách DeliveryPricePlanes */}
-      <Table columns={columns} dataSource={data} loading={loading} rowKey={record => record.id || ''} />
-
-      {/* Modal hiển thị Form */}
-      <Modal width={600} centered title="Tạo Bảng Giá Giao Hàng Mới" open={isModalVisible} onCancel={() => setIsModalVisible(false)} footer={null}>
-        <DeliveryPricePlaneForm ref={formRef} onSubmit={(values: DeliveryPricePlaneFormDto) => handleCreate(values)} loading={formLoading} />
-      </Modal>
+      <Table columns={columns} dataSource={shopPricePlanes} loading={loading} rowKey={record => record.id || ''} />
     </div>
   );
 };
 
-export default SystemDeliveryPricePlane;
+export default ShopDeliveryPricePlane;

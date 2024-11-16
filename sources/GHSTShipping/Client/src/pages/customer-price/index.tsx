@@ -12,6 +12,7 @@ import { apiCreateShopPricePlan, apiGetShops } from '@/api/business.api';
 import PriceTable from './price-table';
 import PriceConfigurationForm from './PriceConfigurationForm';
 import SystemDeliveryPricePlane from './SystemDeliveryPricePlane';
+import ShopDeliveryPricePlane from './ShopDeliveryPricePlane';
 
 const { Option } = Select;
 
@@ -78,9 +79,6 @@ const CustomerPricePage: FC = () => {
       <Tabs defaultActiveKey="1">
         <Tabs.TabPane tab="Bảng giá chung" key="1">
           <SystemDeliveryPricePlane />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Bảng giá khách hàng" key="2">
-          <p>Bảng giá khách hàng</p>
         </Tabs.TabPane>
       </Tabs>
     </Card>

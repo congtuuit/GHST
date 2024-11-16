@@ -5,6 +5,7 @@ import ShopInfo from './ShopInfo';
 import { InfoCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import ShopConfig from './ShopConfig';
 import { IChangeOperationConfig } from '@/api/type';
+import ShopDeliveryPricePlane from '../customer-price/ShopDeliveryPricePlane';
 
 interface CustomerDetailProps {
   data: IShopViewDetailDto | undefined;
@@ -49,6 +50,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
 
   return (
     <Modal
+      centered
       maskClosable={false}
       title={<h3 style={{ fontWeight: 'bold', marginBottom: '0' }}>Cửa Hàng</h3>}
       open={open}
@@ -87,6 +89,16 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
             children: (
               <ShopConfig shopId={detail?.id} partners={detail?.partners} ghnShopDetails={detail?.ghnShopDetails} shopConfigs={detail?.shopConfigs} />
             ),
+          },
+          {
+            disabled: !detail?.isVerified,
+            key: 'SHOP_DELIVERY_PRICE_PLANE',
+            label: (
+              <span>
+                <SettingOutlined /> Bảng giá
+              </span>
+            ),
+            children: <ShopDeliveryPricePlane shopId={detail?.id} />,
           },
         ]}
         onChange={handleTabChange}
