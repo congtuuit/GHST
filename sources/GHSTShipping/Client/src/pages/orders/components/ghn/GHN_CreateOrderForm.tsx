@@ -15,6 +15,7 @@ import OrderBuilder from '@/features/order/order.builder';
 import { IOrder } from '@/features/order/type';
 import './style.css';
 import { DeliveryPricePlaneFormDto } from '@/interface/shop';
+import { BasicShopInfoDto } from '@/features/shop';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -34,10 +35,11 @@ type Item = {
 interface FormOrderGhnProps {
   isActivated: boolean;
   deliveryPricePlanes?: DeliveryPricePlaneFormDto[];
+  myShops?: BasicShopInfoDto[];
 }
 
 const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
-  const { isActivated, deliveryPricePlanes = [] } = props;
+  const { isActivated, deliveryPricePlanes = [], myShops = [] } = props;
   const dispatch = useDispatch();
   const session = useSelector(state => state?.user?.session);
   const [pickShifts, setPickShifts] = useState<IPickShift[]>([]);
@@ -45,6 +47,8 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   const fromAddressRef = useRef<any>(null);
   const toAddressRef = useRef<any>(null);
   const [serviceTypeId, setServiceTypeId] = useState<number>(serviceType.HangNhe);
+  const [shopAddressSelected, setShopAddressSelected] = useState<BasicShopInfoDto>();
+  const [allowEditSenderAddress, setAllowEditSenderAddress] = useState(true);
 
   const fetchPickShifts = async () => {
     try {
@@ -83,7 +87,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
       //       from_district_id: parseInt(senderAddress['districtId']),
       //       from_district_name: senderAddress['districtName'],
       //       from_province_id: parseInt(senderAddress['provinceId']),
-      //       from_province_name: parseInt(senderAddress['provinceName']),
+      //       from_province_name: senderAddress['provinceName'],
       //     };
       //     setTimeout(() => {
       //       form.setFieldsValue(senderInfo);
@@ -151,6 +155,43 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
     console.log('log ', currentValues);
     handleCalcTotalWeigh(currentValues);
   }, 300);
+
+  const handleChangeSenderAddress = (value: string) => {
+    const selectedShopAddress = myShops.find(i => i.id === value);
+    if (Boolean(selectedShopAddress)) {
+      setShopAddressSelected(selectedShopAddress);
+    }
+  };
+
+  const fillSelectedSenderAddress = () => {
+    if (Boolean(shopAddressSelected)) {
+      const senderInfo = {
+        from_name: shopAddressSelected?.name,
+        from_phone: shopAddressSelected?.phoneNumber,
+        from_address: shopAddressSelected?.address,
+        from_ward_id: shopAddressSelected?.wardId,
+        from_ward_name: shopAddressSelected?.wardName,
+        from_district_id: parseInt(shopAddressSelected?.districtId ?? ''),
+        from_district_name: shopAddressSelected?.districtName,
+        from_province_id: parseInt(shopAddressSelected?.provinceId ?? ''),
+        from_province_name: shopAddressSelected?.provinceName,
+      };
+      setTimeout(() => {
+        form.setFieldsValue(senderInfo);
+        fromAddressRef.current?.update(senderInfo);
+      }, 300);
+    }
+  };
+
+  useEffect(() => {
+    if (myShops && myShops.length > 0) {
+      setShopAddressSelected(myShops[0]);
+    }
+  }, [myShops]);
+
+  useEffect(() => {
+    fillSelectedSenderAddress();
+  }, [shopAddressSelected]);
 
   useEffect(() => {
     // TODO INIT FORM DATA WITH SESSION DATA
@@ -230,15 +271,60 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
                 Bên gửi
               </Title>
             </Col>
+            <Col span={24}>
+              <span>Chọn địa chỉ cửa hàng</span>
+              <Col span={12}>
+                <Select
+                  disabled={!allowEditSenderAddress}
+                  onChange={handleChangeSenderAddress}
+                  placeholder="Chọn địa chỉ gửi"
+                  style={{ width: '100%', marginTop: '5px' }}
+                  value={shopAddressSelected?.id}
+                >
+                  {myShops.map(i => (
+                    <Option key={i.id} value={i.id}>
+                      {i.name}
+                    </Option>
+                  ))}
+                </Select>
+
+                <Button style={{ paddingLeft: '0px' }} type="link" onClick={() => setAllowEditSenderAddress(false)}>
+                  Thay đổi địa chỉ
+                </Button>
+                {!allowEditSenderAddress && (
+                  <Button
+                    style={{ paddingLeft: '0px' }}
+                    danger
+                    type="link"
+                    onClick={() => {
+                      setAllowEditSenderAddress(true);
+                      fillSelectedSenderAddress();
+                    }}
+                  >
+                    Hủy
+                  </Button>
+                )}
+              </Col>
+            </Col>
             <div className="border-top-info"></div>
             <Form.Item hidden name="service_type_id" initialValue={serviceTypeId}>
               <InputNumber value={serviceTypeId} />
             </Form.Item>
             <Col span={12}>
-              <Form.Item label="Số điện thoại người gửi" name="from_phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
+              <Form.Item
+                hidden={allowEditSenderAddress}
+                label="Số điện thoại người gửi"
+                name="from_phone"
+                rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+              >
                 <Input placeholder="Nhập số điện thoại người gửi" />
               </Form.Item>
-              <Form.Item label="Tên người gửi" name="from_name" rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}>
+              <Form.Item
+                hidden={allowEditSenderAddress}
+                label="Tên người gửi"
+                name="from_name"
+                rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
+              >
                 <Input placeholder="Nhập tên người gửi" />
               </Form.Item>
             </Col>
@@ -248,6 +334,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
                 key={'from_address'}
                 form={form}
                 required={true}
+                hidden={allowEditSenderAddress}
                 returnField={{
                   address: 'from_address',
                   districtId: 'from_district_id',

@@ -31,6 +31,16 @@ const defaultMenu: MenuList = [
     icon: 'order',
     path: '/order/create',
   },
+  {
+    code: 'my_shop',
+    label: {
+      zh_CN: '',
+      en_US: 'Quản lý cửa hàng',
+      vi_VN: 'Quản lý cửa hàng', // Vietnamese translation
+    },
+    icon: 'order',
+    path: '/shop/list',
+  },
 
   /// OLD
   // {

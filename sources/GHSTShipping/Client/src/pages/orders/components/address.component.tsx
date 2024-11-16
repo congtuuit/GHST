@@ -30,10 +30,11 @@ interface IAddressComponentProps {
   form: FormInstance;
   returnField: IReturnField;
   required: boolean;
+  hidden?: boolean;
 }
 
 const AddressComponent = forwardRef((props: IAddressComponentProps, ref) => {
-  const { form, returnField, required } = props;
+  const { form, returnField, required, hidden } = props;
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [districtId, setDistrictId] = useState<number | undefined>(undefined);
@@ -117,11 +118,11 @@ const AddressComponent = forwardRef((props: IAddressComponentProps, ref) => {
         <Input />
       </Form.Item>
 
-      <Form.Item label="Địa chỉ" name={returnField.address} rules={[{ required, message: 'Vui lòng nhập địa chỉ!' }]}>
+      <Form.Item hidden={hidden} label="Địa chỉ" name={returnField.address} rules={[{ required, message: 'Vui lòng nhập địa chỉ!' }]}>
         <Input placeholder="Nhập địa chỉ" />
       </Form.Item>
 
-      <Form.Item label="Quận - Huyện" name={returnField.districtId} rules={[{ required, message: 'Vui lòng chọn!' }]}>
+      <Form.Item hidden={hidden} label="Quận - Huyện" name={returnField.districtId} rules={[{ required, message: 'Vui lòng chọn!' }]}>
         <Select showSearch placeholder="Chọn quận - huyện" optionFilterProp="children" onChange={handleChangeDistrict}>
           {districts.map(district => (
             <Select.Option key={district.districtID} value={district.districtID}>
@@ -134,7 +135,7 @@ const AddressComponent = forwardRef((props: IAddressComponentProps, ref) => {
         <Input />
       </Form.Item>
 
-      <Form.Item label="Phường - Xã" name={returnField.wardId} rules={[{ required, message: 'Vui lòng chọn!' }]}>
+      <Form.Item hidden={hidden} label="Phường - Xã" name={returnField.wardId} rules={[{ required, message: 'Vui lòng chọn!' }]}>
         <Select showSearch placeholder="Chọn phường - xã" optionFilterProp="children" loading={isWardsLoading} onChange={handleChangeWard}>
           {wards.map(ward => (
             <Select.Option key={ward.wardCode} value={ward.wardCode}>

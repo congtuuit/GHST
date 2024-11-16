@@ -1,3 +1,4 @@
+import { BasicShopInfoDto } from '@/features/shop';
 
 export interface IShopViewDetailDto {
   id: string;
@@ -63,7 +64,8 @@ export interface IDeliveryParter {
 
 export interface IOrderMetadata {
   deliveryConfigs: IShopDeliveryConfigDto[];
-  deliveryPricePlanes: DeliveryPricePlaneFormDto[]
+  deliveryPricePlanes: DeliveryPricePlaneFormDto[];
+  myShops: BasicShopInfoDto[];
 }
 
 interface IShopDeliveryConfigDto {

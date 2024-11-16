@@ -1,5 +1,6 @@
 ﻿using GHSTShipping.Application.DTOs.Shop;
 using GHSTShipping.Application.Features.Configs.Queries;
+using GHSTShipping.Application.Features.Shops.Queries;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Wrappers;
@@ -25,6 +26,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
     {
         public List<DeliveryConfigDto> DeliveryConfigs { get; set; }
         public List<ShopDeliveryPricePlaneDto> DeliveryPricePlanes { get; set; }
+
+        public List<BasicShopInfoDto> MyShops { get; set; }
 
         public class DeliveryConfigDto
         {
@@ -141,10 +144,13 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 //IsActivated = true, // TODO allow enable or disable delivery config price
             });
 
+            var myShops = await _mediator.Send(new GetShopByIdQuery { Id = shop.Id }, cancellationToken);
+
             var response = new GetOrderMetadataResponse()
             {
                 DeliveryConfigs = results,
-                DeliveryPricePlanes = deliveryPricePlanes.Data
+                DeliveryPricePlanes = deliveryPricePlanes.Data,
+                MyShops = myShops
             };
 
             return BaseResult<GetOrderMetadataResponse>.Ok(response);

@@ -35,5 +35,6 @@ const userSlice = createSlice({
 export const { setUserItem } = userSlice.actions;
 
 export const rolesSelector = (state: IStore) => state.user?.session?.roles ?? [];
+export const shopIdSelector = (state: IStore) => state.user?.session?.shopId ?? null;
 
 export default userSlice.reducer;

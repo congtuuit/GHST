@@ -32,7 +32,11 @@ const CreateOrderPage = () => {
   return (
     <Card className="my-card-containter" title="Tạo đơn hàng">
       <Col span={24}>
-        <GHN_CreateOrderForm isActivated={isActiveGhnForm} deliveryPricePlanes={orderMeataData?.deliveryPricePlanes} />
+        <GHN_CreateOrderForm
+          isActivated={isActiveGhnForm}
+          deliveryPricePlanes={orderMeataData?.deliveryPricePlanes}
+          myShops={orderMeataData?.myShops}
+        />
       </Col>
     </Card>
   );

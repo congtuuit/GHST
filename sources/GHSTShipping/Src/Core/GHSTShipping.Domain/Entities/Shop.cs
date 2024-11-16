@@ -45,6 +45,31 @@ namespace GHSTShipping.Domain.Entities
         /// </summary>
         public bool AllowUsePartnerShopAddress { get; set; }
 
+        /// <summary>
+        /// Child shop will has parent id
+        /// </summary>
+        public Guid? ParentId { get; set; }
+
+        [MaxLength(500)]
+        public string Address { get; set; } = null!;
+
+        [MaxLength(100)]
+        public string WardName { get; set; } = null!;
+
+        [MaxLength(100)]
+        public string WardId { get; set; }
+
+        [MaxLength(100)]
+        public string DistrictName { get; set; } = null!;
+
+        public int? DistrictId { get; set; }
+
+        [MaxLength(100)]
+        public string ProvinceName { get; set; } = null!;
+
+        public int? ProvinceId { get; set; }
+
+
         [Obsolete]
         public int? GhnShopId { get; set; }
 

@@ -17,6 +17,7 @@ import CreateOrderPage from '@/pages/orders/CreateOrderPage';
 import RegisterPage from '@/pages/register';
 import ResetPasswordPage from '@/pages/reset-password';
 import LogViewerPage from '@/pages/system/LogViewer';
+import MyShopListPage from '@/pages/shop/MyShopList';
 
 
 import WrapperRouteComponent from './config';
@@ -99,6 +100,11 @@ const routeList: RouteObject[] = [
         path: 'settings',
         element: <WrapperRouteComponent element={<DeliveryConfigPage />} titleId="title.deliveryConfig" allowedRoles={[Roles.Admin]} />,
       },
+      {
+        path: 'shop/list',
+        element: <WrapperRouteComponent element={<MyShopListPage />} titleId="title.myShopList" />,
+      },
+
       {
         path: 'documentation',
         element: <WrapperRouteComponent element={<Documentation />} titleId="title.documentation" />,
