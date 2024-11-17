@@ -124,8 +124,9 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
       if (response.success) {
         message.success('Tạo đơn thành công');
         form.resetFields();
-
-        await fetchPickShifts();
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
       } else {
         message.error(response.errors[0]?.description || 'Xảy ra lỗi, vui lòng kiểm tra lại');
         console.log(response.errors);
@@ -153,8 +154,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
     dispatch(setOrder({ ...currentValues, ...changedValues }));
 
     handleCalcTotalWeigh(currentValues);
-
-    if (Boolean(currentValues?.cod_amount) && currentValues?.cod_amount >= 0) {
+    if (Boolean(changedValues?.cod_amount) && Boolean(currentValues?.cod_amount) && currentValues?.cod_amount >= 0) {
       form.setFieldValue('insurance_value', currentValues?.cod_amount);
     }
   }, 300);
@@ -189,6 +189,10 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   useEffect(() => {
     if (myShops && myShops.length > 0) {
       setShopAddressSelected(myShops[0]);
+      if (!Boolean(myShops[0]?.address) || !Boolean(myShops[0]?.wardId)) {
+        message.info('Vui lòng cập nhật địa chỉ cửa hàng');
+        setAllowEditSenderAddress(false);
+      }
     }
   }, [myShops]);
 
@@ -227,8 +231,6 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
               <Form.Item
                 label="Bảng giá"
                 name="shopDeliveryPricePlaneId"
-                valuePropName="value"
-                getValueFromEvent={value => [value]}
                 rules={[
                   {
                     required: true,

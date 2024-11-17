@@ -1,7 +1,7 @@
 import type { RuleObject } from 'antd/lib/form';
 import type { StoreValue } from 'antd/lib/form/interface';
 import { Button, Card, Col, Form, Input, message, Row, Select, Typography } from 'antd';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiRegisterShop } from '@/api/auth.api';
 import VietNameBankSelector from './VietNameBankSelector';
@@ -82,7 +82,6 @@ const RegisterPage: React.FC = () => {
                     if (!value || getFieldValue('password') === value) {
                       return Promise.resolve();
                     }
-
                     return Promise.reject(new Error('Mật khẩu không khớp!'));
                   },
                 }),
@@ -101,18 +100,20 @@ const RegisterPage: React.FC = () => {
             <Form.Item
               label="Qui mô vận chuyển"
               name="avgMonthlyYield"
-              rules={[
-                { required: true, message: 'Vui lòng chọn qui mô vận chuyển' },
-              ]}
+              rules={[{ required: true, message: 'Vui lòng chọn qui mô vận chuyển' }]}
+              initialValue={'Không có nhu cầu thường xuyên'}
             >
-              <Select defaultValue="Không có nhu cầu thường xuyên" options={[
-                { value: 'Không có nhu cầu thường xuyên', label: 'Không có nhu cầu thường xuyên' },
-                { value: 'Dưới 150 ĐH/tháng', label: 'Dưới 150 ĐH/tháng' },
-                { value: 'Từ 150 - dưới 900 ĐH/tháng', label: 'Từ 150 - dưới 900 ĐH/tháng' },
-                { value: 'Từ 900 - dưới 3.000 ĐH/tháng', label: 'Từ 900 - dưới 3.000 ĐH/tháng' },
-                { value: 'Từ 3.000 - dưới 6.000 ĐH/tháng', label: 'Từ 3.000 - dưới 6.000 ĐH/tháng' },
-                { value: 'Từ 6.000 ĐH/tháng trở lên', label: 'Từ 6.000 ĐH/tháng trở lên' },
-              ]} />
+              <Select
+                defaultValue="Không có nhu cầu thường xuyên"
+                options={[
+                  { value: 'Không có nhu cầu thường xuyên', label: 'Không có nhu cầu thường xuyên' },
+                  { value: 'Dưới 150 ĐH/tháng', label: 'Dưới 150 ĐH/tháng' },
+                  { value: 'Từ 150 - dưới 900 ĐH/tháng', label: 'Từ 150 - dưới 900 ĐH/tháng' },
+                  { value: 'Từ 900 - dưới 3.000 ĐH/tháng', label: 'Từ 900 - dưới 3.000 ĐH/tháng' },
+                  { value: 'Từ 3.000 - dưới 6.000 ĐH/tháng', label: 'Từ 3.000 - dưới 6.000 ĐH/tháng' },
+                  { value: 'Từ 6.000 ĐH/tháng trở lên', label: 'Từ 6.000 ĐH/tháng trở lên' },
+                ]}
+              />
             </Form.Item>
 
             <Form.Item label="Tên ngân hàng" name="bankName" rules={[{ required: true, message: 'Vui lòng nhập tên ngân hàng' }]}>

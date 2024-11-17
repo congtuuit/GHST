@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Table, Button, Modal, notification, Space, message } from 'antd';
+import { Table, Button, Modal, Space, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import DeliveryPricePlaneForm, { DeliveryPricePlaneFormDto } from './DeliveryPricePlaneForm';
+import DeliveryPricePlaneForm from './DeliveryPricePlaneForm';
 import { request } from '@/api/base/request';
 import NumberFormatter from '@/components/core/NumberFormatter';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeliveryPricePlaneFormDto } from '@/interface/shop';
 const { confirm } = Modal;
 
 const SystemDeliveryPricePlane: React.FC = () => {
