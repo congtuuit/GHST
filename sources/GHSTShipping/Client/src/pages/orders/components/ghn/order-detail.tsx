@@ -134,6 +134,12 @@ const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data, showSenderAddress
                 <Price value={data?.totalAmount ?? 0} type="success" />
               </b>
             </Text>
+
+            <br />
+            <Text strong>Giao thất bại thu tiền: </Text>
+            <Text>
+              <Price value={data?.codFailedAmount ?? 0} type="secondary" />
+            </Text>
             <br />
             <Text strong>Hình thức thanh toán:</Text> <Text>{data?.paymentTypeName}</Text>
           </Col>

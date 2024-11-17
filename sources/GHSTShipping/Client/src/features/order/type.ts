@@ -63,6 +63,7 @@ export interface IOrderFilter extends OrderFilterState {
   fromDate?: Dayjs | null;
   toDate?: Dayjs | null;
   groupStatus?:
+    | 'tat_ca'
     | 'nhap'
     | 'cho_ban_giao'
     | 'da_ban_giao_dang_giao'

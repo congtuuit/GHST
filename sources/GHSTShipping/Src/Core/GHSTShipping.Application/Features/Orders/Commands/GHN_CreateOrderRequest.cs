@@ -296,6 +296,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 ToProvinceName = request.ToProvinceName,
 
                 CodAmount = request.CodAmount,
+                CodFailedAmount = request.CodFailedAmount,
                 Content = request.Content,
                 PickStationId = request.PickStationId,
                 DeliverStationId = request.DeliverStationId,

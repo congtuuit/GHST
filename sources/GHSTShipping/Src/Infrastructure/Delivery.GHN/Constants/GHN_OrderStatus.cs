@@ -160,7 +160,30 @@ namespace Delivery.GHN.Constants
                     };
 
                 default:
-                    return new List<string>();
+                    return new List<string>()
+                    {
+                        GHN_OrderStatus.ReadyToPick.ToStringValue(),
+                        GHN_OrderStatus.Picking.ToStringValue(),
+                        GHN_OrderStatus.MoneyCollectPicking.ToStringValue(),
+                        GHN_OrderStatus.Picked.ToStringValue(),
+                        GHN_OrderStatus.Sorting.ToStringValue(),
+                        GHN_OrderStatus.Storing.ToStringValue(),
+                        GHN_OrderStatus.Transporting.ToStringValue(),
+                        GHN_OrderStatus.Delivering.ToStringValue(),
+                        GHN_OrderStatus.DeliveryFail.ToStringValue(),
+                        GHN_OrderStatus.MoneyCollectDelivering.ToStringValue(),
+                        GHN_OrderStatus.Return.ToStringValue(),
+                        GHN_OrderStatus.Returning.ToStringValue(),
+                        GHN_OrderStatus.ReturnFail.ToStringValue(),
+                        GHN_OrderStatus.ReturnTransporting.ToStringValue(),
+                        GHN_OrderStatus.ReturnSorting.ToStringValue(),
+                        GHN_OrderStatus.WaitingToReturn.ToStringValue(),
+                        GHN_OrderStatus.Returned.ToStringValue(),
+                        GHN_OrderStatus.Delivered.ToStringValue(),
+                        GHN_OrderStatus.Cancel.ToStringValue(),
+                        GHN_OrderStatus.Lost.ToStringValue(),
+                        GHN_OrderStatus.Damage.ToStringValue(),
+                    };
             }
         }
     }
@@ -195,6 +218,9 @@ namespace Delivery.GHN.Constants
 
         [EnumMember(Value = "ChoXacNhan")]
         ChoXacNhan = 99,
+
+        [EnumMember(Value = "TatCa")]
+        TatCa = 100,
     }
 
 

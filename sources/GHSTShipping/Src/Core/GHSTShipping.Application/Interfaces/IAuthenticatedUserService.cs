@@ -30,5 +30,7 @@ namespace GHSTShipping.Application.Interfaces
         string DeviceInfo { get; }
         string IpAddress { get; }
         Guid? SessionId { get; }
+
+        bool IsAdmin { get; }
     }
 }

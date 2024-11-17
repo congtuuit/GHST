@@ -2,6 +2,7 @@
 using Delivery.GHN.Models;
 using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Interfaces;
+using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Wrappers;
 using GHSTShipping.Domain.Entities;
 using GHSTShipping.Domain.Enums;
@@ -25,7 +26,8 @@ namespace GHSTShipping.Application.Features.Orders.Commands
     public class GHN_SyncOrderRequestHandler(
         IUnitOfWork unitOfWork,
         IGhnApiClient ghnApiClient,
-        IPartnerConfigService partnerConfigService
+        IPartnerConfigService partnerConfigService,
+        IShopRepository shopRepository
         ) : IRequestHandler<GHN_SyncOrderRequest, BaseResult>
     {
         const int BATCH_SIZE = 100; // Define the batch size to process at a time
@@ -39,7 +41,11 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 OptionValue = request.PartnerOrderCode
             });
 
-            var (orders, orderItems) = await ListOrderMappingAsync(ghnOrdersResponse, request.ShopId, apiConfig, ghnApiClient);
+            var shopUniqueCode = await shopRepository.Where(i => i.Id == request.ShopId)
+                    .Select(i => i.UniqueCode)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+            var (orders, orderItems) = await ListOrderMappingAsync(ghnOrdersResponse, request.ShopId, shopUniqueCode, apiConfig, ghnApiClient);
             await BatchSaveAsync(unitOfWork, orders, orderItems);
 
             return BaseResult.Ok();
@@ -48,6 +54,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         public static async Task<(List<Order>, List<OrderItem>)> ListOrderMappingAsync(
             SearchOrderResponse request,
             Guid shopId,
+            string shopUniqueCode,
             ApiConfig apiConfig,
             IGhnApiClient _ghnApiClient
             )
@@ -63,6 +70,14 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             for (int i = 0; i < ghnOrders.Count; i++)
             {
                 var o = ghnOrders[i];
+
+                if (o.Status != OrderStatus.CANCEL)
+                {
+                    string clientOrderCode = o.ClientOrderCode;
+                    if (string.IsNullOrWhiteSpace(clientOrderCode)) continue; // Ignore the order has not client order code
+                    if (!clientOrderCode.Contains(shopUniqueCode)) continue; // Ignore the order not match shop unique code
+                }
+
                 var deliveryFee = 0; // NEED UPDATE LOGIC
                 int privateDeliveryFee = 0; // TODO calc fro soc
 
@@ -110,7 +125,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
                     var response = await _ghnApiClient.GetWardAsync(apiConfig, fromDistrict.DistrictID);
                     var fromWard = response.FirstOrDefault(i => i.WardCode == entityOrder.FromWardId);
-                    if(fromWard != null)
+                    if (fromWard != null)
                     {
                         entityOrder.FromWardName = fromWard.WardName;
                     }
@@ -156,13 +171,16 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             return (entityOrders, entityOrderItems);
         }
 
-        public static async Task BatchSaveAsync(
+        public static async Task<List<Guid>> BatchSaveAsync(
             IUnitOfWork unitOfWork,
             List<Order> entityOrders,
             List<OrderItem> entityOrderItems,
             int batchSize = BATCH_SIZE
         )
         {
+            // OrderIds processed
+            var response = new List<Guid>();
+
             // Initialize lists to hold new and update batches
             var newOrderBatch = new List<Order>();
             var updateOrderBatch = new List<Order>();
@@ -176,6 +194,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 .Select(o => new Order
                 {
                     Id = o.Id,
+                    ClientOrderCode = o.ClientOrderCode,
                     private_order_code = o.private_order_code,
                 })
                 .ToDictionaryAsync(o => o.private_order_code);
@@ -206,12 +225,41 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 // Check if current order exists
                 if (existingOrders.TryGetValue(currentOrder.private_order_code, out var existingOrder))
                 {
+                    // Hold existed data
                     currentOrder.Id = existingOrder.Id;
-                    updateOrderBatch.Add(currentOrder);
+
+                    unitOfWork.Orders.Modify(existingOrder);
+                    existingOrder.ReturnName = currentOrder.ReturnName;
+                    existingOrder.ReturnPhone = currentOrder.ReturnPhone;
+                    existingOrder.ReturnAddress = currentOrder.ReturnAddress;
+                    existingOrder.ReturnDistrictId = currentOrder.ReturnDistrictId;
+                    existingOrder.ReturnDistrictName = currentOrder.ReturnDistrictName;
+                    existingOrder.ReturnWardCode = currentOrder.ReturnWardCode;
+                    existingOrder.ReturnWardName = currentOrder.ReturnWardName;
+                    existingOrder.FromProvinceName = currentOrder.FromProvinceName;
+                    existingOrder.Content = currentOrder.Content;
+                    existingOrder.PickStationId = currentOrder.PickStationId;
+                    existingOrder.DeliverStationId = currentOrder.DeliverStationId;
+                    existingOrder.Coupon = currentOrder.Coupon;
+                    existingOrder.CurrentStatus = currentOrder.CurrentStatus;
+                    existingOrder.LastSyncDate = DateTime.UtcNow;
+
+                    existingOrder.PrivateUpdateFromPartner(
+                        currentOrder.private_order_code,
+                        currentOrder.private_sort_code,
+                        currentOrder.private_trans_type,
+                        currentOrder.private_total_fee,
+                        currentOrder.private_expected_delivery_time,
+                        currentOrder.private_operation_partner
+                    );
+
+                    response.Add(existingOrder.Id);
                 }
                 else
                 {
                     newOrderBatch.Add(currentOrder);
+
+                    response.Add(currentOrder.Id);
                 }
 
                 foreach (var item in relatedItems)
@@ -254,25 +302,27 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 }
 
                 // Process batch if batch size is reached or last item
-                if (updateOrderBatch.Count > 0 || updateOrderItemBatch.Count > 0)
+                if (updateOrderItemBatch.Count > 0)
                 {
-                    if (updateOrderBatch.Count > 0)
+                    /*if (updateOrderBatch.Count > 0)
                     {
                         unitOfWork.Orders.UpdateRange(updateOrderBatch);
-                    }
+                    }*/
 
                     if (updateOrderItemBatch.Count > 0)
                     {
                         unitOfWork.OrderItems.UpdateRange(updateOrderItemBatch);
                     }
 
-                    updateOrderBatch.Clear();
+                    //updateOrderBatch.Clear();
                     updateOrderItemBatch.Clear();
                 }
 
                 // Commit the changes to the database
                 await unitOfWork.SaveChangesAsync();
             }
+
+            return response;
         }
 
         private static Order OrderMapper(GHN_SearchOrderDataDto o, Guid? shopId = null, int deliveryFee = 0)
@@ -280,8 +330,6 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             var entityOrder = new Order
             {
                 ShopId = shopId,
-                UniqueCode = o.ClientOrderCode,
-                ClientOrderCode = o.ClientOrderCode,
                 IsPublished = true,
                 LastSyncDate = DateTime.UtcNow,
                 DeliveryPartner = EnumSupplierConstants.GHN,
@@ -323,7 +371,16 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 CurrentStatus = o.Status,
                 RequiredNote = o.RequiredNote,
                 CodAmount = o.CodAmount,
+                CodFailedAmount = o.CodFailedAmount,
+
             };
+
+            if (!string.IsNullOrWhiteSpace(o.ClientOrderCode))
+            {
+                entityOrder.UniqueCode = o.ClientOrderCode;
+                entityOrder.ClientOrderCode = o.ClientOrderCode;
+                entityOrder.Created = DateTime.UtcNow;
+            }
 
             return entityOrder;
         }

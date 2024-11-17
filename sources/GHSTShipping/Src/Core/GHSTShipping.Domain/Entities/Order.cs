@@ -159,6 +159,9 @@ namespace GHSTShipping.Domain.Entities
 
         public long CodAmount { get; set; }
 
+        public long CodFailedAmount { get; set; }
+
+
         [MaxLength(4000)]
         public string? Content { get; set; }
 
@@ -237,7 +240,7 @@ namespace GHSTShipping.Domain.Entities
             string private_sort_code,
             string private_trans_type,
             int private_total_fee,
-            DateTime private_expected_delivery_time,
+            DateTime? private_expected_delivery_time,
             string private_operation_partner
             )
         {

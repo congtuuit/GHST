@@ -5,7 +5,6 @@ using Delivery.GHN.Constants;
 using GHSTShipping.Application.DTOs;
 using GHSTShipping.Application.Extensions;
 using GHSTShipping.Application.Features.Orders.Commands;
-using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Parameters;
@@ -49,204 +48,160 @@ namespace GHSTShipping.Application.Features.Orders.Queries
     }
 
     public class GetOrderPagedListRequestHandler(
-        IGhnApiClient ghnApiClient,
-        IUnitOfWork unitOfWork,
-        IAuthenticatedUserService authenticatedUser,
-        IShopRepository shopRepository,
-        IPartnerConfigService partnerConfigService,
-        IMapper mapper,
-        IServiceScopeFactory serviceScopeFactory,
-        MapperConfiguration mapperConfiguration
-        ) : IRequestHandler<GetOrderPagedListRequest, BaseResult<PaginationResponseDto<OrderDto>>>
+    IGhnApiClient ghnApiClient,
+    IUnitOfWork unitOfWork,
+    IAuthenticatedUserService authenticatedUser,
+    IShopRepository shopRepository,
+    IPartnerConfigService partnerConfigService,
+    IMapper mapper,
+    IServiceScopeFactory serviceScopeFactory,
+    MapperConfiguration mapperConfiguration
+) : IRequestHandler<GetOrderPagedListRequest, BaseResult<PaginationResponseDto<OrderDto>>>
     {
         public async Task<BaseResult<PaginationResponseDto<OrderDto>>> Handle(GetOrderPagedListRequest request, CancellationToken cancellationToken)
         {
-            var userId = authenticatedUser.UId;
-            var isAdmin = authenticatedUser.Type == AccountTypeConstants.ADMIN;
-            int skipCount = (request.PageNumber - 1) * request.PageSize;
-            var query = unitOfWork.Orders.All();
+            var (shopId, shopUniqueCode) = await GetShopInfoAsync(request.ShopId, authenticatedUser, shopRepository, cancellationToken);
 
-            Guid? shopId = null;
-            if (!isAdmin)
+            /// Nếu không có giá trị shopId và người dùng không phải là admin, trả về kết quả rỗng
+            /// - !shopId.HasValue: Không xác định được shopId từ yêu cầu hoặc tài khoản người dùng
+            /// - !authenticatedUser.IsAdmin: Người dùng hiện tại không có quyền admin
+            /// => Điều này có nghĩa là người dùng không có quyền truy cập bất kỳ shop nào hoặc đơn hàng nào
+            if (!shopId.HasValue && !authenticatedUser.IsAdmin) return EmptyResult(request);
+
+            var skipCount = (request.PageNumber - 1) * request.PageSize;
+            IQueryable<Order> query = unitOfWork.Orders.All().AsNoTracking();
+
+            if (IsLocalQuery(request.GroupStatus))
             {
-                var shop = await shopRepository.Where(i => i.AccountId == userId)
-                  .Select(i => new
-                  {
-                      ShopId = i.Id,
-                      i.UniqueCode,
-                      i.AllowPublishOrder,
-                  })
-                 .FirstOrDefaultAsync(cancellationToken);
+                query = ApplyFilters(query, request, shopId);
 
-                if (shop == null)
-                {
-                    return BaseResult<PaginationResponseDto<OrderDto>>.Ok(new PaginationResponseDto<OrderDto>(new System.Collections.Generic.List<OrderDto>(), 0, request.PageNumber, request.PageSize));
-                }
-
-                shopId = shop.ShopId;
-            }
-            else
-            {
-                if (request.ShopId.HasValue)
-                {
-                    shopId = request.ShopId.Value;
-                }
-            }
-
-            // Filter by status
-            if (request.GroupStatus == OrderGroupStatus.Nhap || request.GroupStatus == OrderGroupStatus.ChoXacNhan)
-            {
-                // Filter by shopId
-                if (shopId.HasValue)
-                {
-                    query = query.Where(i => i.ShopId == shopId);
-                }
-
-                // Filter by code
-                if (!string.IsNullOrWhiteSpace(request.OrderCode))
-                {
-                    query = query.Where(o => o.ClientOrderCode.Contains(request.OrderCode) || request.OrderCode.Contains(o.ClientOrderCode));
-                }
-
-                // Filter by delivery partner
-                if (!string.IsNullOrWhiteSpace(request.DeliveryPartner))
-                {
-                    query = query.Where(o => o.DeliveryPartner.Contains(request.DeliveryPartner));
-                }
-
-                if (isAdmin)
-                {
-                    if (request.GroupStatus == OrderGroupStatus.Nhap)
-                    {
-                        query = query.Where(o => o.IsPublished == false && o.CurrentStatus == OrderStatus.DRAFT);
-                    }
-                    else
-                    {
-                        query = query.Where(o => o.IsPublished == false && o.CurrentStatus == OrderStatus.WAITING_CONFIRM);
-                    }
-                }
-                else
-                {
-                    query = query.Where(o => o.IsPublished == false);
-                }
-
-                query = query.OrderByDescending(i => i.Created);
-
-                PaginationResponseDto<OrderDto> pagingResult = await query
+                var pagingResult = await query
+                    .OrderByDescending(i => i.Created)
                     .ProjectTo<OrderDto>(mapperConfiguration)
                     .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);
 
-                int index = 0;
-                foreach (var item in pagingResult.Data)
-                {
-                    item.No = skipCount + index + 1;
-                    index++;
-                }
-
-                return BaseResult<PaginationResponseDto<OrderDto>>.Ok(pagingResult);
+                return MapPaginationResult(pagingResult, skipCount);
             }
-            else
+            else if (await ShouldSyncFromGHN(request, shopId))
             {
-                bool isGhnQuery = false;
-                if (shopId.HasValue)
-                {
-                    var shopConfig = await partnerConfigService.GetShopConfigsAsync(shopId.Value);
-                    var deliveryPartner = shopConfig.FirstOrDefault()?.DeliveryPartner;
-                    isGhnQuery = deliveryPartner == EnumDeliveryPartner.GHN;
-                }
-
-                if (request.DeliveryPartner == EnumDeliveryPartner.GHN.GetCode() || isGhnQuery)
-                {
-                    var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, shopId.Value);
-                    var searchStatus = request.GroupStatus.GetDetails();
-                    var searchParams = new Delivery.GHN.Models.ShippingOrderSearchRequest
-                    {
-                        Status = searchStatus,
-                        ShopId = int.Parse(apiConfig.ShopId),
-                        Limit = request.PageSize,
-                        Offset = request.PageNumber > 0 ? request.PageNumber - 1 : request.PageNumber,
-                    };
-
-                    if (request.PaymentTypeId.HasValue)
-                    {
-                        searchParams.PaymentTypeId = new System.Collections.Generic.List<int> { request.PaymentTypeId.Value };
-                    }
-
-                    if (request.IsPrint.HasValue)
-                    {
-                        searchParams.IsPrint = request.IsPrint;
-                    }
-
-                    if (request.IsCodFailedCollected.HasValue)
-                    {
-                        searchParams.IsCodFailedCollected = request.IsCodFailedCollected;
-                    }
-
-                    if (request.IsDocumentPod.HasValue)
-                    {
-                        searchParams.IsDocumentPod = request.IsDocumentPod;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(request.OrderCode))
-                    {
-                        searchParams.OptionValue = request.OrderCode;
-                    }
-                    if (request.FromDate.HasValue)
-                    {
-                        searchParams.FromTime = DateTimeHelper.ConvertToUnixTimestamp(request.FromDate.Value);
-                    }
-                    if (request.ToDate.HasValue)
-                    {
-                        searchParams.ToTime = DateTimeHelper.ConvertToUnixTimestamp(request.ToDate.Value);
-                    }
-
-                    // search from GHN hub
-                    var ghnOrdersResponse = await ghnApiClient.SearchOrdersAsync(apiConfig, searchParams);
-
-                    // Mapping to my system
-                    var (entityOrders, entityOrderItems) = await GHN_SyncOrderRequestHandler.ListOrderMappingAsync(ghnOrdersResponse, shopId.Value, apiConfig, ghnApiClient);
-
-                    if (entityOrders.Count > 0 || entityOrderItems.Count > 0)
-                    {
-                        //// TODO open to optimize performance
-                        //Task.Run(() => JobSyncOrders(entityOrders, entityOrderItems));
-
-                        await GHN_SyncOrderRequestHandler.BatchSaveAsync(unitOfWork, entityOrders, entityOrderItems);
-
-                        var _orders = mapper.Map<List<OrderDto>>(entityOrders);
-                        var result = new PaginationResponseDto<OrderDto>(_orders, ghnOrdersResponse.Total, request.PageNumber, request.PageSize);
-
-                        int index = 0;
-                        foreach (var item in result.Data)
-                        {
-                            item.No = skipCount + index + 1;
-                            if (string.IsNullOrWhiteSpace(item.ClientOrderCode))
-                            {
-                                item.ClientOrderCode = item.PrivateOrderCode;
-                            }
-                            index++;
-                        }
-
-                        return BaseResult<PaginationResponseDto<OrderDto>>.Ok(result);
-
-                    }
-                    else
-                    {
-                        return BaseResult<PaginationResponseDto<OrderDto>>.Ok(null);
-                    }
-                }
+                return await SyncOrdersFromGHNAsync(request, shopId.Value, shopUniqueCode, skipCount, cancellationToken);
             }
 
             return BaseResult<PaginationResponseDto<OrderDto>>.Ok(null);
         }
 
-        private async Task JobSyncOrders(List<Order> orders, List<OrderItem> orderItems)
+        private static async Task<(Guid? ShopId, string UniqueCode)> GetShopInfoAsync(
+            Guid? requestShopId,
+            IAuthenticatedUserService authenticatedUser,
+            IShopRepository shopRepository,
+            CancellationToken cancellationToken)
         {
-            using (var scope = serviceScopeFactory.CreateScope())
-            {
-                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                await GHN_SyncOrderRequestHandler.BatchSaveAsync(unitOfWork, orders, orderItems);
-            }
+            // Xác định điều kiện truy vấn shop
+            var query = authenticatedUser.IsAdmin && requestShopId.HasValue
+                ? shopRepository.Where(i => i.Id == requestShopId.Value)
+                : shopRepository.Where(i => i.AccountId == authenticatedUser.UId);
+
+            // Thực hiện truy vấn và lấy kết quả
+            var shop = await query
+                .Select(i => new { i.Id, i.UniqueCode })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            // Trả về kết quả
+            return (shop?.Id, shop?.UniqueCode ?? string.Empty);
         }
+
+        private IQueryable<Order> ApplyFilters(IQueryable<Order> query, GetOrderPagedListRequest request, Guid? shopId)
+        {
+            if (shopId.HasValue)
+            {
+                query = query.Where(i => i.ShopId == shopId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.OrderCode))
+            {
+                query = query.Where(o => o.ClientOrderCode.Contains(request.OrderCode) || request.OrderCode.Contains(o.ClientOrderCode));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.DeliveryPartner))
+            {
+                query = query.Where(o => o.DeliveryPartner.Contains(request.DeliveryPartner));
+            }
+
+            if (request.GroupStatus == OrderGroupStatus.Nhap)
+            {
+                query = query.Where(o => o.IsPublished == false && o.CurrentStatus == OrderStatus.DRAFT);
+            }
+            else if (request.GroupStatus == OrderGroupStatus.ChoXacNhan)
+            {
+                query = query.Where(o => o.IsPublished == false && o.CurrentStatus == OrderStatus.WAITING_CONFIRM);
+            }
+
+            return query;
+        }
+
+        private async Task<bool> ShouldSyncFromGHN(GetOrderPagedListRequest request, Guid? shopId)
+        {
+            if (!shopId.HasValue) return false;
+
+            var shopConfig = await partnerConfigService.GetShopConfigsAsync(shopId.Value);
+            var deliveryPartner = shopConfig.FirstOrDefault()?.DeliveryPartner;
+
+            return request.DeliveryPartner == EnumDeliveryPartner.GHN.GetCode() || deliveryPartner == EnumDeliveryPartner.GHN;
+        }
+
+        private async Task<BaseResult<PaginationResponseDto<OrderDto>>> SyncOrdersFromGHNAsync(
+            GetOrderPagedListRequest request, Guid shopId, string shopUniqueCode, int skipCount, CancellationToken cancellationToken)
+        {
+            var apiConfig = await partnerConfigService.GetApiConfigAsync(EnumDeliveryPartner.GHN, shopId);
+            var searchParams = new Delivery.GHN.Models.ShippingOrderSearchRequest
+            {
+                Status = request.GroupStatus.GetDetails(),
+                ShopId = int.Parse(apiConfig.ShopId),
+                Limit = request.PageSize,
+                Offset = request.PageNumber > 0 ? (request.PageNumber - 1) * request.PageSize : 0,
+                OptionValue = request.OrderCode
+            };
+
+            var ghnOrdersResponse = await ghnApiClient.SearchOrdersAsync(apiConfig, searchParams);
+
+            var (entityOrders, entityOrderItems) = await GHN_SyncOrderRequestHandler.ListOrderMappingAsync(
+                ghnOrdersResponse,
+                shopId,
+                shopUniqueCode,
+                apiConfig,
+                ghnApiClient);
+
+            if (entityOrders.Count > 0)
+            {
+                var orderIdsSaved = await GHN_SyncOrderRequestHandler.BatchSaveAsync(unitOfWork, entityOrders, entityOrderItems);
+
+                var mappedOrders = await unitOfWork.Orders.Where(i => orderIdsSaved.Contains(i.Id))
+                    .ProjectTo<OrderDto>(mapperConfiguration)
+                    .ToPaginationAsync(request.PageNumber, request.PageSize);
+
+                return MapPaginationResult(mappedOrders, skipCount);
+            }
+
+            return BaseResult<PaginationResponseDto<OrderDto>>.Ok(null);
+        }
+
+        private static BaseResult<PaginationResponseDto<OrderDto>> MapPaginationResult(PaginationResponseDto<OrderDto> result, int skipCount)
+        {
+            int index = 0;
+            foreach (var item in result.Data)
+            {
+                item.No = skipCount + index + 1;
+                index++;
+            }
+
+            return BaseResult<PaginationResponseDto<OrderDto>>.Ok(result);
+        }
+
+        private static BaseResult<PaginationResponseDto<OrderDto>> EmptyResult(GetOrderPagedListRequest request)
+        {
+            return BaseResult<PaginationResponseDto<OrderDto>>.Ok(new PaginationResponseDto<OrderDto>(new List<OrderDto>(), 0, request.PageNumber, request.PageSize));
+        }
+
+        private static bool IsLocalQuery(OrderGroupStatus status) => status == OrderGroupStatus.ChoXacNhan || status == OrderGroupStatus.Nhap;
     }
 }

@@ -107,12 +107,18 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             try
             {
                 // Send order to GHN
+                var shopId = order.ShopId.Value;
                 var createDeliveryOrderRequest = mapper.Map<CreateDeliveryOrderRequest>(order);
-                var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, order.ShopId.Value);
+                var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, shopId);
 
                 /// DEBUG
-                //var createOrder = await ghnApiClient.CreateDeliveryOrderAsync(apiConfig, order.PartnerShopId, createDeliveryOrderRequest);
-                var createOrder = await ghnApiClient.CreateDraftDeliveryOrderAsync(apiConfig, order.PartnerShopId, createDeliveryOrderRequest);
+                var previewOrder = await ghnApiClient.CreateDraftDeliveryOrderAsync(apiConfig, order.PartnerShopId, createDeliveryOrderRequest);
+                if (previewOrder.Code != 200)
+                {
+                    return BaseResult.Failure(new Error(ErrorCode.AccessDenied, previewOrder.MessageDisplay));
+                }
+
+                var createOrder = await ghnApiClient.CreateDeliveryOrderAsync(apiConfig, order.PartnerShopId, createDeliveryOrderRequest);
 
                 if (createOrder.Code == 200)
                 {

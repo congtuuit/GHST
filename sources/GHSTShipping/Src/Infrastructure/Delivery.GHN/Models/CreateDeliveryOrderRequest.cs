@@ -110,6 +110,10 @@ public class CreateDeliveryOrderRequest
     [JsonPropertyName("cod_amount")]
     public int CodAmount { get; set; }
 
+    [JsonProperty("cod_failed_amount")]
+    [JsonPropertyName("cod_failed_amount")]
+    public int CodFailedAmount { get; set; }
+
     [JsonProperty("insurance_value")]
     [JsonPropertyName("insurance_value")]
     public int InsuranceValue { get; set; }

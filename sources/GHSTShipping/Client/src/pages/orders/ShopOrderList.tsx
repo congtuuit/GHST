@@ -188,35 +188,31 @@ const ShopOrderList = () => {
       key: 'deliveryFee',
       align: 'right',
       render: (value: number, record: IOrderViewDto) => {
-        if (record.status === 'waiting_confirm') {
-          return (
+        return (
+          <div>
+            <div style={{ fontSize: '12px' }}>Tổng cước</div>
+            <Price style={{ fontWeight: 'bold' }} value={record.totalServiceFee} type="success" />
             <div>
-              <div style={{ fontSize: '12px' }}>Tổng cước</div>
-              <Price style={{ fontWeight: 'bold' }} value={record.totalServiceFee} type="success" />
-              <div>
-                <Popover
-                  content={
-                    <>
-                      <div>
-                        <span>Cước theo bảng giá: </span>
-                        <Price value={value} />
-                      </div>
-                      <div>
-                        <span>Phí bảo hiểm: </span>
-                        <Price value={record.insuranceFee} />
-                      </div>
-                    </>
-                  }
-                  title="Chi tiết cước"
-                >
-                  <Button type="link">Xem chi tiết</Button>
-                </Popover>
-              </div>
+              <Popover
+                content={
+                  <>
+                    <div>
+                      <span>Cước theo bảng giá: </span>
+                      <Price value={value} />
+                    </div>
+                    <div>
+                      <span>Phí bảo hiểm: </span>
+                      <Price value={record.insuranceFee} />
+                    </div>
+                  </>
+                }
+                title="Chi tiết cước"
+              >
+                <Button type="link">Xem chi tiết</Button>
+              </Popover>
             </div>
-          );
-        }
-
-        return <Price value={value} type="success" />;
+          </div>
+        );
       },
     },
     {

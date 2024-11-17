@@ -25,7 +25,7 @@ import OrderStatus from './OrderStatus';
 import { revertDateFormatMap } from '@/components/core/table-column/type';
 import AdminOrderFilterWrapper from './AdminOrderFilterWrapper';
 import { useParams } from 'react-router-dom';
-import ghnOrderFilter, { FilterStatusOption } from '@/features/order/ghnOrderFilter';
+import ghnOrderFilter, { FilterStatusOption, OrderGroupStatus } from '@/features/order/ghnOrderFilter';
 import './ShopOrder.css';
 import ChangeOrderWeight from './ghn/ChangeOrderWeight';
 import NumberFormatter from '@/components/core/NumberFormatter';
@@ -184,6 +184,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
 
   const handleSearchOrder = debounce(changedValues => {
     setSearchOrderCodes(changedValues);
+    setOrderStatusFilter(OrderGroupStatus.TatCa);
   }, 300);
 
   const columns: ColumnsType<IOrderViewDto> = [
@@ -347,7 +348,6 @@ const ShopOrders = (props: ShopOrdersProps) => {
       key: 'deliveryFee',
       align: 'right',
       render: (value: number, record: IOrderViewDto) => {
-        if (record.status === 'waiting_confirm') {
           return (
             <div>
               <div style={{ fontSize: '12px' }}>Tổng cước</div>
@@ -373,9 +373,6 @@ const ShopOrders = (props: ShopOrdersProps) => {
               </div>
             </div>
           );
-        }
-
-        return <Price value={value} type="success" />;
       },
     },
     {

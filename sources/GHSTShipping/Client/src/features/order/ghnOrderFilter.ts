@@ -1,7 +1,8 @@
 import { GHN_OrderStatus } from './contants';
 import { IDeliveryStatus } from './type';
 
-const OrderGroupStatus = {
+export const OrderGroupStatus = {
+  TatCa: 100,
   ChoXacNhan: 99,
   Nhap: 0,
   ChoBanGiao: 1,

@@ -77,6 +77,8 @@ namespace GHSTShipping.Domain.DTOs
         public int Height { get; set; }
 
         public long CodAmount { get; set; }
+        public long CodFailedAmount { get; set; }
+
         public long InsuranceValue { get; set; }
 
         /// <summary>

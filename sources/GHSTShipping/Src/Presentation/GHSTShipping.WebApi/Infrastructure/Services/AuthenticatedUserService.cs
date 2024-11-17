@@ -1,4 +1,5 @@
 using GHSTShipping.Application.Interfaces;
+using GHSTShipping.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Security.Claims;
@@ -42,6 +43,14 @@ namespace GHSTShipping.WebApi.Infrastructure.Services
                 {
                     return Guid.Parse(value);
                 }
+            }
+        }
+
+        public bool IsAdmin
+        {
+            get
+            {
+                return Type == AccountTypeConstants.ADMIN;
             }
         }
     }
