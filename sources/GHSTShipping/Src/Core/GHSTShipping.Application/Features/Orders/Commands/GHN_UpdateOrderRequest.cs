@@ -75,6 +75,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 Length = order.Length,
                 Width = order.Width,
                 Weight = order.Weight,
+                InsuranceValue = order.InsuranceValue,
             });
             
             order.OrrverideDeliveryFee(pricePlan.ShippingCost);

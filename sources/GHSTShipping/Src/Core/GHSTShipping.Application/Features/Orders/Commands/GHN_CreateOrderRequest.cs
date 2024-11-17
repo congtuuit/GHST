@@ -192,7 +192,8 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 Height = request.Height,
                 Length = request.Length,
                 Weight = request.Weight,
-                Width = request.Width
+                Width = request.Width,
+                InsuranceValue = request.InsuranceValue,
             });
 
             // Handle orverride sender address using shop address got from deliery partner
@@ -243,6 +244,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             return new Order
             {
                 DeliveryPricePlaneId = request.ShopDeliveryPricePlaneId,
+                InsuranceFee = deliveryFeePlan.InsuranceFee,
 
                 PartnerShopId = partnerShopId,
                 ShopId = shopId,

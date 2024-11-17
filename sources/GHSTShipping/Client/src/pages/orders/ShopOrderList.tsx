@@ -5,7 +5,7 @@ import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 import type { ColumnsType } from 'antd/lib/table';
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Card, Col, message, Radio, Row, Tag, Typography } from 'antd';
+import { Button, Card, Col, message, Popover, Radio, Row, Tag, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { apiCancelOrderGhn, apiCountOrderByStatus, apiGetOrderDetail, apiGetOrders, apiGetShopOrders } from '@/api/business.api';
@@ -143,7 +143,7 @@ const ShopOrderList = () => {
       dataIndex: 'codAmount',
       key: 'codAmount',
       align: 'right',
-      render: (value: number) => {
+      render: (value: number, record: IOrderViewDto) => {
         return (
           <div>
             <div style={{ fontSize: '12px' }}>COD</div>
@@ -178,29 +178,38 @@ const ShopOrderList = () => {
         if (record.status === 'waiting_confirm') {
           return (
             <div>
-              <div>Tạm tính</div>
-              <Price value={value} type="success" />
+              <div>
+                <Tag style={{ minWidth: '50px', marginRight: "0" }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
+                  {record.paymentTypeName}
+                </Tag>
+              </div>
+
+              <div style={{ fontSize: '12px' }}>Tổng cước</div>
+              <Price style={{ fontWeight: 'bold' }} value={record.totalServiceFee} type="success" />
+              <div>
+                <Popover
+                  content={
+                    <>
+                      <div>
+                        <span>Cước theo bảng giá: </span>
+                        <Price value={value} />
+                      </div>
+                      <div>
+                        <span>Phí bảo hiểm: </span>
+                        <Price value={record.insuranceFee} />
+                      </div>
+                    </>
+                  }
+                  title="Chi tiết cước"
+                >
+                  <Button type="link">Xem chi tiết</Button>
+                </Popover>
+              </div>
             </div>
           );
         }
 
         return <Price value={value} type="success" />;
-      },
-    },
-
-    {
-      title: 'Tùy chọn thanh toán',
-      dataIndex: 'paymentTypeName',
-      key: 'paymentTypeName',
-      align: 'left',
-      render: (value: string, record: IOrderViewDto) => {
-        return (
-          <div>
-            <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
-              {value}
-            </Tag>
-          </div>
-        );
       },
     },
     {

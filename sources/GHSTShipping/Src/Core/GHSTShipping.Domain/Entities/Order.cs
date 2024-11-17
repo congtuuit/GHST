@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Net.Sockets;
 
 namespace GHSTShipping.Domain.Entities
 {
@@ -37,6 +38,8 @@ namespace GHSTShipping.Domain.Entities
         /// Delivery fee has been orverried and just display on Admin
         /// </summary>
         public long CustomDeliveryFee { get; private set; } // NEED TO MAPPING
+
+        public long InsuranceFee { get; set; }
 
         public DateTime? PublishDate { get; set; } // NEED TO MAPPING
 
@@ -149,7 +152,7 @@ namespace GHSTShipping.Domain.Entities
         public long CalculateWeight { get; set; }
         public List<OrderItem> Items { get; set; } = new List<OrderItem>();
 
-        public int CodAmount { get; set; }
+        public long CodAmount { get; set; }
 
         [MaxLength(4000)]
         public string? Content { get; set; }
@@ -157,7 +160,7 @@ namespace GHSTShipping.Domain.Entities
         public int? PickStationId { get; set; }
         public int? DeliverStationId { get; set; }
 
-        public int InsuranceValue { get; set; }
+        public long InsuranceValue { get; set; }
         public int ServiceId { get; set; } = 0;
         public int ServiceTypeId { get; set; } = 2;
 

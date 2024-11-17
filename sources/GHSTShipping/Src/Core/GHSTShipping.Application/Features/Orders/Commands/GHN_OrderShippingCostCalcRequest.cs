@@ -17,6 +17,11 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         public long Length { get; set; } // Chiều dài của đơn hàng (cm)
         public long Width { get; set; } // Chiều rộng của đơn hàng (cm)
         public long Height { get; set; } // Chiều cao của đơn hàng (cm)
+
+        /// <summary>
+        /// Giá trị đơn hàng
+        /// </summary>
+        public long InsuranceValue { get; set; }
     }
 
     public class GHN_OrderShippingCostCalcRequestHandler : IRequestHandler<GHN_OrderShippingCostCalcRequest, OrderShippingCostDto>
@@ -93,12 +98,19 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 shippingCost = pricePlane.PublicPrice + (extraSteps * pricePlane.StepPrice);
             }
 
+            decimal insuranceFee = 0;
+            if (request.InsuranceValue > pricePlane.LimitInsurance)
+            {
+                insuranceFee = (pricePlane.InsuranceFeeRate / 100) * request.InsuranceValue;
+            }
+
             // Trả về kết quả tính toán
             return new OrderShippingCostDto
             {
                 ShopDeliveryPricePlaneId = request.ShopDeliveryPricePlaneId,
                 OrderWeight = finalWeight,
-                ShippingCost = shippingCost
+                ShippingCost = shippingCost,
+                InsuranceFee = (long)insuranceFee,
             };
         }
     }

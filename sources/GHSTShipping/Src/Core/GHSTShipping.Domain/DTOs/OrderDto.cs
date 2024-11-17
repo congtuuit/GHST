@@ -15,7 +15,20 @@ namespace GHSTShipping.Domain.DTOs
         public Guid? ShopId { get; set; }
         public string ShopName { get; set; }
         public string DeliveryPartner { get; set; }
+
         public long DeliveryFee { get; set; }
+        public long InsuranceFee { get; set; }
+
+        /// <summary>
+        /// Tổng cước cần thu
+        /// </summary>
+        public long TotalServiceFee
+        {
+            get
+            {
+                return DeliveryFee + InsuranceFee;
+            }
+        }
 
         public string ClientOrderCode { get; set; }
         public string FromName { get; set; }
@@ -45,8 +58,8 @@ namespace GHSTShipping.Domain.DTOs
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public int CodAmount { get; set; }
-        public int InsuranceValue { get; set; }
+        public long CodAmount { get; set; }
+        public long InsuranceValue { get; set; }
 
         /// <summary>
         /// 2: Hàng nhẹ, 5: Hàng nặng

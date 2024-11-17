@@ -80,6 +80,9 @@ export interface IOrderViewDto {
   statusName: string;
   statusColor: string;
   created: string;
+
+  totalServiceFee: number;
+  insuranceFee: number;
 }
 
 export interface IUpdateOrderRequest {
