@@ -146,10 +146,15 @@ namespace GHSTShipping.Domain.Entities
         public int ConvertRate { get; set; }
 
 
-        [Obsolete]
-        public long ConvertedWeight { get; set; }
-        [Obsolete]
-        public long CalculateWeight { get; set; }
+        /// <summary>
+        /// Khối lượng chuyển đổi
+        /// </summary>
+        public decimal ConvertedWeight { get; set; }
+
+        /// <summary>
+        /// Khối lượng tính phí
+        /// </summary>
+        public decimal CalculateWeight { get; set; }
         public List<OrderItem> Items { get; set; } = new List<OrderItem>();
 
         public long CodAmount { get; set; }

@@ -111,6 +111,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 OrderWeight = finalWeight,
                 ShippingCost = shippingCost,
                 InsuranceFee = (long)insuranceFee,
+                CalcOrderWeight = convertedWeight
             };
         }
     }

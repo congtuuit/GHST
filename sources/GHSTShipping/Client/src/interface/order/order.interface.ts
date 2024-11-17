@@ -58,15 +58,14 @@ export interface IOrderViewDto {
   rootLength: number;
   rootWidth: number;
   rootHeight: number;
-  rootDisplaySize: string;
-  rootConvertedWeight: number;
 
   weight: number;
   length: number;
   width: number;
   height: number;
-  displaySize: string;
+
   convertedWeight: number;
+  calculateWeight: number;
 
   codAmount: number;
   insuranceValue: number;

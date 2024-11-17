@@ -3,7 +3,7 @@ import type { IOrderDetail, IOrderDto, IOrderViewDto, IUpdateOrderRequest, ShopO
 import type { RadioChangeEvent, TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 import type { ColumnsType } from 'antd/lib/table';
-import { Button, Card, Col, message, Radio, Row, Select, Tag, Typography } from 'antd';
+import { Button, Card, Col, message, Popover, Radio, Row, Select, Tag, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -303,32 +303,38 @@ const ShopOrders = (props: ShopOrdersProps) => {
       title: 'KL Đơn hàng (gram)',
       dataIndex: '#donhang',
       key: '#donhang',
-      width: '100px',
       render: (value: string, record: IOrderViewDto) => {
-        const isCustomized = record.rootConvertedWeight !== record.convertedWeight;
         return (
           <div>
             <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={record?.serviceTypeId === 2 ? 'cyan' : 'red'}>
               {record.serviceTypeName}
             </Tag>
 
-            {record.rootDisplaySize !== '0x0x0' && (
-              <div style={{ marginTop: '10px' }}>
-                <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={'gray'}>
-                  {<NumberFormatter value={record?.rootConvertedWeight} style="unit" unit="gram" />} [{record.rootDisplaySize}]
-                </Tag>
-              </div>
-            )}
+            <div style={{ marginTop: '5px' }}>
+              <span style={{ fontSize: '12px' }}>KL Tính Phí </span>
+              <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={'orange'}>
+                {<NumberFormatter value={record?.calculateWeight} style="unit" unit="gram" />}
+              </Tag>
+            </div>
 
-            {isCustomized && (
+
+            <div style={{ marginTop: '5px' }}>
+              <span style={{ fontSize: '12px' }}>KL Quy Đổi </span>
+              <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={''}>
+                {<NumberFormatter value={record?.convertedWeight} style="unit" unit="gram" />}
+              </Tag>
+            </div>
+
+            {/* {isCustomized && (
               <div style={{ marginTop: '10px' }}>
                 <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={'green'}>
                   {<NumberFormatter value={record?.convertedWeight} style="unit" unit="gram" />} [{record.displaySize}]
                 </Tag>
               </div>
-            )}
+            )} */}
+
             {record.status === 'waiting_confirm' && (
-              <Button onClick={() => handleChangeOrderWeight(record)} type="link">
+              <Button onClick={() => handleChangeOrderWeight(record)} type="link" disabled>
                 Thay đổi
               </Button>
             )}
@@ -345,26 +351,38 @@ const ShopOrders = (props: ShopOrdersProps) => {
         if (record.status === 'waiting_confirm') {
           return (
             <div>
-              <div>Tạm tính</div>
-              <Price value={value} type="success" />
+              <div>
+                <Tag style={{ minWidth: '50px', marginRight: '0' }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
+                  {record.paymentTypeName}
+                </Tag>
+              </div>
+
+              <div style={{ fontSize: '12px' }}>Tổng cước</div>
+              <Price style={{ fontWeight: 'bold' }} value={record.totalServiceFee} type="success" />
+              <div>
+                <Popover
+                  content={
+                    <>
+                      <div>
+                        <span>Cước theo bảng giá: </span>
+                        <Price value={value} />
+                      </div>
+                      <div>
+                        <span>Phí bảo hiểm: </span>
+                        <Price value={record.insuranceFee} />
+                      </div>
+                    </>
+                  }
+                  title="Chi tiết cước"
+                >
+                  <Button type="link">Xem chi tiết</Button>
+                </Popover>
+              </div>
             </div>
           );
         }
 
         return <Price value={value} type="success" />;
-      },
-    },
-    {
-      title: 'Người thanh toán',
-      dataIndex: 'paymentTypeName',
-      key: 'paymentTypeName',
-      width: '50px',
-      render: (value: string, record: IOrderViewDto) => {
-        return (
-          <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
-            {value}
-          </Tag>
-        );
       },
     },
     {

@@ -164,23 +164,15 @@ namespace GHSTShipping.Domain.DTOs
 
         public string PrivateOrderCode { get; set; }
 
-        public string RootDisplaySize
-        {
-            get
-            {
-                string displaySize = $"{RootLength}x{RootWidth}x{RootHeight}";
-                return displaySize;
-            }
-        }
+        /// <summary>
+        /// Khối lượng chuyển đổi
+        /// </summary>
+        public decimal ConvertedWeight { get; set; }
 
-        public int RootConvertedWeight
-        {
-            get
-            {
-                int convertedWeight = RootLength * RootWidth * RootHeight;
-                return convertedWeight;
-            }
-        }
+        /// <summary>
+        /// Khối lượng tính phí
+        /// </summary>
+        public decimal CalculateWeight { get; set; }
 
         public string DisplaySize
         {
@@ -188,15 +180,6 @@ namespace GHSTShipping.Domain.DTOs
             {
                 string displaySize = $"{Length}x{Width}x{Height}";
                 return displaySize;
-            }
-        }
-
-        public int ConvertedWeight
-        {
-            get
-            {
-                int convertedWeight = Length * Width * Height;
-                return convertedWeight;
             }
         }
     }

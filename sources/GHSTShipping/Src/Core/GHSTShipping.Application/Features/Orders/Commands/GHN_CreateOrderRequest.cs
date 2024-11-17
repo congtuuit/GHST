@@ -135,6 +135,12 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             // Process order with GHN partner
             if (deliveryConfig.PartnerConfig.DeliveryPartner == EnumDeliveryPartner.GHN)
             {
+                // Force change InsuranceValue if request InsuranceValue = 0
+                if (request.InsuranceValue == 0)
+                {
+                    request.InsuranceValue = request.CodAmount;
+                }
+
                 // Override sender address
                 if (shop.AllowUsePartnerShopAddress)
                 {
@@ -186,7 +192,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             var uniqueShopCode = shop.UniqueCode;
             var allowPublishOrder = shop.AllowPublishOrder;
 
-            var deliveryFeePlan = await _mediator.Send(new GHN_OrderShippingCostCalcRequest()
+            OrderShippingCostDto deliveryFeePlan = await _mediator.Send(new GHN_OrderShippingCostCalcRequest()
             {
                 ShopDeliveryPricePlaneId = request.ShopDeliveryPricePlaneId.Value,
                 Height = request.Height,
@@ -243,6 +249,9 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
             return new Order
             {
+                ConvertedWeight = deliveryFeePlan.CalcOrderWeight,
+                CalculateWeight = deliveryFeePlan.OrderWeight,
+
                 DeliveryPricePlaneId = request.ShopDeliveryPricePlaneId,
                 InsuranceFee = deliveryFeePlan.InsuranceFee,
 
