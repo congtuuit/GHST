@@ -152,8 +152,11 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
     const currentValues = form.getFieldsValue();
     dispatch(setOrder({ ...currentValues, ...changedValues }));
 
-    console.log('log ', currentValues);
     handleCalcTotalWeigh(currentValues);
+
+    if (Boolean(currentValues?.cod_amount) && currentValues?.cod_amount >= 0) {
+      form.setFieldValue('insurance_value', currentValues?.cod_amount);
+    }
   }, 300);
 
   const handleChangeSenderAddress = (value: string) => {

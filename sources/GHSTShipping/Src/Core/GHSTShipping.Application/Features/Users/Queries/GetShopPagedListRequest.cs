@@ -34,7 +34,7 @@ namespace GHSTShipping.Application.Features.Users.Queries
 
             int skipCount = (request.PageNumber - 1) * request.PageSize;
             PaginationResponseDto<ShopDto> pagingResult = await unitOfWork.Shops
-                .All()
+                .Where(i => i.ParentId == null)
                 .Select(i => new ShopDto
                 {
                     Id = i.Id,

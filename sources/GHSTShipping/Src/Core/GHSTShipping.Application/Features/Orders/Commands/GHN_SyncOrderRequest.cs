@@ -280,7 +280,8 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             var entityOrder = new Order
             {
                 ShopId = shopId,
-                UniqueCode = null,
+                UniqueCode = o.ClientOrderCode,
+                ClientOrderCode = o.ClientOrderCode,
                 IsPublished = true,
                 LastSyncDate = DateTime.UtcNow,
                 DeliveryPartner = EnumSupplierConstants.GHN,

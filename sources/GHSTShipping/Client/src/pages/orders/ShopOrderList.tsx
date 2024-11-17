@@ -20,6 +20,7 @@ import { revertDateFormatMap } from '@/components/core/table-column/type';
 import ghnOrderFilter, { FilterStatusOption } from '@/features/order/ghnOrderFilter';
 import { RadioChangeEvent } from 'antd/lib';
 import AdminOrderFilterWrapper from './components/AdminOrderFilterWrapper';
+import CopyTextButton from '@/components/core/CopyTextButton';
 
 const _ghnOrderFilter = new ghnOrderFilter();
 const orderStatusSection = _ghnOrderFilter.filterStatus;
@@ -86,15 +87,20 @@ const ShopOrderList = () => {
       width: 160,
       render: (value: string, record: IOrderViewDto) => {
         return (
-          <div onClick={() => handleViewOrderDetail(record.id)} style={{ cursor: 'pointer' }}>
-            <Button type="link">{value}</Button>
-            <OrderStatus
-              isPublished={record?.isPublished}
-              status={record?.status}
-              statusName={record?.statusName}
-              statusColor={record?.statusColor}
-            />
-            <span>{record?.fromPhone}</span>
+          <div>
+            <Button type="link">
+              <span onClick={() => handleViewOrderDetail(record.id)}>{value} </span>
+              <CopyTextButton text={value} />
+            </Button>
+            <div onClick={() => handleViewOrderDetail(record.id)}>
+              <OrderStatus
+                isPublished={record?.isPublished}
+                status={record?.status}
+                statusName={record?.statusName ?? 'N/A'}
+                statusColor={record?.statusColor}
+              />
+              <span>{record?.fromPhone}</span>
+            </div>
           </div>
         );
       },

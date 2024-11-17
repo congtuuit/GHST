@@ -40,7 +40,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
 
         public async Task<BaseResult<PaginationResponseDto<ShopViewReportDto>>> Handle(GetOrdersGroupByShopRequest request, CancellationToken cancellationToken)
         {
-            var query = _shopRepository.Where(i => i.IsVerified);
+            var query = _shopRepository.Where(i => i.IsVerified && i.ParentId == null);
             if (request.ShopId.HasValue)
             {
                 query = query.Where(i => i.Id == request.ShopId);

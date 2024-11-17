@@ -21,6 +21,8 @@ namespace GHSTShipping.Application.Services
     public class PartnerConfigService(
         IShopPartnerConfigRepository shopPartnerConfigRepository,
         IPartnerConfigRepository partnerConfigRepository,
+        IOrderRepository orderRepository,
+        IOrderItemRepository orderItemRepository,
         IGhnApiClient ghnApiClient
         , IUnitOfWork unitOfWork) : IPartnerConfigService
     {
@@ -292,6 +294,26 @@ namespace GHSTShipping.Application.Services
                     var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}'";
                     //var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}' AND PartnerConfigId = '{request.DeliveryConfigId}'";
                     await shopPartnerConfigRepository.ExecuteSqlRawAsync(sqlQuery);
+
+                    // Remove all order and order item related to shop
+                    var shopOrders = await orderRepository
+                        .Where(i => i.LastSyncDate.HasValue)
+                        .ToListAsync();
+
+                    if (shopOrders.Count > 0)
+                    {
+                        orderRepository.HardDeleteRange(shopOrders);
+                    }
+
+                    var orderIds = shopOrders.Select(o => o.Id);
+                    var orderItems = await orderItemRepository
+                        .Where(i => orderIds.Contains(i.OrderId))
+                        .ToListAsync();
+
+                    if (orderItems.Count > 0)
+                    {
+                        orderItemRepository.HardDeleteRange(orderItems);
+                    }
                 }
 
                 if (request.IsConnect)

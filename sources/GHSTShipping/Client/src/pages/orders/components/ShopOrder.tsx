@@ -31,6 +31,8 @@ import ChangeOrderWeight from './ghn/ChangeOrderWeight';
 import NumberFormatter from '@/components/core/NumberFormatter';
 import { addConfirmOrderToQueue } from '@/features/order/orderSlice';
 import { handleCallApiConfirmOrder } from '@/features/order';
+import Price from '@/components/core/price';
+import CopyTextButton from '@/components/core/CopyTextButton';
 
 const { Option } = Select;
 
@@ -199,15 +201,20 @@ const ShopOrders = (props: ShopOrdersProps) => {
       width: '50px',
       render: (value: string, record: IOrderViewDto) => {
         return (
-          <div onClick={() => handleViewOrderDetail(record.id)}>
-            <Button type="link">{value}</Button>
-            <OrderStatus
-              isPublished={record?.isPublished}
-              status={record?.status}
-              statusName={record?.statusName ?? 'N/A'}
-              statusColor={record?.statusColor}
-            />
-            <span>{record?.fromPhone}</span>
+          <div>
+            <Button type="link">
+              <span onClick={() => handleViewOrderDetail(record.id)}>{value} </span>
+              <CopyTextButton text={value} />
+            </Button>
+            <div onClick={() => handleViewOrderDetail(record.id)}>
+              <OrderStatus
+                isPublished={record?.isPublished}
+                status={record?.status}
+                statusName={record?.statusName ?? 'N/A'}
+                statusColor={record?.statusColor}
+              />
+              <span>{record?.fromPhone}</span>
+            </div>
           </div>
         );
       },
@@ -216,7 +223,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
       title: 'Người gửi',
       dataIndex: 'fromName',
       key: 'fromName',
-      width: '200px',
+      width: '120px',
       render: (value: string, record: IOrderViewDto) => {
         const dateFormatted = formatUtcToLocalTime(record?.created, revertDateFormatMap['day']);
         return (
@@ -232,7 +239,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
       title: 'Địa chỉ gửi',
       dataIndex: 'fromAddress',
       key: 'fromAddress',
-      width: '250px',
+      width: '200px',
       render: (value: string, record: IOrderViewDto) => {
         return (
           <div>
@@ -249,7 +256,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
       title: 'Người nhận',
       dataIndex: 'toName',
       key: 'toName',
-      width: '150px',
+      width: '100px',
       render: (value: string, record: IOrderViewDto) => {
         return (
           <div>
@@ -263,7 +270,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
       title: 'Địa chỉ nhận',
       dataIndex: 'toAddress',
       key: 'toAddress',
-      width: '250px',
+      width: '200px',
       render: (value: string, record: IOrderViewDto) => {
         return (
           <div>
@@ -277,32 +284,42 @@ const ShopOrders = (props: ShopOrdersProps) => {
       },
     },
     {
-      title: 'Loại dịch vụ',
-      dataIndex: 'serviceTypeName',
-      key: 'serviceTypeName',
-      width: '100px',
-      render: (value: string, record: IOrderViewDto) => {
+      title: 'Thu hộ',
+      dataIndex: 'codAmount',
+      key: 'codAmount',
+      align: 'right',
+      render: (value: number, record: IOrderViewDto) => {
         return (
-          <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={record?.serviceTypeId === 2 ? 'cyan' : 'red'}>
-            {value}
-          </Tag>
+          <div>
+            <div style={{ fontSize: '12px' }}>COD</div>
+            <Price style={{ fontWeight: 'bold' }} value={value} type="warning" />
+            <div style={{ marginTop: '5px' }}>Giá trị đơn hàng</div>
+            <Price value={record.insuranceValue} />
+          </div>
         );
       },
     },
-
     {
       title: 'KL Đơn hàng (gram)',
       dataIndex: '#donhang',
       key: '#donhang',
+      width: '100px',
       render: (value: string, record: IOrderViewDto) => {
         const isCustomized = record.rootConvertedWeight !== record.convertedWeight;
         return (
           <div>
-            <div>
-              <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={'gray'}>
-                {<NumberFormatter value={record?.rootConvertedWeight} style="unit" unit="gram" />} [{record.rootDisplaySize}]
-              </Tag>
-            </div>
+            <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={record?.serviceTypeId === 2 ? 'cyan' : 'red'}>
+              {record.serviceTypeName}
+            </Tag>
+
+            {record.rootDisplaySize !== '0x0x0' && (
+              <div style={{ marginTop: '10px' }}>
+                <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={'gray'}>
+                  {<NumberFormatter value={record?.rootConvertedWeight} style="unit" unit="gram" />} [{record.rootDisplaySize}]
+                </Tag>
+              </div>
+            )}
+
             {isCustomized && (
               <div style={{ marginTop: '10px' }}>
                 <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={'green'}>
@@ -319,12 +336,29 @@ const ShopOrders = (props: ShopOrdersProps) => {
         );
       },
     },
+    {
+      title: 'Phí vận chuyển',
+      dataIndex: 'deliveryFee',
+      key: 'deliveryFee',
+      align: 'right',
+      render: (value: number, record: IOrderViewDto) => {
+        if (record.status === 'waiting_confirm') {
+          return (
+            <div>
+              <div>Tạm tính</div>
+              <Price value={value} type="success" />
+            </div>
+          );
+        }
 
+        return <Price value={value} type="success" />;
+      },
+    },
     {
       title: 'Người thanh toán',
       dataIndex: 'paymentTypeName',
       key: 'paymentTypeName',
-      width: '100px',
+      width: '50px',
       render: (value: string, record: IOrderViewDto) => {
         return (
           <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
