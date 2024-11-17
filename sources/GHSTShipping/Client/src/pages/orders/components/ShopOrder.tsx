@@ -317,7 +317,6 @@ const ShopOrders = (props: ShopOrdersProps) => {
               </Tag>
             </div>
 
-
             <div style={{ marginTop: '5px' }}>
               <span style={{ fontSize: '12px' }}>KL Quy Đổi </span>
               <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={''}>
@@ -351,12 +350,6 @@ const ShopOrders = (props: ShopOrdersProps) => {
         if (record.status === 'waiting_confirm') {
           return (
             <div>
-              <div>
-                <Tag style={{ minWidth: '50px', marginRight: '0' }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
-                  {record.paymentTypeName}
-                </Tag>
-              </div>
-
               <div style={{ fontSize: '12px' }}>Tổng cước</div>
               <Price style={{ fontWeight: 'bold' }} value={record.totalServiceFee} type="success" />
               <div>
@@ -383,6 +376,27 @@ const ShopOrders = (props: ShopOrdersProps) => {
         }
 
         return <Price value={value} type="success" />;
+      },
+    },
+    {
+      title: 'Tùy chọn thanh toán',
+      dataIndex: 'totalAmount',
+      key: 'totalAmount',
+      align: 'right',
+      render: (value: number, record: IOrderViewDto) => {
+        return (
+          <>
+            <div>
+              <Tag style={{ minWidth: '50px', marginRight: '0' }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
+                {record.paymentTypeName}
+              </Tag>
+            </div>
+
+            <div>Tổng thu: </div>
+            <Price value={value} type="success" />
+            <div style={{ fontStyle: 'italic', fontSize: '12px' }}>(Bao gồm COD)</div>
+          </>
+        );
       },
     },
     {

@@ -133,7 +133,7 @@ const DeliveryPricePlaneForm = forwardRef((props: DeliveryPricePlaneFormProps, r
         {/* ConvertWeightRate */}
         <Col span={12}>
           <Form.Item
-            label="Tỷ Lệ Chuyển Đổi Trọng Lượng"
+            label="Tỷ Lệ Chuyển Đổi Trọng Lượng (gram)"
             name="convertWeightRate"
             rules={[{ required: true, message: 'Vui lòng nhập tỷ lệ chuyển đổi trọng lượng' }]}
           >

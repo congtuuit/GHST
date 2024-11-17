@@ -148,22 +148,35 @@ const ShopOrderList = () => {
           <div>
             <div style={{ fontSize: '12px' }}>COD</div>
             <Price style={{ fontWeight: 'bold' }} value={value} type="warning" />
+            <div style={{ marginTop: '5px' }}>Giá trị đơn hàng</div>
+            <Price value={record.insuranceValue} />
           </div>
         );
       },
     },
     {
-      title: 'Đơn hàng',
-      dataIndex: 'insuranceValue',
-      key: 'insuranceValue',
-      render: (value: number, record: IOrderViewDto) => {
+      title: 'KL Đơn hàng (gram)',
+      dataIndex: '#donhang',
+      key: '#donhang',
+      render: (value: string, record: IOrderViewDto) => {
         return (
           <div>
-            <div>
-              Trọng lượng: <NumberFormatter value={record?.weight} style="unit" unit="gram" />
+            <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={record?.serviceTypeId === 2 ? 'cyan' : 'red'}>
+              {record.serviceTypeName}
+            </Tag>
+
+            <div style={{ marginTop: '5px' }}>
+              <span style={{ fontSize: '12px' }}>KL Tính Phí </span>
+              <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={'orange'}>
+                {<NumberFormatter value={record?.calculateWeight} style="unit" unit="gram" />}
+              </Tag>
             </div>
-            <div>
-              Giá trị đơn hàng: <Price value={value} />
+
+            <div style={{ marginTop: '5px' }}>
+              <span style={{ fontSize: '12px' }}>KL Quy Đổi </span>
+              <Tag style={{ minWidth: '50px', textAlign: 'center' }} color={''}>
+                {<NumberFormatter value={record?.convertedWeight} style="unit" unit="gram" />}
+              </Tag>
             </div>
           </div>
         );
@@ -178,12 +191,6 @@ const ShopOrderList = () => {
         if (record.status === 'waiting_confirm') {
           return (
             <div>
-              <div>
-                <Tag style={{ minWidth: '50px', marginRight: "0" }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
-                  {record.paymentTypeName}
-                </Tag>
-              </div>
-
               <div style={{ fontSize: '12px' }}>Tổng cước</div>
               <Price style={{ fontWeight: 'bold' }} value={record.totalServiceFee} type="success" />
               <div>
@@ -213,11 +220,24 @@ const ShopOrderList = () => {
       },
     },
     {
-      title: 'Trạng thái',
-      align: 'center',
-      render: (_: any, record: IOrderViewDto) => {
-        const text = record.isPublished ? record.statusName : record.status === 'waiting_confirm' ? 'Chờ xác nhận' : record.statusName;
-        return <Tag color={record.statusColor ?? 'gray'}>{text}</Tag>;
+      title: 'Tùy chọn thanh toán',
+      dataIndex: 'totalAmount',
+      key: 'totalAmount',
+      align: 'right',
+      render: (value: number, record: IOrderViewDto) => {
+        return (
+          <>
+            <div>
+              <Tag style={{ minWidth: '50px', marginRight: '0' }} color={record?.paymentTypeId === 1 ? '' : 'geekblue'}>
+                {record.paymentTypeName}
+              </Tag>
+            </div>
+
+            <div>Tổng thu: </div>
+            <Price value={value} type="success" />
+            <div style={{ fontStyle: 'italic', fontSize: '12px' }}>(Bao gồm COD)</div>
+          </>
+        );
       },
     },
     {

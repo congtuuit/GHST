@@ -77,7 +77,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             var convertWeightRate = pricePlane.ConvertWeightRate <= 0 ? 1 : pricePlane.ConvertWeightRate;
 
             // Tính toán khối lượng chuyển đổi
-            var convertedWeight = (request.Length * request.Width * request.Height) / convertWeightRate;
+            var convertedWeight = ((request.Length * request.Width * request.Height) / convertWeightRate) * 1000;
 
             // Lấy khối lượng cuối cùng là giá trị lớn nhất giữa cân nặng thực tế và cân nặng chuyển đổi
             var finalWeight = Math.Max(convertedWeight, request.Weight);

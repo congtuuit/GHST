@@ -5,6 +5,7 @@ import { IOrderDetail } from '@/interface/order/order.interface';
 import MyModal from '@/components/core/modal';
 import Price from '@/components/core/price';
 import OrderStatus from '../OrderStatus';
+import NumberFormatter from '@/components/core/NumberFormatter';
 const { Title, Text } = Typography;
 
 interface OrderDialogProps {
@@ -28,15 +29,15 @@ const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data, showSenderAddress
   };
 
   const displayAddress = (address?: string, wardName?: string, disctrictName?: string, provinceName?: string) => {
-    let fullAddress = address ?? "";
-    if(Boolean(wardName)) {
-      fullAddress += ", " + wardName;
+    let fullAddress = address ?? '';
+    if (Boolean(wardName)) {
+      fullAddress += ', ' + wardName;
     }
-    if(Boolean(disctrictName)) {
-      fullAddress += ", " + disctrictName;
+    if (Boolean(disctrictName)) {
+      fullAddress += ', ' + disctrictName;
     }
-    if(Boolean(provinceName)) {
-      fullAddress += ", " + provinceName;
+    if (Boolean(provinceName)) {
+      fullAddress += ', ' + provinceName;
     }
 
     return fullAddress;
@@ -107,19 +108,31 @@ const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data, showSenderAddress
             <Title level={4}>Vận chuyển và Thanh toán</Title>
             <Text strong>Phí vận chuyển: </Text>
             <Text>
-              <b>
-                <Price value={data?.deliveryFee ?? 0} type="warning" />
-              </b>
+              <Price value={data?.deliveryFee ?? 0} type="secondary" />
             </Text>
             <br />
             <Text strong>COD: </Text>
             <Text>
-              <Price value={data?.codAmount ?? 0} type="success" />
+              <Price value={data?.codAmount ?? 0} type="warning" />
             </Text>
             <br />
             <Text strong>Giá trị đơn hàng: </Text>
             <Text>
-              <Price value={data?.insuranceValue ?? 0} type="success" />
+              <Price value={data?.insuranceValue ?? 0} type="secondary" />
+            </Text>
+            <br />
+
+            <Text strong>Phí bảo hiểm hàng hóa (phụ phí): </Text>
+            <Text>
+              <Price value={data?.insuranceFee ?? 0} type="secondary" />
+            </Text>
+            <br />
+
+            <Text strong>Tổng thu: </Text>
+            <Text>
+              <b>
+                <Price value={data?.totalAmount ?? 0} type="success" />
+              </b>
             </Text>
             <br />
             <Text strong>Hình thức thanh toán:</Text> <Text>{data?.paymentTypeName}</Text>
@@ -142,7 +155,7 @@ const OrderDetailDialog: React.FC<OrderDialogProps> = ({ data, showSenderAddress
             <Title level={4}>Thông tin Kiện hàng</Title>
             <Row>
               <Col span={6}>
-                <Text strong>Trọng lượng: </Text> <Text>{data?.weight} kg</Text>
+                <Text strong>Trọng lượng: </Text> <NumberFormatter value={data?.calculateWeight as number} style="unit" unit="gram" />
               </Col>
               <Col span={6}>
                 <Text strong>Kích thước: </Text> <Text>{`${data?.length} x ${data?.width} x ${data?.height} cm`}</Text>

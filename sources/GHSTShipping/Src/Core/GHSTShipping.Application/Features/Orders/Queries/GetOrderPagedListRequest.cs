@@ -200,7 +200,10 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                         searchParams.ToTime = DateTimeHelper.ConvertToUnixTimestamp(request.ToDate.Value);
                     }
 
+                    // search from GHN hub
                     var ghnOrdersResponse = await ghnApiClient.SearchOrdersAsync(apiConfig, searchParams);
+
+                    // Mapping to my system
                     var (entityOrders, entityOrderItems) = await GHN_SyncOrderRequestHandler.ListOrderMappingAsync(ghnOrdersResponse, shopId.Value, apiConfig, ghnApiClient);
 
                     if (entityOrders.Count > 0 || entityOrderItems.Count > 0)

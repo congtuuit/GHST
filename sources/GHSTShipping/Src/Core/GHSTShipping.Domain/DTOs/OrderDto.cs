@@ -30,6 +30,24 @@ namespace GHSTShipping.Domain.DTOs
             }
         }
 
+        /// <summary>
+        /// Tổng thu của khách
+        /// </summary>
+        public long TotalAmount
+        {
+            get
+            {
+                // Người gửi trả phí ship
+                if (PaymentTypeId == 1)
+                {
+                    return CodAmount;
+                }
+
+                // Người nhận trả phí ship
+                return DeliveryFee + InsuranceFee + CodAmount;
+            }
+        }
+
         public string ClientOrderCode { get; set; }
         public string FromName { get; set; }
         public string FromPhone { get; set; }
@@ -174,13 +192,5 @@ namespace GHSTShipping.Domain.DTOs
         /// </summary>
         public decimal CalculateWeight { get; set; }
 
-        public string DisplaySize
-        {
-            get
-            {
-                string displaySize = $"{Length}x{Width}x{Height}";
-                return displaySize;
-            }
-        }
     }
 }

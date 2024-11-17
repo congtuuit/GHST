@@ -82,6 +82,7 @@ export interface IOrderViewDto {
 
   totalServiceFee: number;
   insuranceFee: number;
+  totalAmount: number;
 }
 
 export interface IUpdateOrderRequest {
