@@ -1,6 +1,7 @@
 ﻿using GHSTShipping.Application.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -49,11 +50,21 @@ namespace GHSTShipping.WebApi.Controllers.v1
 
             if (!System.IO.File.Exists(filePath))
             {
-                return BaseResult<string>.Failure();
+                return BaseResult<string>.Ok("File không tồn tại!");
             }
 
-            var logContent = System.IO.File.ReadAllText(filePath);
-            return BaseResult<string>.Ok(logContent);
+            try
+            {
+                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new StreamReader(fileStream);
+                var logContent = reader.ReadToEnd();
+
+                return BaseResult<string>.Ok(logContent);
+            }
+            catch (Exception ex)
+            {
+                return BaseResult<string>.Ok(ex.Message);
+            }
         }
 
         [HttpDelete("clear/{fileName}")]

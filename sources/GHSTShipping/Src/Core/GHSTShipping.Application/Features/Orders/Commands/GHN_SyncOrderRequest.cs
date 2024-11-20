@@ -71,6 +71,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             {
                 var o = ghnOrders[i];
 
+                // những đơn là cancel sẽ không đính kèm client code, nên phải lấy về hết
                 if (o.Status != OrderStatus.CANCEL)
                 {
                     string clientOrderCode = o.ClientOrderCode;
@@ -191,6 +192,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             var orderCodes = entityOrders.Select(o => o.private_order_code).Distinct();
             var existingOrders = await unitOfWork.Orders
                 .Where(o => orderCodes.Contains(o.private_order_code))
+                .AsNoTracking() // Thêm AsNoTracking() ở đây
                 .Select(o => new Order
                 {
                     Id = o.Id,
@@ -301,20 +303,14 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     newOrderItemBatch.Clear();
                 }
 
-                // Process batch if batch size is reached or last item
                 if (updateOrderItemBatch.Count > 0)
                 {
-                    /*if (updateOrderBatch.Count > 0)
+                    foreach (var item in updateOrderItemBatch)
                     {
-                        unitOfWork.Orders.UpdateRange(updateOrderBatch);
-                    }*/
-
-                    if (updateOrderItemBatch.Count > 0)
-                    {
-                        unitOfWork.OrderItems.UpdateRange(updateOrderItemBatch);
+                        unitOfWork.OrderItems.Modify(item);
                     }
 
-                    //updateOrderBatch.Clear();
+                    unitOfWork.OrderItems.UpdateRange(updateOrderItemBatch);
                     updateOrderItemBatch.Clear();
                 }
 
@@ -323,6 +319,164 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             }
 
             return response;
+        }
+
+        public static async Task<List<Guid>> NEW_BatchSaveAsync(
+            IUnitOfWork unitOfWork,
+            List<Order> entityOrders,
+            List<OrderItem> entityOrderItems,
+            int batchSize = BATCH_SIZE)
+        {
+            // OrderIds processed
+            var response = new List<Guid>();
+
+            // Initialize lists to hold new and update batches
+            var newOrderBatch = new List<Order>();
+            var updateOrderBatch = new List<Order>();
+            var newOrderItemBatch = new List<OrderItem>();
+            var updateOrderItemBatch = new List<OrderItem>();
+
+            // Fetch existing orders based on private_order_code
+            var existingOrders = await FetchExistingOrdersAsync(unitOfWork, entityOrders);
+
+            // Fetch existing order items in a single query
+            var existingOrderItems = await FetchExistingOrderItemsAsync(unitOfWork, entityOrderItems);
+
+            // Loop through each order to categorize them into new or update batches
+            for (int i = 0; i < entityOrders.Count; i++)
+            {
+                var currentOrder = entityOrders[i];
+                var relatedItems = entityOrderItems.Where(item => item.OrderId == currentOrder.Id).ToList();
+
+                if (existingOrders.TryGetValue(currentOrder.private_order_code, out var existingOrder))
+                {
+                    // Update existing order
+                    PrepareOrderForUpdate(existingOrder, currentOrder);
+                    updateOrderBatch.Add(existingOrder);
+                    response.Add(existingOrder.Id);
+                }
+                else
+                {
+                    // Add to new order batch
+                    newOrderBatch.Add(currentOrder);
+                    response.Add(currentOrder.Id);
+                }
+
+                // Categorize OrderItems into new or update batches
+                foreach (var item in relatedItems)
+                {
+                    item.OrderId = currentOrder.Id;
+                    var existingItem = existingOrderItems.FirstOrDefault(i => i.ItemOrderCode == item.ItemOrderCode);
+
+                    if (existingItem != null)
+                    {
+                        item.Id = existingItem.Id;
+                        item.OrderId = existingItem.OrderId;
+                        updateOrderItemBatch.Add(item);
+                    }
+                    else
+                    {
+                        newOrderItemBatch.Add(item);
+                    }
+                }
+            }
+
+            // Save Orders and OrderItems in batches
+            await SaveOrdersAsync(unitOfWork, newOrderBatch, updateOrderBatch);
+            await SaveOrderItemsAsync(unitOfWork, newOrderItemBatch, updateOrderItemBatch);
+
+            return response;
+        }
+
+        private static async Task<Dictionary<string, Order>> FetchExistingOrdersAsync(
+            IUnitOfWork unitOfWork, List<Order> entityOrders)
+        {
+            var orderCodes = entityOrders.Select(o => o.private_order_code).Distinct();
+            return await unitOfWork.Orders
+                .Where(o => orderCodes.Contains(o.private_order_code))
+                .AsNoTracking()
+                .ToDictionaryAsync(o => o.private_order_code);
+        }
+
+
+        private static async Task<List<OrderItem>> FetchExistingOrderItemsAsync(
+            IUnitOfWork unitOfWork, List<OrderItem> entityOrderItems)
+        {
+            var existingOrderItemCodes = entityOrderItems
+                .Select(item => item.ItemOrderCode)
+                .Distinct();
+
+            return await unitOfWork.OrderItems
+                .Where(item => existingOrderItemCodes.Contains(item.ItemOrderCode))
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        private static void PrepareOrderForUpdate(Order existingOrder, Order currentOrder)
+        {
+            existingOrder.ReturnName = currentOrder.ReturnName;
+            existingOrder.ReturnPhone = currentOrder.ReturnPhone;
+            existingOrder.ReturnAddress = currentOrder.ReturnAddress;
+            existingOrder.ReturnDistrictId = currentOrder.ReturnDistrictId;
+            existingOrder.ReturnDistrictName = currentOrder.ReturnDistrictName;
+            existingOrder.ReturnWardCode = currentOrder.ReturnWardCode;
+            existingOrder.ReturnWardName = currentOrder.ReturnWardName;
+            existingOrder.FromProvinceName = currentOrder.FromProvinceName;
+            existingOrder.Content = currentOrder.Content;
+            existingOrder.PickStationId = currentOrder.PickStationId;
+            existingOrder.DeliverStationId = currentOrder.DeliverStationId;
+            existingOrder.Coupon = currentOrder.Coupon;
+            existingOrder.CurrentStatus = currentOrder.CurrentStatus;
+            existingOrder.LastSyncDate = DateTime.UtcNow;
+
+            existingOrder.PrivateUpdateFromPartner(
+                currentOrder.private_order_code,
+                currentOrder.private_sort_code,
+                currentOrder.private_trans_type,
+                currentOrder.private_total_fee,
+                currentOrder.private_expected_delivery_time,
+                currentOrder.private_operation_partner);
+        }
+
+        private static async Task SaveOrdersAsync(
+            IUnitOfWork unitOfWork,
+            List<Order> newOrders,
+            List<Order> updateOrders)
+        {
+            // Add new orders
+            if (newOrders.Count > 0)
+            {
+                await unitOfWork.Orders.AddRangeAsync(newOrders);
+                await unitOfWork.SaveChangesAsync();
+            }
+
+            // Update existing orders
+            if (updateOrders.Count > 0)
+            {
+                unitOfWork.Orders.UpdateRange(updateOrders);
+                await unitOfWork.SaveChangesAsync();
+            }
+        }
+
+
+        private static async Task SaveOrderItemsAsync(
+            IUnitOfWork unitOfWork,
+            List<OrderItem> newOrderItems,
+            List<OrderItem> updateOrderItems)
+        {
+            // Add new order items
+            if (newOrderItems.Count > 0)
+            {
+                await unitOfWork.OrderItems.AddRangeAsync(newOrderItems);
+                await unitOfWork.SaveChangesAsync();
+            }
+
+            // Update existing order items
+            /*if (updateOrderItems.Count > 0)
+            {
+                unitOfWork.OrderItems.UpdateRange(updateOrderItems);
+                await unitOfWork.SaveChangesAsync();
+            }*/
         }
 
         private static Order OrderMapper(GHN_SearchOrderDataDto o, Guid? shopId = null, int deliveryFee = 0)
@@ -373,13 +527,13 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 CodAmount = o.CodAmount,
                 CodFailedAmount = o.CodFailedAmount,
 
+                Created = DateTime.UtcNow
             };
 
             if (!string.IsNullOrWhiteSpace(o.ClientOrderCode))
             {
                 entityOrder.UniqueCode = o.ClientOrderCode;
                 entityOrder.ClientOrderCode = o.ClientOrderCode;
-                entityOrder.Created = DateTime.UtcNow;
             }
 
             return entityOrder;

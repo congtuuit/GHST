@@ -288,7 +288,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 ToName = request.ToName,
                 ToPhone = request.ToPhone,
                 ToAddress = request.ToAddress,
-                ToWardId = $"{request.ToWardId}",
+                ToWardId = request.ToWardId,
                 ToWardName = request.ToWardName,
                 ToDistrictId = request.ToDistrictId,
                 ToDistrictName = request.ToDistrictName,

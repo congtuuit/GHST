@@ -14,6 +14,7 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
     public class UnitOfWork(ApplicationDbContext dbContext) : IUnitOfWork
     {
         private IGenericRepository<Shop> _shop;
+        private IGenericRepository<ShopPartnerConfig> _shopPartnerConfigs;
         private IGenericRepository<DeliveryPricePlane> _deliveryPricePlanes;
         private IGenericRepository<ShopOrderCodeSequence> _shopOrderCodeSequence;
         private IGenericRepository<Order> _order;
@@ -21,6 +22,10 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
 
         public IGenericRepository<Shop> Shops 
             => _shop ??= new GenericRepository<Shop>(dbContext);
+
+        public IGenericRepository<ShopPartnerConfig> ShopPartnerConfigs
+            => _shopPartnerConfigs ??= new GenericRepository<ShopPartnerConfig>(dbContext);
+
         public IGenericRepository<DeliveryPricePlane> DeliveryPricePlanes
             => _deliveryPricePlanes ??= new GenericRepository<DeliveryPricePlane>(dbContext);
         public IGenericRepository<ShopOrderCodeSequence> ShopOrderCodeSequences 

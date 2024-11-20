@@ -10,5 +10,10 @@ namespace GHSTShipping.Application.Helpers
             DateTimeOffset dateTimeOffset = new DateTimeOffset(dateTime.ToUniversalTime());
             return dateTimeOffset.ToUnixTimeSeconds();
         }
+
+        public static long ConvertToUnixTimestamp(DateTimeOffset dateTimeOffset)
+        {
+            return dateTimeOffset.ToUnixTimeSeconds();
+        }
     }
 }

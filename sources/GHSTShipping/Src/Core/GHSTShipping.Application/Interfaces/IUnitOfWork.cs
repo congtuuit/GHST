@@ -18,6 +18,7 @@ namespace GHSTShipping.Application.Interfaces
         IQueryable<T> SqlRaw<T>(string sql, params object[] parameters);
 
         IGenericRepository<Shop> Shops { get; }
+        IGenericRepository<ShopPartnerConfig> ShopPartnerConfigs { get; }
         IGenericRepository<DeliveryPricePlane> DeliveryPricePlanes { get; }
         IGenericRepository<ShopOrderCodeSequence> ShopOrderCodeSequences { get; }
         IGenericRepository<Order> Orders { get; }

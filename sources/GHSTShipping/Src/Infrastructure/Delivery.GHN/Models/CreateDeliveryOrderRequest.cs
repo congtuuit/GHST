@@ -80,7 +80,7 @@ public class CreateDeliveryOrderRequest
 
     [JsonProperty("to_ward_id")]
     [JsonPropertyName("to_ward_id")]
-    public int? ToWardId { get; set; }
+    public required string ToWardId { get; set; }
 
     [JsonProperty("to_ward_name")]
     [JsonPropertyName("to_ward_name")]

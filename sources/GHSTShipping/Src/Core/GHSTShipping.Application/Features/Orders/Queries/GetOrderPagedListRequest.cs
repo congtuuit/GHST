@@ -5,6 +5,7 @@ using Delivery.GHN.Constants;
 using GHSTShipping.Application.DTOs;
 using GHSTShipping.Application.Extensions;
 using GHSTShipping.Application.Features.Orders.Commands;
+using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Parameters;
@@ -136,6 +137,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 query = query.Where(o => o.IsPublished == false && o.CurrentStatus == OrderStatus.WAITING_CONFIRM);
             }
 
+            
+
             return query;
         }
 
@@ -159,8 +162,36 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 ShopId = int.Parse(apiConfig.ShopId),
                 Limit = request.PageSize,
                 Offset = request.PageNumber > 0 ? (request.PageNumber - 1) * request.PageSize : 0,
-                OptionValue = request.OrderCode
             };
+
+            if (request.PaymentTypeId.HasValue)
+            {
+                searchParams.PaymentTypeId = new System.Collections.Generic.List<int> { request.PaymentTypeId.Value };
+            }
+            if (request.IsPrint.HasValue)
+            {
+                searchParams.IsPrint = request.IsPrint;
+            }
+            if (request.IsCodFailedCollected.HasValue)
+            {
+                searchParams.IsCodFailedCollected = request.IsCodFailedCollected;
+            }
+            if (request.IsDocumentPod.HasValue)
+            {
+                searchParams.IsDocumentPod = request.IsDocumentPod;
+            }
+            if (!string.IsNullOrWhiteSpace(request.OrderCode))
+            {
+                searchParams.OptionValue = request.OrderCode;
+            }
+            if (request.FromDate.HasValue)
+            {
+                searchParams.FromTime = DateTimeHelper.ConvertToUnixTimestamp(request.FromDate.Value);
+            }
+            if (request.ToDate.HasValue)
+            {
+                searchParams.ToTime = DateTimeHelper.ConvertToUnixTimestamp(request.ToDate.Value);
+            }
 
             var ghnOrdersResponse = await ghnApiClient.SearchOrdersAsync(apiConfig, searchParams);
 

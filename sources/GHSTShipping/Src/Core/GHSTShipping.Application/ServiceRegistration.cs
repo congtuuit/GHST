@@ -4,6 +4,7 @@ using GHSTShipping.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using GHSTShipping.Application.Mappers;
+using GHSTShipping.Application.Features.Orders.Jobs;
 
 namespace GHSTShipping.Application
 {
@@ -14,15 +15,13 @@ namespace GHSTShipping.Application
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceRegistration).Assembly));
 
-
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddSingleton(AutoMapperConfig.Configure());
-
 
             services.AddScoped<IPartnerConfigService, PartnerConfigService>();
             services.AddScoped<IOrderCodeSequenceService, OrderCodeSequenceService>();
 
-            
+            services.AddHostedService<SyncOrderCronJob>();
 
             return services;
         }
