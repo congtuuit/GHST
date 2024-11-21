@@ -4,7 +4,12 @@ import React, { useState } from 'react';
 
 import MyInputNumber from '../MyInputNumber';
 
-const OrderInfoForm = () => {
+interface OrderInfoFormProps {
+  convertedWeight: number;
+  highlight: boolean;
+}
+const OrderInfoForm = (props: OrderInfoFormProps) => {
+  const { convertedWeight, highlight } = props;
   const [failedDelivery, setFailedDelivery] = useState(false);
 
   const onFailedDeliveryChange = (e: any) => {
@@ -15,7 +20,7 @@ const OrderInfoForm = () => {
     <Card title="Thông tin đơn hàng" style={{ marginBottom: '16px' }}>
       <Row gutter={16}>
         {/* Weight */}
-        <Col span={6}>
+        <Col span={4}>
           <Form.Item
             label="KL (gram)"
             name={'weight'}
@@ -32,12 +37,12 @@ const OrderInfoForm = () => {
               },
             ]}
           >
-            <MyInputNumber max={50000} placeholder="Nhập giá trị" />
+            <MyInputNumber style={{ color: `${!highlight ? 'orange' : 'black'}` }} max={50000} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
 
         {/* Dimensions */}
-        <Col span={6}>
+        <Col span={4}>
           <Form.Item
             label="Dài (cm)"
             name={'length'}
@@ -57,7 +62,7 @@ const OrderInfoForm = () => {
             <MyInputNumber max={200} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col span={4}>
           <Form.Item
             label="Rộng (cm)"
             name={'width'}
@@ -77,7 +82,7 @@ const OrderInfoForm = () => {
             <MyInputNumber max={200} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col span={4}>
           <Form.Item
             label="Cao (cm)"
             name={'height'}
@@ -97,6 +102,10 @@ const OrderInfoForm = () => {
             <MyInputNumber max={200} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
+        <Col span={8}>
+          <span>KL quy đổi (gram): </span>
+          <span style={{ color: `${highlight ? 'orange' : 'black'}` }}>{convertedWeight}</span>
+        </Col>
       </Row>
 
       <Row gutter={16}>
@@ -114,7 +123,7 @@ const OrderInfoForm = () => {
             label="Tổng giá trị hàng hóa"
             tooltip={{ title: 'Nhập tổng giá trị hàng hóa', icon: <InfoCircleOutlined /> }}
           >
-            <MyInputNumber defaultValue="0" max={5000000} placeholder="Nhập giá trị"/>
+            <MyInputNumber defaultValue="0" max={5000000} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
       </Row>
@@ -131,7 +140,7 @@ const OrderInfoForm = () => {
         {failedDelivery && (
           <Col span={12}>
             <Form.Item name="cod_failed_amount">
-              <MyInputNumber defaultValue="" max={99999999} placeholder="Nhập giá trị"/>
+              <MyInputNumber defaultValue="" max={99999999} placeholder="Nhập giá trị" />
             </Form.Item>
           </Col>
         )}

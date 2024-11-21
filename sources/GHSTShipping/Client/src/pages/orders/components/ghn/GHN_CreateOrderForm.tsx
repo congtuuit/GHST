@@ -16,6 +16,7 @@ import { IOrder } from '@/features/order/type';
 import './style.css';
 import { DeliveryPricePlaneFormDto } from '@/interface/shop';
 import { BasicShopInfoDto } from '@/features/shop';
+import { request } from '@/api/base/request';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -50,6 +51,8 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   const [serviceTypeId, setServiceTypeId] = useState<number>(serviceType.HangNhe);
   const [shopAddressSelected, setShopAddressSelected] = useState<BasicShopInfoDto>();
   const [allowEditSenderAddress, setAllowEditSenderAddress] = useState(true);
+  const [convertedWeight, setConvertedWeight] = useState(0);
+  const [isHighLight, setIsHighLight] = useState(false);
 
   const fetchPickShifts = async () => {
     try {
@@ -155,11 +158,28 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
     dispatch(setOrder({ ...currentValues, ...changedValues }));
     dispatch(setTempOrder({ ...currentValues, ...changedValues }));
 
-    handleCalcTotalWeigh(currentValues);
+    // Nếu thay đổi không phải là khối lượng đơn hàng thì tiến hành tính lại
+    if (!Boolean(changedValues?.weight)) {
+      handleCalcTotalWeigh(currentValues);
+    }
+
     if (Boolean(changedValues?.cod_amount) && Boolean(currentValues?.cod_amount) && currentValues?.cod_amount >= 0) {
       form.setFieldValue('insurance_value', currentValues?.cod_amount);
     }
-  }, 300);
+
+    const { shopDeliveryPricePlaneId, weight, length, width, height } = currentValues;
+    if (shopDeliveryPricePlaneId == null || weight == null || length == null || width == null || height == null) {
+      console.error('All fields must be filled out');
+    } else {
+      calculateShippingCost({
+        shopDeliveryPricePlaneId: shopDeliveryPricePlaneId,
+        weight: Number(weight),
+        length: Number(length),
+        width: Number(width),
+        height: Number(height),
+      });
+    }
+  }, 500);
 
   const handleChangeSenderAddress = (value: string) => {
     const selectedShopAddress = myShops.find(i => i.id === value);
@@ -185,6 +205,30 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
         form.setFieldsValue(senderInfo);
         fromAddressRef.current?.update(senderInfo);
       }, 300);
+    }
+  };
+
+  type CalculateShippingCostInput = {
+    shopDeliveryPricePlaneId: number; // Replace with `string` if it's not a number
+    weight: number;
+    length: number;
+    width: number;
+    height: number;
+  };
+
+  const calculateShippingCost = async ({ shopDeliveryPricePlaneId, weight, length, width, height }: CalculateShippingCostInput): Promise<any> => {
+    const payload = {
+      shopDeliveryPricePlaneId,
+      weight,
+      length,
+      width,
+      height,
+    };
+    const response = await request('post', '/orders/calculate-shipping-cost', payload);
+    if (response.success) {
+      const convertedWeight = response?.data?.calcOrderWeight ?? 0;
+      setConvertedWeight(convertedWeight);
+      setIsHighLight(convertedWeight > weight);
     }
   };
 
@@ -221,6 +265,8 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
       form.setFieldValue('shopDeliveryPricePlaneId', shopDeliveryPricePlaneId);
     }
   }, [shopDeliveryPricePlaneId]);
+
+  useEffect(() => {}, []);
 
   const CreateOrderButton = () => {
     return (
@@ -396,7 +442,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
         </Card>
 
         <ProductForm />
-        <OrderInfoForm />
+        <OrderInfoForm convertedWeight={convertedWeight} highlight={isHighLight} />
         <NoteForm />
 
         <Col span={12} style={{ marginTop: '16px' }}>

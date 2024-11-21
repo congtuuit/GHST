@@ -84,6 +84,7 @@ const ProductForm = () => {
             {/* Quantity */}
             <Col span={6}>
               <Form.Item
+                initialValue={1}
                 label="Số lượng"
                 name={['items', index, 'quantity']}
                 rules={[

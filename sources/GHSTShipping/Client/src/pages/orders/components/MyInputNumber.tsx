@@ -8,6 +8,7 @@ interface MyInputNumberProps {
   defaultValue?: string; // Default value (uncontrolled input)
   max?: number;
   onChange?: (value: number) => void; // Callback to handle changes in the input
+  style?: React.CSSProperties;
 }
 
 const MyInputNumber: React.FC<MyInputNumberProps> = ({
@@ -17,6 +18,7 @@ const MyInputNumber: React.FC<MyInputNumberProps> = ({
   defaultValue = '', // Default to empty string if not provided
   max = 20000,
   onChange,
+  style,
 }) => {
   const [inputValue, setInputValue] = useState<string>(defaultValue);
 
@@ -80,6 +82,7 @@ const MyInputNumber: React.FC<MyInputNumberProps> = ({
 
   return (
     <Input
+      style={style}
       placeholder={placeholder}
       value={inputValue} // Display current state
       onChange={handleInputChange}
