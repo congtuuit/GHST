@@ -6,7 +6,7 @@ import AddressComponent from '../address.component';
 import NoteForm from './note-form.ghn';
 import OrderInfoForm from './order-info-form.ghn';
 import ProductForm from './product-form.ghn';
-import { setOrder } from '@/features/order/orderSlice'; // Adjust the path accordingly
+import { setOrder, setTempOrder } from '@/features/order/orderSlice'; // Adjust the path accordingly
 import { debounce } from '@/utils/common';
 import { getItemWithExpiry, setItemWithExpiry } from '@/utils/common';
 import { IPickShift } from '@/interface/business';
@@ -42,6 +42,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   const { isActivated, deliveryPricePlanes = [], myShops = [] } = props;
   const dispatch = useDispatch();
   const session = useSelector(state => state?.user?.session);
+  const shopDeliveryPricePlaneId = useSelector(state => state?.order?.tempOrder?.shopDeliveryPricePlaneId ?? '');
   const [pickShifts, setPickShifts] = useState<IPickShift[]>([]);
   const [form] = Form.useForm();
   const fromAddressRef = useRef<any>(null);
@@ -152,6 +153,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   const handleValuesChange = debounce(changedValues => {
     const currentValues = form.getFieldsValue();
     dispatch(setOrder({ ...currentValues, ...changedValues }));
+    dispatch(setTempOrder({ ...currentValues, ...changedValues }));
 
     handleCalcTotalWeigh(currentValues);
     if (Boolean(changedValues?.cod_amount) && Boolean(currentValues?.cod_amount) && currentValues?.cod_amount >= 0) {
@@ -209,10 +211,16 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   }, []);
 
   useEffect(() => {
-    if (deliveryPricePlanes && deliveryPricePlanes.length > 0) {
+    if (!Boolean(shopDeliveryPricePlaneId) && deliveryPricePlanes && deliveryPricePlanes.length > 0) {
       form.setFieldValue('shopDeliveryPricePlaneId', deliveryPricePlanes[0]?.id);
     }
   }, [deliveryPricePlanes]);
+
+  useEffect(() => {
+    if (Boolean(shopDeliveryPricePlaneId)) {
+      form.setFieldValue('shopDeliveryPricePlaneId', shopDeliveryPricePlaneId);
+    }
+  }, [shopDeliveryPricePlaneId]);
 
   const CreateOrderButton = () => {
     return (

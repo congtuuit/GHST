@@ -5,7 +5,6 @@ import tagsViewReducer from './tags-view.store';
 import globalReducer from './global.store';
 import orderReducer from '@/features/order/orderSlice';
 
-
 const rootReducer = combineReducers({
   user: userReducer,
   tagsView: tagsViewReducer,

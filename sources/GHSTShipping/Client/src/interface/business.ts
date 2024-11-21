@@ -95,6 +95,8 @@ export interface ICreateDeliveryOrderRequest {
   return_ward_code?: string; // Optional return ward code
 
   client_order_code?: string; // Optional client order code
+
+  shopDeliveryPricePlaneId?: string;
 }
 
 interface DeliveryOrderItemDto {

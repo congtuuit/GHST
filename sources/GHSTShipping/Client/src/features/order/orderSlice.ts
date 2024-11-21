@@ -6,6 +6,7 @@ import { IOrderFilter } from './type';
 
 export interface IOrderState {
   order: ICreateDeliveryOrderRequest | null;
+  tempOrder: ICreateDeliveryOrderRequest | null;
   orders: any[];
   shop: ShopOrderViewDto | null;
   orderFilter?: IOrderFilter;
@@ -14,6 +15,7 @@ export interface IOrderState {
 
 const initialState: IOrderState = {
   order: null,
+  tempOrder: null,
   orders: [],
   shop: null,
   confirmOrderQueue: [],
@@ -47,8 +49,11 @@ const orderSlice = createSlice({
       const values = state.confirmOrderQueue.filter(item => item !== action.payload);
       state.confirmOrderQueue = [...values];
     },
+    setTempOrder(state, action: PayloadAction<ICreateDeliveryOrderRequest>) {
+      state.tempOrder = action.payload;
+    }
   },
 });
 
-export const { setOrder, clearOrder, setShopInfo, setOrderFilter, addConfirmOrderToQueue, removeConfirmOrderToQueue } = orderSlice.actions;
+export const { setTempOrder, setOrder, clearOrder, setShopInfo, setOrderFilter, addConfirmOrderToQueue, removeConfirmOrderToQueue } = orderSlice.actions;
 export default orderSlice.reducer;
