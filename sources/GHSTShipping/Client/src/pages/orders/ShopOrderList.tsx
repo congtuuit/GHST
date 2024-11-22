@@ -21,11 +21,13 @@ import ghnOrderFilter, { FilterStatusOption } from '@/features/order/ghnOrderFil
 import { RadioChangeEvent } from 'antd/lib';
 import AdminOrderFilterWrapper from './components/AdminOrderFilterWrapper';
 import CopyTextButton from '@/components/core/CopyTextButton';
+import { useNavigate } from 'react-router-dom';
 
 const _ghnOrderFilter = new ghnOrderFilter();
 const orderStatusSection = _ghnOrderFilter.filterStatus;
 
 const ShopOrderList = () => {
+  const navigate = useNavigate();
   const { orderFilter, confirmOrderQueue } = useSelector(state => state.order);
   const { session } = useSelector(state => state.user);
   const shopId = session?.shopId;
@@ -43,7 +45,7 @@ const ShopOrderList = () => {
   const [reloadTable, setReloadTable] = useState(false);
   const [fetchingData, setFetchingData] = useState(false);
 
-  const pageSize = 7;
+  const pageSize = 5;
 
   const fetchOrders = async (params: IOrderPagedParameter | null) => {
     if (params == null) {
@@ -336,6 +338,9 @@ const ShopOrderList = () => {
     <Card className="my-card-containter" title="Danh sách đơn hàng">
       <Row>
         <Col span={24} style={{ marginTop: '10px' }}>
+          <Button onClick={() => navigate('/order/create')} type="primary" style={{ marginBottom: '10px' }}>
+            Tạo đơn hàng
+          </Button>
           {groupStatusFilterOptions.length > 0 && (
             <Radio.Group
               className="order-status-filter-containter"

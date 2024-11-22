@@ -67,6 +67,9 @@ export interface IOrderViewDto {
   convertedWeight: number;
   calculateWeight: number;
 
+  rootConvertedWeight: number;
+  rootCalculateWeight: number;
+
   codAmount: number;
   insuranceValue: number;
 

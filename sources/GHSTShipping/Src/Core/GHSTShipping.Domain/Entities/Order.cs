@@ -138,6 +138,16 @@ namespace GHSTShipping.Domain.Entities
         public int RootHeight { get; set; }
         public int RootConvertRate { get; set; }
 
+        /// <summary>
+        /// KH nhập Khối lượng chuyển đổi
+        /// </summary>
+        public decimal RootConvertedWeight { get; set; }
+
+        /// <summary>
+        /// KH nhập khối lượng tính phí
+        /// </summary>
+        public decimal RootCalculateWeight { get; set; }
+
 
         public int Weight { get; set; }
         public int Length { get; set; }

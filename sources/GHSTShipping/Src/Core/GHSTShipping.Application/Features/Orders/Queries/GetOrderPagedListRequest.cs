@@ -81,7 +81,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     .ProjectTo<OrderDto>(mapperConfiguration)
                     .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);
 
-                return MapPaginationResult(pagingResult, skipCount);
+                return MapPaginationResult(pagingResult, skipCount, authenticatedUser.IsAdmin);
             }
             else if (await ShouldSyncFromGHN(request, shopId))
             {
@@ -136,8 +136,6 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             {
                 query = query.Where(o => o.IsPublished == false && o.CurrentStatus == OrderStatus.WAITING_CONFIRM);
             }
-
-            
 
             return query;
         }
@@ -210,18 +208,33 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     .ProjectTo<OrderDto>(mapperConfiguration)
                     .ToPaginationAsync(request.PageNumber, request.PageSize);
 
-                return MapPaginationResult(mappedOrders, skipCount);
+                return MapPaginationResult(mappedOrders, skipCount, authenticatedUser.IsAdmin);
             }
 
             return BaseResult<PaginationResponseDto<OrderDto>>.Ok(null);
         }
 
-        private static BaseResult<PaginationResponseDto<OrderDto>> MapPaginationResult(PaginationResponseDto<OrderDto> result, int skipCount)
+        private static BaseResult<PaginationResponseDto<OrderDto>> MapPaginationResult(
+            PaginationResponseDto<OrderDto> result,
+            int skipCount,
+            bool isAdmin)
         {
             int index = 0;
             foreach (var item in result.Data)
             {
                 item.No = skipCount + index + 1;
+
+                // Hide some fields
+                if (isAdmin == false)
+                {
+                    item.Height = item.RootHeight;
+                    item.Length = item.RootLength;
+                    item.Width = item.RootWidth;
+                    item.Weight = item.RootWeight;
+                    item.ConvertedWeight = item.RootConvertedWeight;
+                    item.CalculateWeight = item.RootCalculateWeight;
+                }
+
                 index++;
             }
 

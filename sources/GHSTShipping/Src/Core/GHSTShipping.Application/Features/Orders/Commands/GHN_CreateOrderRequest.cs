@@ -252,6 +252,9 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 ConvertedWeight = deliveryFeePlan.CalcOrderWeight,
                 CalculateWeight = deliveryFeePlan.OrderWeight,
 
+                RootConvertedWeight = deliveryFeePlan.CalcOrderWeight,
+                RootCalculateWeight = deliveryFeePlan.OrderWeight,
+
                 DeliveryPricePlaneId = request.ShopDeliveryPricePlaneId,
                 InsuranceFee = deliveryFeePlan.InsuranceFee,
 

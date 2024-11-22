@@ -194,5 +194,15 @@ namespace GHSTShipping.Domain.DTOs
         /// </summary>
         public decimal CalculateWeight { get; set; }
 
+        /// <summary>
+        /// KH nhập Khối lượng chuyển đổi
+        /// </summary>
+        public decimal RootConvertedWeight { get; set; }
+
+        /// <summary>
+        /// KH nhập khối lượng tính phí
+        /// </summary>
+        public decimal RootCalculateWeight { get; set; }
+
     }
 }

@@ -333,11 +333,35 @@ const ShopOrders = (props: ShopOrdersProps) => {
               </div>
             )} */}
 
-            {record.status === 'waiting_confirm' && (
-              <Button onClick={() => handleChangeOrderWeight(record)} type="link" disabled>
-                Thay đổi
+            <Popover
+              content={
+                <>
+                  <div>
+                    <div>KL Tính Phí: {<NumberFormatter value={record?.rootCalculateWeight} style="unit" unit="gram" />}</div>
+                    <div>KL Quy Đổi: {<NumberFormatter value={record?.rootConvertedWeight} style="unit" unit="gram" />}</div>
+                    <div>Cân nặng: {<NumberFormatter value={record?.rootWeight} style="unit" unit="gram" />}</div>
+                    <div>
+                      Kích thước: {<NumberFormatter value={record?.rootLength} style="decimal" />}x
+                      {<NumberFormatter value={record?.rootWidth} style="decimal" />}x
+                      {<NumberFormatter value={record?.rootHeight} style="unit" unit="centimeter" />}
+                    </div>
+                  </div>
+                </>
+              }
+              title="Khối lượng đơn hàng khách nhập"
+            >
+              <Button size="small" type="link" style={{ fontSize: '12px', fontStyle: 'italic' }}>
+                Thông tin khách nhập
               </Button>
-            )}
+            </Popover>
+
+            <div>
+              {record.status === 'waiting_confirm' && (
+                <Button onClick={() => handleChangeOrderWeight(record)} type="link" disabled>
+                  Thay đổi
+                </Button>
+              )}
+            </div>
           </div>
         );
       },
@@ -348,31 +372,31 @@ const ShopOrders = (props: ShopOrdersProps) => {
       key: 'deliveryFee',
       align: 'right',
       render: (value: number, record: IOrderViewDto) => {
-          return (
+        return (
+          <div>
+            <div style={{ fontSize: '12px' }}>Tổng cước</div>
+            <Price style={{ fontWeight: 'bold' }} value={record.totalServiceFee} type="success" />
             <div>
-              <div style={{ fontSize: '12px' }}>Tổng cước</div>
-              <Price style={{ fontWeight: 'bold' }} value={record.totalServiceFee} type="success" />
-              <div>
-                <Popover
-                  content={
-                    <>
-                      <div>
-                        <span>Cước theo bảng giá: </span>
-                        <Price value={value} />
-                      </div>
-                      <div>
-                        <span>Phí bảo hiểm: </span>
-                        <Price value={record.insuranceFee} />
-                      </div>
-                    </>
-                  }
-                  title="Chi tiết cước"
-                >
-                  <Button type="link">Xem chi tiết</Button>
-                </Popover>
-              </div>
+              <Popover
+                content={
+                  <>
+                    <div>
+                      <span>Cước theo bảng giá: </span>
+                      <Price value={value} />
+                    </div>
+                    <div>
+                      <span>Phí bảo hiểm: </span>
+                      <Price value={record.insuranceFee} />
+                    </div>
+                  </>
+                }
+                title="Chi tiết cước"
+              >
+                <Button type="link">Xem chi tiết</Button>
+              </Popover>
             </div>
-          );
+          </div>
+        );
       },
     },
     {
