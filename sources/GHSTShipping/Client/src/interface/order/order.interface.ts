@@ -26,7 +26,7 @@ export interface IOrderDetail extends IOrderViewDto {
   pickShift?: any;
   requiredNote?: string;
   note?: string;
-  items?: IOrderItemDto[]
+  items?: IOrderItemDto[];
 }
 
 export interface ShopOrderViewDto {
@@ -53,7 +53,7 @@ export interface IOrderViewDto {
   fromName: string;
   fromPhone: string;
   fromAddress: string;
-  
+
   fromWardName: string;
   fromDistrictName: string;
   fromProvinceName: string;
@@ -100,6 +100,17 @@ export interface IOrderViewDto {
   codFailedAmount: number;
   shopDeliveryPricePlaneId?: string;
 
+  orderDeiveryPricePlanDetail?: IOrderDeiveryPricePlanDetailDto;
+}
+
+export interface IOrderDeiveryPricePlanDetailDto {
+  id: string; 
+  name: string;
+  minWeight: number; 
+  maxWeight: number;
+  stepPrice: number;
+  stepWeight: number;
+  publicPrice: number;
 }
 
 export interface IOrderItemDto {

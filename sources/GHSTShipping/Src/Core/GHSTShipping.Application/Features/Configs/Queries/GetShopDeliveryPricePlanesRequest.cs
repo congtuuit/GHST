@@ -1,5 +1,6 @@
 ﻿using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Wrappers;
+using GHSTShipping.Domain.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,24 +15,8 @@ namespace GHSTShipping.Application.Features.Configs.Queries
     {
         public Guid? ShopId { get; set; }
         public bool? IsActivated { get; set; }
-    }
 
-    public class ShopDeliveryPricePlaneDto
-    {
-        public Guid? Id { get; set; }
-        public Guid? ParentId { get; set; }
-        public Guid? ShopId { get; set; }
-        public string Name { get; set; }
-        public long MinWeight { get; set; }
-        public long MaxWeight { get; set; }
-        public long PublicPrice { get; set; }
-        public long PrivatePrice { get; set; }
-        public long StepPrice { get; set; }
-        public long StepWeight { get; set; }
-        public long LimitInsurance { get; set; }
-        public decimal InsuranceFeeRate { get; set; }
-        public decimal ReturnFeeRate { get; set; }
-        public decimal ConvertWeightRate { get; set; }
+        public IEnumerable<Guid> Ids { get; set; }
     }
 
     public class GetShopDeliveryPricePlanesRequestHandler : IRequestHandler<GetShopDeliveryPricePlanesRequest, BaseResult<List<ShopDeliveryPricePlaneDto>>>
@@ -46,9 +31,15 @@ namespace GHSTShipping.Application.Features.Configs.Queries
         public async Task<BaseResult<List<ShopDeliveryPricePlaneDto>>> Handle(GetShopDeliveryPricePlanesRequest request, CancellationToken cancellationToken)
         {
             var query = _repository.Where(i => i.ShopId == null);
+
             if (request.ShopId.HasValue)
             {
                 query = _repository.Where(i => i.ShopId == request.ShopId);
+            }
+
+            if (request.Ids != null && request.Ids.Any())
+            {
+                query = _repository.Where(i => request.Ids.Contains(i.Id));
             }
 
             if (request.IsActivated.HasValue)
@@ -56,9 +47,8 @@ namespace GHSTShipping.Application.Features.Configs.Queries
                 query = query.Where(i => i.IsActivated == request.IsActivated);
             }
 
-            // Truy vấn kết hợp và mapping chỉ trong một lần
             var deliveryPricePlanes = await query
-                .AsNoTracking() // Tối ưu hóa hiệu năng cho các truy vấn chỉ đọc
+                .AsNoTracking()
                 .Select(i => new ShopDeliveryPricePlaneDto
                 {
                     Id = i.Id,
@@ -79,8 +69,8 @@ namespace GHSTShipping.Application.Features.Configs.Queries
                 })
                 .ToListAsync(cancellationToken);
 
-
-            if (request.ShopId.HasValue && deliveryPricePlanes.Count > 0)
+            bool fetchDetail = (request.ShopId.HasValue && deliveryPricePlanes.Count > 0) || (request.Ids != null && request.Ids.Any());
+            if (fetchDetail)
             {
                 var parentPricePlaneIds = deliveryPricePlanes.Select(i => i.ParentId);
                 var parentPricePlanes = await _repository.Where(i => parentPricePlaneIds.Contains(i.Id))

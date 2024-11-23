@@ -204,5 +204,8 @@ namespace GHSTShipping.Domain.DTOs
         /// </summary>
         public decimal RootCalculateWeight { get; set; }
 
+        public Guid? DeliveryPricePlaneId { get; set; }
+
+        public ShopDeliveryPricePlaneDto OrderDeiveryPricePlanDetail { get; set; }
     }
 }

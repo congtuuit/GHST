@@ -4,6 +4,7 @@ using Delivery.GHN;
 using Delivery.GHN.Constants;
 using GHSTShipping.Application.DTOs;
 using GHSTShipping.Application.Extensions;
+using GHSTShipping.Application.Features.Configs.Queries;
 using GHSTShipping.Application.Features.Orders.Commands;
 using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Interfaces;
@@ -49,6 +50,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
     }
 
     public class GetOrderPagedListRequestHandler(
+    IMediator mediator,
     IGhnApiClient ghnApiClient,
     IUnitOfWork unitOfWork,
     IAuthenticatedUserService authenticatedUser,
@@ -81,7 +83,17 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     .ProjectTo<OrderDto>(mapperConfiguration)
                     .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken);
 
-                return MapPaginationResult(pagingResult, skipCount, authenticatedUser.IsAdmin);
+                var deliveryPricePlaneIds = pagingResult.Data
+                    .Where(i => i.DeliveryPricePlaneId.HasValue)
+                    .Select(i => i.DeliveryPricePlaneId.Value)
+                    .ToList();
+
+                var deliveryPricePlanes = await mediator.Send(new GetShopDeliveryPricePlanesRequest
+                {
+                    Ids = deliveryPricePlaneIds
+                });
+
+                return MapPaginationResult(pagingResult, skipCount, authenticatedUser.IsAdmin, deliveryPricePlanes.Data);
             }
             else if (await ShouldSyncFromGHN(request, shopId))
             {
@@ -208,7 +220,17 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     .ProjectTo<OrderDto>(mapperConfiguration)
                     .ToPaginationAsync(request.PageNumber, request.PageSize);
 
-                return MapPaginationResult(mappedOrders, skipCount, authenticatedUser.IsAdmin);
+                var deliveryPricePlaneIds = mappedOrders.Data
+                   .Where(i => i.DeliveryPricePlaneId.HasValue)
+                   .Select(i => i.DeliveryPricePlaneId.Value)
+                   .ToList();
+
+                var deliveryPricePlanes = await mediator.Send(new GetShopDeliveryPricePlanesRequest
+                {
+                    Ids = deliveryPricePlaneIds
+                });
+
+                return MapPaginationResult(mappedOrders, skipCount, authenticatedUser.IsAdmin, deliveryPricePlanes.Data);
             }
 
             return BaseResult<PaginationResponseDto<OrderDto>>.Ok(null);
@@ -217,7 +239,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         private static BaseResult<PaginationResponseDto<OrderDto>> MapPaginationResult(
             PaginationResponseDto<OrderDto> result,
             int skipCount,
-            bool isAdmin)
+            bool isAdmin,
+            List<ShopDeliveryPricePlaneDto> orderDeiveryPricePlanDetails)
         {
             int index = 0;
             foreach (var item in result.Data)
@@ -233,6 +256,11 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                     item.Weight = item.RootWeight;
                     item.ConvertedWeight = item.RootConvertedWeight;
                     item.CalculateWeight = item.RootCalculateWeight;
+                }
+
+                if (item.DeliveryPricePlaneId.HasValue)
+                {
+                    item.OrderDeiveryPricePlanDetail = orderDeiveryPricePlanDetails.FirstOrDefault(i => i.Id == item.DeliveryPricePlaneId);
                 }
 
                 index++;

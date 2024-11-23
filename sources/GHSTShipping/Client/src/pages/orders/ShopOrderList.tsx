@@ -19,6 +19,7 @@ import { RadioChangeEvent } from 'antd/lib';
 import AdminOrderFilterWrapper from './components/AdminOrderFilterWrapper';
 import CopyTextButton from '@/components/core/CopyTextButton';
 import { useNavigate } from 'react-router-dom';
+import OrderDeliveryPlanDetail from './components/OrderDeliveryPlanDetail';
 
 const _ghnOrderFilter = new ghnOrderFilter();
 const orderStatusSection = _ghnOrderFilter.filterStatus;
@@ -255,6 +256,7 @@ const ShopOrderList = () => {
                       <span>Phí bảo hiểm: </span>
                       <Price value={record.insuranceFee} />
                     </div>
+                    <OrderDeliveryPlanDetail data={record.orderDeiveryPricePlanDetail} />
                   </>
                 }
                 title="Chi tiết cước"
