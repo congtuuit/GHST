@@ -23,18 +23,24 @@ namespace GHSTShipping.Infrastructure.Persistence
             }
             else
             {
-                var loggerFactory = LoggerFactory.Create(loggingBuilder =>
+               /* var loggerFactory = LoggerFactory.Create(loggingBuilder =>
                 {
                     loggingBuilder.AddSerilog(); // Use Serilog for logging
-                });
+                });*/
 
-                /// Add DbContext with Serilog LoggerFactory
+/*              /// Add DbContext with Serilog LoggerFactory
                 /// The OPENJSON function was introduced in SQL Server 2016 (13.x); while that’s quite an old version, it’s still supported, and we don’t want to break its users by relying on it. Therefore, we’ve introduced a general way for you to tell EF which SQL Server is being targeted – this will allow us to take advantage of newer features while preserving backwards compatibility for users on older versions. To do this, simply call the new UseCompatibilityLevel method when configuring your context options:
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options
                     .UseSqlServer(configuration.GetConnectionString("DefaultConnection"), o => o.UseCompatibilityLevel(120))
                     .EnableSensitiveDataLogging() // Optional
-                    .UseLoggerFactory(loggerFactory)); // Attach Serilog for EF Core logging
+                    .UseLoggerFactory(loggerFactory)); // Attach Serilog for EF Core logging*/
+
+                /// Add DbContext with Serilog LoggerFactory
+                /// The OPENJSON function was introduced in SQL Server 2016 (13.x); while that’s quite an old version, it’s still supported, and we don’t want to break its users by relying on it. Therefore, we’ve introduced a general way for you to tell EF which SQL Server is being targeted – this will allow us to take advantage of newer features while preserving backwards compatibility for users on older versions. To do this, simply call the new UseCompatibilityLevel method when configuring your context options:
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options
+                    .UseSqlServer(configuration.GetConnectionString("DefaultConnection"), o => o.UseCompatibilityLevel(120)));
             }
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();

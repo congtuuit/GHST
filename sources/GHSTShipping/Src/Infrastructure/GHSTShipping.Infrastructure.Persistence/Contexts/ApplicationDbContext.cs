@@ -3,8 +3,6 @@ using GHSTShipping.Domain.Common;
 using GHSTShipping.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.Extensions.Logging;
-using Serilog;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -86,16 +84,6 @@ namespace GHSTShipping.Infrastructure.Persistence.Contexts
 
 
             base.OnModelCreating(builder);
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder
-                .UseLoggerFactory(LoggerFactory.Create(builder =>
-                {
-                    builder.AddSerilog(); // Use Serilog for EF Core logging
-                }))
-                .EnableSensitiveDataLogging(); // Logs query parameters (use only in development)
         }
     }
 }
