@@ -23,6 +23,8 @@ namespace GHSTShipping.Application.Mappers
                .ForMember(dest => dest.PrivateOrderCode, opt => opt.MapFrom(i => i.private_order_code))
                ;
 
+            CreateMap<OrderItem, OrderItemDto>();
+
             CreateMap<Order, CreateDeliveryOrderRequest>();
             CreateMap<OrderItem, CreateDeliveryOrderRequest.Item>();
         }

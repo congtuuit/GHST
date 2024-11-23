@@ -8,7 +8,6 @@ using GHSTShipping.Domain.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,6 +38,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             // Fetch the order details
             var order = await orderRepository
                 .Where(i => i.Id == request.OrderId)
+                .Include(i => i.Items)
                 .ProjectTo<OrderDetailDto>(mapperConfiguration)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -46,6 +46,17 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             if (order == null)
             {
                 return BaseResult<OrderDetailDto>.Failure(new Error(ErrorCode.NotFound));
+            }
+
+            // Hide some fields
+            if (authenticatedUserService.IsAdmin == false)
+            {
+                order.Height = order.RootHeight;
+                order.Length = order.RootLength;
+                order.Width = order.RootWidth;
+                order.Weight = order.RootWeight;
+                order.ConvertedWeight = order.RootConvertedWeight;
+                order.CalculateWeight = order.RootCalculateWeight;
             }
 
             // If the PrivateOrderCode is empty, return the order details

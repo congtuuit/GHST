@@ -17,6 +17,16 @@ export interface IOrderDto {
 
 export interface IOrderDetail extends IOrderViewDto {
   privateOrderCode: string;
+  fromWardId?: string;
+  fromDistrictId?: number;
+  fromProvinceId?: number;
+  toWardId?: string;
+  toDistrictId?: number;
+  toProvinceId?: number;
+  pickShift?: any;
+  requiredNote?: string;
+  note?: string;
+  items?: IOrderItemDto[]
 }
 
 export interface ShopOrderViewDto {
@@ -43,6 +53,7 @@ export interface IOrderViewDto {
   fromName: string;
   fromPhone: string;
   fromAddress: string;
+  
   fromWardName: string;
   fromDistrictName: string;
   fromProvinceName: string;
@@ -87,6 +98,23 @@ export interface IOrderViewDto {
   insuranceFee: number;
   totalAmount: number;
   codFailedAmount: number;
+  shopDeliveryPricePlaneId?: string;
+
+}
+
+export interface IOrderItemDto {
+  id: string;
+  orderId: string;
+
+  name: string;
+  quantity: number;
+  weight?: number;
+
+  code: string;
+  price?: number;
+  length?: number;
+  width?: number;
+  height?: number;
 }
 
 export interface IUpdateOrderRequest {

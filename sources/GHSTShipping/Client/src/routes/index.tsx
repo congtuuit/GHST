@@ -97,6 +97,10 @@ const routeList: RouteObject[] = [
         element: <WrapperRouteComponent element={<CreateOrderPage />} titleId="title.createOrder" />,
       },
       {
+        path: 'order/update/:id',
+        element: <WrapperRouteComponent element={<CreateOrderPage />} titleId="title.createOrder" />,
+      },
+      {
         path: 'settings',
         element: <WrapperRouteComponent element={<DeliveryConfigPage />} titleId="title.deliveryConfig" allowedRoles={[Roles.Admin]} />,
       },

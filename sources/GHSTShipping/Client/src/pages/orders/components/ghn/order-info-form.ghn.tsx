@@ -1,20 +1,27 @@
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { Card, Checkbox, Col, Form, Input, InputNumber, Row } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import MyInputNumber from '../MyInputNumber';
 
 interface OrderInfoFormProps {
   convertedWeight: number;
   highlight: boolean;
+  allowFailedDelivery?: boolean;
 }
 const OrderInfoForm = (props: OrderInfoFormProps) => {
-  const { convertedWeight, highlight } = props;
+  const { convertedWeight, highlight, allowFailedDelivery } = props;
   const [failedDelivery, setFailedDelivery] = useState(false);
 
   const onFailedDeliveryChange = (e: any) => {
     setFailedDelivery(e.target.checked);
   };
+
+  useEffect(() => {
+    if (allowFailedDelivery) {
+      setFailedDelivery(allowFailedDelivery);
+    }
+  }, [allowFailedDelivery]);
 
   return (
     <Card title="Thông tin đơn hàng" style={{ marginBottom: '16px' }}>

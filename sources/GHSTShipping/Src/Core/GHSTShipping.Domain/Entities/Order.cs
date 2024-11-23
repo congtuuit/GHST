@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Net.Sockets;
 
 namespace GHSTShipping.Domain.Entities
 {
@@ -27,7 +26,7 @@ namespace GHSTShipping.Domain.Entities
         public bool IsPublished { get; set; }
 
         [MaxLength(100)]
-        public string? DeliveryPartner {  get; set; }
+        public string? DeliveryPartner { get; set; }
 
         /// <summary>
         /// Delivery fee with price rules
@@ -193,17 +192,17 @@ namespace GHSTShipping.Domain.Entities
         public string private_order_code { get; set; }
 
         [MaxLength(100)]
-        public string private_sort_code { get; private  set; }
+        public string private_sort_code { get; private set; }
 
         [MaxLength(100)]
-        public string private_trans_type { get; private  set; }
+        public string private_trans_type { get; private set; }
 
-        public int private_total_fee { get; private  set; }
+        public int private_total_fee { get; private set; }
 
-        public DateTime? private_expected_delivery_time { get; private  set; }
+        public DateTime? private_expected_delivery_time { get; private set; }
 
         [MaxLength(100)]
-        public string private_operation_partner { get; private  set; }
+        public string private_operation_partner { get; private set; }
 
         #endregion
 
@@ -213,11 +212,10 @@ namespace GHSTShipping.Domain.Entities
 
         public Guid? DeliveryPricePlaneId { get; set; }
 
-
         public void GenerateOrderCode(long sequenceCode, string prefix)
         {
             int length = 5;
-            string sequenceCodeFormatted =  $"{sequenceCode}".PadLeft(length, '0');
+            string sequenceCodeFormatted = $"{sequenceCode}".PadLeft(length, '0');
             string uniqueCode = prefix + sequenceCodeFormatted;
 
             this.UniqueCode = uniqueCode;

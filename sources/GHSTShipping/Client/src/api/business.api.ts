@@ -49,6 +49,11 @@ export const apiCreateDeliveryOrder = (data: IOrder) => {
   return request('post', '/orders/ghn/create', data);
 };
 
+//ICreateDeliveryOrderRequest
+export const apiUpdateDeliveryOrder = (id: string, data: IOrder) => {
+  return request('post', `/orders/ghn/update/${id}`, data);
+};
+
 export const apiGetOrders = (params: IOrderPagedParameter) => {
   // Build query string
   const queryString = buildQueryString(params);

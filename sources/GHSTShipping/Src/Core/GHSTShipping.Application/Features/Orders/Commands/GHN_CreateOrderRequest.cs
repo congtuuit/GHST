@@ -22,6 +22,8 @@ namespace GHSTShipping.Application.Features.Orders.Commands
     public class GHN_CreateOrderRequest : CreateDeliveryOrderRequest, IRequest<BaseResult<CreateDeliveryOrderResponse>>
     {
         public Guid? ShopDeliveryPricePlaneId { get; set; }
+
+        public Guid? OrderId { get; set; }
     }
 
     public class GHN_CreateOrderRequestHandler : IRequestHandler<GHN_CreateOrderRequest, BaseResult<CreateDeliveryOrderResponse>>
@@ -221,19 +223,67 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 partnerShopId);
 
             order.OrrverideDeliveryFee(order.DeliveryFee);
-            order.GenerateOrderCode(await _orderCodeSequenceService.GenerateOrderCodeAsync(shopId), uniqueShopCode);
-            await _orderRepository.AddAsync(order);
-            await _orderHistoryRepository.AddAsync(new OrderStatusHistory
+
+            // Handle update order
+            if (request.OrderId.HasValue)
             {
-                OrderId = order.Id,
-                ChangedBy = shopId.ToString(),
-                Status = allowPublishOrder ? OrderStatus.READY_TO_PICK : OrderStatus.WAITING_CONFIRM,
-                Notes = "Order created via API"
-            });
+                var orderIdExisted = await _orderRepository
+                    .Where(i => i.Id == request.OrderId.Value)
+                    .Select(o => new
+                    {
+                        o.Id,
+                        o.UniqueCode,
+                        o.ClientOrderCode,
+                        o.CurrentStatus,
+                        o.Created,
+                        o.CreatedBy
+                    })
+                    .FirstOrDefaultAsync();
 
-            await _unitOfWork.SaveChangesAsync();
+                // Order not found
+                if (orderIdExisted == null)
+                {
+                    return ("", new Guid());
+                }
 
-            return (order.ClientOrderCode, order.Id);
+                order.Id = orderIdExisted.Id;
+                order.UniqueCode = orderIdExisted.UniqueCode;
+                order.ClientOrderCode = orderIdExisted.ClientOrderCode;
+                order.CurrentStatus = orderIdExisted.CurrentStatus;
+                order.Created = orderIdExisted.Created;
+                order.CreatedBy = orderIdExisted.CreatedBy;
+
+
+                _orderRepository.Update(order);
+                await _orderHistoryRepository.AddAsync(new OrderStatusHistory
+                {
+                    OrderId = order.Id,
+                    ChangedBy = shopId.ToString(),
+                    Status = allowPublishOrder ? OrderStatus.READY_TO_PICK : OrderStatus.WAITING_CONFIRM,
+                    Notes = "Order updated via API"
+                });
+
+                await _unitOfWork.SaveChangesAsync();
+
+                return (order.ClientOrderCode, order.Id);
+            }
+            else
+            {
+                // Handle create order
+                order.GenerateOrderCode(await _orderCodeSequenceService.GenerateOrderCodeAsync(shopId), uniqueShopCode);
+                await _orderRepository.AddAsync(order);
+                await _orderHistoryRepository.AddAsync(new OrderStatusHistory
+                {
+                    OrderId = order.Id,
+                    ChangedBy = shopId.ToString(),
+                    Status = allowPublishOrder ? OrderStatus.READY_TO_PICK : OrderStatus.WAITING_CONFIRM,
+                    Notes = "Order created via API"
+                });
+
+                await _unitOfWork.SaveChangesAsync();
+
+                return (order.ClientOrderCode, order.Id);
+            }
         }
 
         private Order CreateOrderEntity(

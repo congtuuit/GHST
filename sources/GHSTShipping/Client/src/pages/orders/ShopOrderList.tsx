@@ -1,10 +1,8 @@
-import type { IOrderStatus } from './orderStatus';
 import type { IOrderPagedParameter, IPaginationResponse } from '@/interface/business';
-import type { IOrderDetail, IOrderDto, IOrderViewDto } from '@/interface/order/order.interface';
+import type { IOrderDetail, IOrderItemDto, IOrderViewDto } from '@/interface/order/order.interface';
 import type { TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 import type { ColumnsType } from 'antd/lib/table';
-import { SearchOutlined } from '@ant-design/icons';
 import { Button, Card, Col, message, Popover, Radio, Row, Tag, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -13,7 +11,6 @@ import Datatable from '@/components/core/datatable';
 import Price from '@/components/core/price';
 import { debounce, formatUtcToLocalTime } from '@/utils/common';
 import OrderDetailDialog from './components/ghn/order-detail';
-import { orderStatuses } from './orderStatus';
 import NumberFormatter from '@/components/core/NumberFormatter';
 import OrderStatus from './components/OrderStatus';
 import { revertDateFormatMap } from '@/components/core/table-column/type';
@@ -71,6 +68,58 @@ const ShopOrderList = () => {
     if (response.success) {
       setRefresh(!refresh);
       message.success('Hủy đơn thành công!');
+    }
+  };
+
+  const handleEditOrder = async (record: IOrderViewDto) => {
+    const orderId = record.id;
+    const response = await apiGetOrderDetail(orderId);
+    if (response.success) {
+      const o: IOrderDetail = response.data;
+      const editOrderObject = {
+        id: o.id,
+        shopDeliveryPricePlaneId: o.shopDeliveryPricePlaneId,
+        pick_shift: o.pickShift,
+        service_type_id: o.serviceTypeId,
+        from_phone: o.fromPhone,
+        from_name: o.fromName,
+        from_province_id: o.fromProvinceId,
+        from_province_name: o.fromProvinceName,
+        from_address: o.fromAddress,
+        from_district_id: o.fromDistrictId,
+        from_district_name: o.fromDistrictName,
+        from_ward_id: o.fromWardId,
+        from_ward_name: o.fromWardName,
+
+        to_phone: o.toPhone,
+        to_name: o.toName,
+        to_province_id: o.toProvinceId,
+        to_province_name: o.toProvinceName,
+        to_address: o.toAddress,
+        to_district_id: o.toDistrictId,
+        to_district_name: o.toDistrictName,
+        to_ward_id: o.toWardId,
+        to_ward_name: o.toWardName,
+
+        weight: o.weight,
+        length: o.length,
+        width: o.width,
+        height: o.height,
+        cod_amount: o.codAmount,
+        insurance_value: o.insuranceValue,
+        required_note: o.requiredNote,
+        note: o.note,
+        payment_type_id: o.paymentTypeId,
+        cod_failed_amount: o.codFailedAmount,
+        items: o.items?.map((i: IOrderItemDto) => {
+          return {
+            ...i,
+          };
+        }),
+      };
+
+      localStorage.setItem(`${editOrderObject.id}`, JSON.stringify(editOrderObject));
+      navigate(`/order/update/${editOrderObject.id}`);
     }
   };
 
@@ -241,12 +290,15 @@ const ShopOrderList = () => {
     {
       title: 'Thao tác',
       key: 'action',
-      width: 150,
+      width: 200,
       align: 'center' as const,
       render: (_: any, record: IOrderViewDto) => {
         if (record.status === 'waiting_confirm' || record.status === 'draft' || record.status === 'ready_to_pick') {
           return (
             <div key={record.id}>
+              <Button className="table-btn-action" size="small" onClick={() => handleEditOrder(record)}>
+                Chỉnh sửa
+              </Button>
               <Button danger className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
                 Hủy đơn
               </Button>

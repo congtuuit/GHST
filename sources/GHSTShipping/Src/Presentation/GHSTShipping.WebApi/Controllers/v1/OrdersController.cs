@@ -1,5 +1,6 @@
 using Delivery.GHN.Models;
 using GHSTShipping.Application.DTOs;
+using GHSTShipping.Application.DTOs.Orders;
 using GHSTShipping.Application.Features.Orders.Commands;
 using GHSTShipping.Application.Features.Orders.Queries;
 using GHSTShipping.Application.Wrappers;
@@ -7,7 +8,6 @@ using GHSTShipping.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using GHSTShipping.Application.DTOs.Orders;
 
 namespace GHSTShipping.WebApi.Controllers.v1
 {
@@ -50,6 +50,20 @@ namespace GHSTShipping.WebApi.Controllers.v1
             return await Mediator.Send(request);
         }
 
+        [HttpPost]
+        [Route("ghn/update/{Id}")]
+        public async Task<BaseResult<CreateDeliveryOrderResponse>> UpdateGhnAsync([FromRoute] Guid? Id, [FromBody] GHN_CreateOrderRequest request)
+        {
+            if (Id.HasValue)
+            {
+                request.OrderId = Id;
+
+                return await Mediator.Send(request);
+            }
+
+            return BaseResult<CreateDeliveryOrderResponse>.Failure();
+        }
+
         [HttpPut]
         [Route("ghn/cancel")]
         public async Task<BaseResult> CancelGhnAsync([FromBody] GHN_CancelOrderRequest request)
@@ -61,7 +75,7 @@ namespace GHSTShipping.WebApi.Controllers.v1
         [Route("ghn/confirm/{orderId}")]
         public async Task<BaseResult> ConfirmGhnOrderAsync([FromRoute] Guid orderId)
         {
-            return await Mediator.Send(new GHN_ConfirmOrderRequest() { OrderId = orderId});
+            return await Mediator.Send(new GHN_ConfirmOrderRequest() { OrderId = orderId });
         }
 
         [HttpPut]

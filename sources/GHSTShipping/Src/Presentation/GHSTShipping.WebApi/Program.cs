@@ -56,7 +56,12 @@ builder.Services.AddHealthChecks();
 // Add GHN delivery lib
 builder.Services.UseGhnApiClient();
 
-builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
+// Configure Serilog
+builder.Host.UseSerilog((context, configuration) =>
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .WriteTo.Debug() // Log to Debug Output window
+);
 
 var app = builder.Build();
 

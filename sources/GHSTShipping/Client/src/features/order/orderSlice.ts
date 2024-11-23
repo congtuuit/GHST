@@ -1,6 +1,6 @@
 // store/orderSlice.ts
 import { ICreateDeliveryOrderRequest } from '@/interface/business';
-import { ShopOrderViewDto } from '@/interface/order/order.interface';
+import { IOrderViewDto, ShopOrderViewDto } from '@/interface/order/order.interface';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IOrderFilter } from './type';
 
@@ -51,7 +51,7 @@ const orderSlice = createSlice({
     },
     setTempOrder(state, action: PayloadAction<ICreateDeliveryOrderRequest>) {
       state.tempOrder = action.payload;
-    }
+    },
   },
 });
 

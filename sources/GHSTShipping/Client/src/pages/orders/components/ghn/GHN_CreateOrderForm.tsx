@@ -1,11 +1,11 @@
 import { Button, Card, Col, Form, Input, InputNumber, message, Row, Select, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { apiCreateDeliveryOrder, apiGetPickShifts } from '@/api/business.api';
+import { apiCreateDeliveryOrder, apiGetPickShifts, apiUpdateDeliveryOrder } from '@/api/business.api';
 import AddressComponent from '../address.component';
 import NoteForm from './note-form.ghn';
 import OrderInfoForm from './order-info-form.ghn';
-import ProductForm from './product-form.ghn';
+import ProductForm, { IProduct } from './product-form.ghn';
 import { setOrder, setTempOrder } from '@/features/order/orderSlice'; // Adjust the path accordingly
 import { debounce } from '@/utils/common';
 import { getItemWithExpiry, setItemWithExpiry } from '@/utils/common';
@@ -17,6 +17,7 @@ import './style.css';
 import { DeliveryPricePlaneFormDto } from '@/interface/shop';
 import { BasicShopInfoDto } from '@/features/shop';
 import { request } from '@/api/base/request';
+import { useParams } from 'react-router-dom';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -40,10 +41,16 @@ interface FormOrderGhnProps {
 }
 
 const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
+  const { id } = useParams<{ id: string }>();
+  const editOrderData = Boolean(id) ? localStorage.getItem(`${id}`) ?? '' : '';
+  const editOrder = Boolean(id) ? JSON.parse(editOrderData) : '';
+  const isEdit = Boolean(editOrder) ? true : false;
+
   const { isActivated, deliveryPricePlanes = [], myShops = [] } = props;
   const dispatch = useDispatch();
   const session = useSelector(state => state?.user?.session);
   const shopDeliveryPricePlaneId = useSelector(state => state?.order?.tempOrder?.shopDeliveryPricePlaneId ?? '');
+
   const [pickShifts, setPickShifts] = useState<IPickShift[]>([]);
   const [form] = Form.useForm();
   const fromAddressRef = useRef<any>(null);
@@ -53,6 +60,9 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   const [allowEditSenderAddress, setAllowEditSenderAddress] = useState(true);
   const [convertedWeight, setConvertedWeight] = useState(0);
   const [isHighLight, setIsHighLight] = useState(false);
+
+  const [editProducts, setEditProducts] = useState<IProduct[]>([]);
+  const [allowFailedDelivery, setAllowFailedDelivery] = useState(false);
 
   const fetchPickShifts = async () => {
     try {
@@ -76,7 +86,6 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
       // }, 500);
 
       // init sender address
-
       //// AUTO FILL SENDER ADDRESS
       // const senderAddressJson = localStorage.getItem('senderAddress') ?? '';
       // if (Boolean(senderAddressJson)) {
@@ -124,16 +133,30 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
         return;
       }
 
-      const response = await apiCreateDeliveryOrder(values);
-      if (response.success) {
-        message.success('Tạo đơn thành công');
-        form.resetFields();
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
+      if (isEdit) {
+        const response = await apiUpdateDeliveryOrder(id as string, values);
+        if (response.success) {
+          message.success('Cật nhật đơn hàng thành công');
+          form.resetFields();
+
+          localStorage.removeItem(`${id}}`);
+
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        }
       } else {
-        message.error(response.errors[0]?.description || 'Xảy ra lỗi, vui lòng kiểm tra lại');
-        console.log(response.errors);
+        const response = await apiCreateDeliveryOrder(values);
+        if (response.success) {
+          message.success('Tạo đơn thành công');
+          form.resetFields();
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          message.error(response.errors[0]?.description || 'Xảy ra lỗi, vui lòng kiểm tra lại');
+          console.log(response.errors);
+        }
       }
     } catch (error) {
       message.info('Thông tin đơn hàng chưa đủ, vui lòng kiểm tra lại!');
@@ -154,6 +177,10 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
 
   // Debounced update to Redux
   const handleValuesChange = debounce(changedValues => {
+    handleCalc(changedValues);
+  }, 500);
+
+  const handleCalc = (changedValues: any, auto_update_insurance_value: boolean = true) => {
     const currentValues = form.getFieldsValue();
     dispatch(setOrder({ ...currentValues, ...changedValues }));
     dispatch(setTempOrder({ ...currentValues, ...changedValues }));
@@ -163,8 +190,15 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
       handleCalcTotalWeigh(currentValues);
     }
 
-    if (Boolean(changedValues?.cod_amount) && Boolean(currentValues?.cod_amount) && currentValues?.cod_amount >= 0) {
-      form.setFieldValue('insurance_value', currentValues?.cod_amount);
+    if (auto_update_insurance_value) {
+      if (
+        Boolean(changedValues?.cod_amount) &&
+        Boolean(currentValues?.cod_amount) &&
+        currentValues?.cod_amount >= 0 &&
+        !Boolean(currentValues?.insurance_value)
+      ) {
+        form.setFieldValue('insurance_value', currentValues?.cod_amount);
+      }
     }
 
     const { shopDeliveryPricePlaneId, weight, length, width, height } = currentValues;
@@ -179,7 +213,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
         height: Number(height),
       });
     }
-  }, 500);
+  };
 
   const handleChangeSenderAddress = (value: string) => {
     const selectedShopAddress = myShops.find(i => i.id === value);
@@ -251,6 +285,33 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   }, [session]);
 
   useEffect(() => {
+    if (isEdit) {
+      const editOrderData = editOrder;
+      form.setFieldsValue(editOrderData);
+      if (editOrderData?.cod_failed_amount > 0) {
+        setAllowFailedDelivery(true);
+      }
+      const products: IProduct[] = editOrderData.items.map((i: any) => {
+        return {
+          name: i?.name,
+          weight: `${i?.weight ?? 0}`,
+          quantity: `${i?.quantity ?? 0}`,
+        } as IProduct;
+      });
+      setEditProducts(products);
+
+      setTimeout(() => {
+        fromAddressRef.current?.update(editOrderData);
+        toAddressRef.current?.update(editOrderData);
+      }, 500);
+
+      setTimeout(() => {
+        handleCalc(editOrderData, false);
+      }, 800);
+    }
+  }, [isEdit]);
+
+  useEffect(() => {
     fetchPickShifts();
   }, []);
 
@@ -271,7 +332,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   const CreateOrderButton = () => {
     return (
       <Button htmlType="button" type="primary" onClick={handleFormSubmit} style={{ marginBottom: '10px', marginTop: '10px', float: 'right' }}>
-        <DeliveredProcedureOutlined /> Tạo đơn
+        <DeliveredProcedureOutlined /> {isEdit ? 'Cập nhật' : 'Tạo đơn'}
       </Button>
     );
   };
@@ -441,8 +502,8 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
           </Row>
         </Card>
 
-        <ProductForm />
-        <OrderInfoForm convertedWeight={convertedWeight} highlight={isHighLight} />
+        <ProductForm products={editProducts} />
+        <OrderInfoForm allowFailedDelivery={allowFailedDelivery} convertedWeight={convertedWeight} highlight={isHighLight} />
         <NoteForm />
 
         <Col span={12} style={{ marginTop: '16px' }}>
