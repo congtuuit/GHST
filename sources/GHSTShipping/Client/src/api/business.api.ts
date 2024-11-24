@@ -8,7 +8,7 @@ import type {
   PaginationResponse,
   ShopPricePlanDto,
 } from '@/interface/business';
-import type { IOrderDetail, IOrderDto, IOrderViewDto, IUpdateOrderRequest, ShopOrderViewDto } from '@/interface/order/order.interface';
+import type { IOrderDetail, IOrderDto, IOrderViewDto, IUpdateOrderWeightRequest, ShopOrderViewDto } from '@/interface/order/order.interface';
 import type { IOrderMetadata, IShopViewDetailDto, IUpdateShopDeliveryConfigRequest } from '@/interface/shop';
 import type { IDeliveryConfigDto } from '@/pages/delivery-config';
 
@@ -98,4 +98,4 @@ export const apiGetShopOrders = (params: IShopOrderParameter) => {
 };
 export const apiConfirmOrderGhn = (orderId: string) => request('put', `/orders/ghn/confirm/${orderId}`);
 export const apiCountOrderByStatus = (shopId: string) => request('get', `/orders/ghn/count-order-by-status/${shopId}`);
-export const apiUpdateGhnOrder = (payload: IUpdateOrderRequest) => request('put', `/orders/ghn/update`, payload);
+export const apiUpdateGhnOrderWeight = (payload: IUpdateOrderWeightRequest) => request('put', `/orders/ghn/update`, payload);

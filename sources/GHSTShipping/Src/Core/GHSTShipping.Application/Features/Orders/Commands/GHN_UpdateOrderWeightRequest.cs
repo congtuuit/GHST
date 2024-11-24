@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace GHSTShipping.Application.Features.Orders.Commands
 {
-    public class GHN_UpdateOrderRequest : IRequest<BaseResult>
+    public class GHN_UpdateOrderWeightRequest : IRequest<BaseResult>
     {
         public Guid OrderId { get; set; }
 
@@ -18,16 +18,15 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         public int Length { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
-        public int ConvertRate { get; set; } = 1;
     }
 
-    public class GHN_UpdateOrderRequestHandler(
+    public class GHN_UpdateOrderWeightRequestHandler(
         IUnitOfWork unitOfWork,
         IOrderRepository orderRepository,
         IMediator mediator
-        ) : IRequestHandler<GHN_UpdateOrderRequest, BaseResult>
+        ) : IRequestHandler<GHN_UpdateOrderWeightRequest, BaseResult>
     {
-        public async Task<BaseResult> Handle(GHN_UpdateOrderRequest request, CancellationToken cancellationToken)
+        public async Task<BaseResult> Handle(GHN_UpdateOrderWeightRequest request, CancellationToken cancellationToken)
         {
             var order = await orderRepository.Where(i => request.OrderId == i.Id)
                 .Select(i => new Domain.Entities.Order
@@ -37,12 +36,13 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     CurrentStatus = i.CurrentStatus,
                     PartnerShopId = i.PartnerShopId,
                     DeliveryPricePlaneId = i.DeliveryPricePlaneId,
+                    ConvertedWeight = i.ConvertedWeight,
+                    CalculateWeight = i.CalculateWeight,
 
                     Length = i.Length,
                     Width = i.Width,
                     Height = i.Height,
                     Weight = i.Weight,
-                    ConvertRate = i.ConvertRate
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -77,7 +77,9 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 Weight = order.Weight,
                 InsuranceValue = order.InsuranceValue,
             });
-            
+
+            order.ConvertedWeight = pricePlan.CalcOrderWeight;
+            order.CalculateWeight = pricePlan.OrderWeight;
             order.OrrverideDeliveryFee(pricePlan.ShippingCost);
 
             await unitOfWork.SaveChangesAsync(cancellationToken);

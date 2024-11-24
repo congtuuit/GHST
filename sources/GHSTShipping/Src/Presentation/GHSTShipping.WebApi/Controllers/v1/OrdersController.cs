@@ -80,7 +80,7 @@ namespace GHSTShipping.WebApi.Controllers.v1
 
         [HttpPut]
         [Route("ghn/update")]
-        public async Task<BaseResult> UpdateGhnOrderAsync([FromBody] GHN_UpdateOrderRequest request)
+        public async Task<BaseResult> UpdateGhnOrderAsync([FromBody] GHN_UpdateOrderWeightRequest request)
         {
             return await Mediator.Send(request);
         }

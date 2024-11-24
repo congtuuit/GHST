@@ -30,6 +30,14 @@ namespace GHSTShipping.Domain.DTOs
             }
         }
 
+        public long _TotalServiceFee
+        {
+            get
+            {
+                return CustomDeliveryFee + InsuranceFee;
+            }
+        }
+
         /// <summary>
         /// Tổng thu của khách
         /// </summary>
@@ -207,5 +215,7 @@ namespace GHSTShipping.Domain.DTOs
         public Guid? DeliveryPricePlaneId { get; set; }
 
         public ShopDeliveryPricePlaneDto OrderDeiveryPricePlanDetail { get; set; }
+
+        public long CustomDeliveryFee { get; set; }
     }
 }

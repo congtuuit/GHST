@@ -1,5 +1,5 @@
 import type { IOrderPagedParameter, IPaginationResponse } from '@/interface/business';
-import type { IOrderDetail, IOrderDto, IOrderViewDto, IUpdateOrderRequest, ShopOrderViewDto } from '@/interface/order/order.interface';
+import type { IOrderDetail, IOrderDto, IOrderViewDto, IUpdateOrderWeightRequest, ShopOrderViewDto } from '@/interface/order/order.interface';
 import type { RadioChangeEvent, TablePaginationConfig } from 'antd';
 import type { FilterValue } from 'antd/es/table/interface';
 import type { ColumnsType } from 'antd/lib/table';
@@ -14,7 +14,7 @@ import {
   apiGetOrders,
   apiGetShopDetail,
   apiGetShopOrders,
-  apiUpdateGhnOrder,
+  apiUpdateGhnOrderWeight,
 } from '@/api/business.api';
 import Datatable, { DatatableRef } from '@/components/core/datatable';
 import { supplierKeys, suppliers } from '@/constants/data';
@@ -33,6 +33,7 @@ import { addConfirmOrderToQueue } from '@/features/order/orderSlice';
 import { handleCallApiConfirmOrder } from '@/features/order';
 import Price from '@/components/core/price';
 import CopyTextButton from '@/components/core/CopyTextButton';
+import OrderDeliveryPlanDetail from './OrderDeliveryPlanDetail';
 
 const { Option } = Select;
 
@@ -149,20 +150,25 @@ const ShopOrders = (props: ShopOrdersProps) => {
     }
   };
 
+  /**
+   * Admin đặt thông tin KL cho đơn hàng dùng để gủi sang đơn vị vận chuyên
+   * Thông tin này sẽ không hiện ở Shop
+   * @param record 
+   */
   const handleChangeOrderWeight = (record: IOrderViewDto) => {
     setUpdateOrder(record);
     setOpenChangeOrderDialog(true);
   };
 
   const handleSubmitChangeOrderWeight = async (record: IOrderViewDto | undefined, newValues: any) => {
-    const payload: IUpdateOrderRequest = {
+    const payload: IUpdateOrderWeightRequest = {
       orderId: record?.id,
       length: newValues.length,
       width: newValues.width,
       height: newValues.height,
-      convertRate: newValues.convertRate,
+      weight: newValues.weight
     };
-    const response = await apiUpdateGhnOrder(payload);
+    const response = await apiUpdateGhnOrderWeight(payload);
     if (response.success) {
       setReloadTable(!reloadTable);
       setOpenChangeOrderDialog(false);
@@ -357,7 +363,11 @@ const ShopOrders = (props: ShopOrdersProps) => {
 
             <div>
               {record.status === 'waiting_confirm' && (
-                <Button onClick={() => handleChangeOrderWeight(record)} type="link" disabled>
+                <Button
+                  title="Thay đổi KL đơn hàng, điều chỉnh thông tin gửi sang đơn vị vận chuyển"
+                  onClick={() => handleChangeOrderWeight(record)}
+                  type="link"
+                >
                   Thay đổi
                 </Button>
               )}
@@ -375,7 +385,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
         return (
           <div>
             <div style={{ fontSize: '12px' }}>Tổng cước</div>
-            <Price style={{ fontWeight: 'bold' }} value={record.totalServiceFee} type="success" />
+            <Price style={{ fontWeight: 'bold' }} value={record._TotalServiceFee} type="success" />
             <div>
               <Popover
                 content={
@@ -388,6 +398,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
                       <span>Phí bảo hiểm: </span>
                       <Price value={record.insuranceFee} />
                     </div>
+                    <OrderDeliveryPlanDetail data={record.orderDeiveryPricePlanDetail} />
                   </>
                 }
                 title="Chi tiết cước"

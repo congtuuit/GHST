@@ -95,12 +95,15 @@ export interface IOrderViewDto {
   created: string;
 
   totalServiceFee: number;
+  _TotalServiceFee: number;
   insuranceFee: number;
   totalAmount: number;
   codFailedAmount: number;
   shopDeliveryPricePlaneId?: string;
 
   orderDeiveryPricePlanDetail?: IOrderDeiveryPricePlanDetailDto;
+
+  customDeliveryFee?: number;
 }
 
 export interface IOrderDeiveryPricePlanDetailDto {
@@ -128,11 +131,10 @@ export interface IOrderItemDto {
   height?: number;
 }
 
-export interface IUpdateOrderRequest {
+export interface IUpdateOrderWeightRequest {
   orderId?: string;
   weight?: number;
   length?: number;
   width?: number;
   height?: number;
-  convertRate?: number;
 }
