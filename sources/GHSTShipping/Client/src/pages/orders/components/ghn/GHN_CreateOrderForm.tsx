@@ -141,9 +141,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
         if (response.success) {
           message.success('Cật nhật đơn hàng thành công');
           form.resetFields();
-
           localStorage.removeItem(`${id}}`);
-
           setTimeout(() => {
             location.reload();
           }, 1000);
