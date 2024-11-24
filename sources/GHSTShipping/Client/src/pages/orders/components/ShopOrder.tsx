@@ -24,16 +24,17 @@ import GoBackButton from '@/components/core/GoBackButton';
 import OrderStatus from './OrderStatus';
 import { revertDateFormatMap } from '@/components/core/table-column/type';
 import AdminOrderFilterWrapper from './AdminOrderFilterWrapper';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ghnOrderFilter, { FilterStatusOption, OrderGroupStatus } from '@/features/order/ghnOrderFilter';
 import './ShopOrder.css';
 import ChangeOrderWeight from './ghn/ChangeOrderWeight';
 import NumberFormatter from '@/components/core/NumberFormatter';
 import { addConfirmOrderToQueue } from '@/features/order/orderSlice';
-import { handleCallApiConfirmOrder } from '@/features/order';
+import { executeHandleEditOrder, handleCallApiConfirmOrder } from '@/features/order';
 import Price from '@/components/core/price';
 import CopyTextButton from '@/components/core/CopyTextButton';
 import OrderDeliveryPlanDetail from './OrderDeliveryPlanDetail';
+import { setStoreId } from '@/stores/user.store';
 
 const { Option } = Select;
 
@@ -45,6 +46,7 @@ const _ghnOrderFilter = new ghnOrderFilter();
 const orderStatusSection = _ghnOrderFilter.filterStatus;
 
 const ShopOrders = (props: ShopOrdersProps) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { shopId } = useParams(); // Destructure shopId from useParams
   const { orderFilter, confirmOrderQueue } = useSelector(state => state.order);
@@ -153,7 +155,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
   /**
    * Admin đặt thông tin KL cho đơn hàng dùng để gủi sang đơn vị vận chuyên
    * Thông tin này sẽ không hiện ở Shop
-   * @param record 
+   * @param record
    */
   const handleChangeOrderWeight = (record: IOrderViewDto) => {
     setUpdateOrder(record);
@@ -166,7 +168,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
       length: newValues.length,
       width: newValues.width,
       height: newValues.height,
-      weight: newValues.weight
+      weight: newValues.weight,
     };
     const response = await apiUpdateGhnOrderWeight(payload);
     if (response.success) {
@@ -192,6 +194,13 @@ const ShopOrders = (props: ShopOrdersProps) => {
     setSearchOrderCodes(changedValues);
     setOrderStatusFilter(OrderGroupStatus.TatCa);
   }, 300);
+
+  const handleEditOrder = async (record: IOrderViewDto) => {
+    dispatch(setStoreId(record.shopId as string));
+    executeHandleEditOrder(record, () => {
+      navigate(`/order/update/${record.id}`);
+    });
+  };
 
   const columns: ColumnsType<IOrderViewDto> = [
     {
@@ -440,6 +449,9 @@ const ShopOrders = (props: ShopOrdersProps) => {
           const isConfirming = confirmOrderQueue.indexOf(record.id) >= 0;
           return (
             <div key={record.id}>
+              <Button className="table-btn-action" size="small" onClick={() => handleEditOrder(record)}>
+                Chỉnh sửa
+              </Button>
               <Button
                 loading={isConfirming}
                 disabled={isConfirming}

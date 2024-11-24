@@ -21,6 +21,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
     /// </summary>
     public class GetOrderMetadataRequest : IRequest<BaseResult<GetOrderMetadataResponse>>
     {
+        public Guid ShopId { get; set; }
     }
 
     public class GetOrderMetadataResponse
@@ -75,16 +76,10 @@ namespace GHSTShipping.Application.Features.Orders.Queries
 
         public async Task<BaseResult<GetOrderMetadataResponse>> Handle(GetOrderMetadataRequest request, CancellationToken cancellationToken)
         {
-            Guid userId = _authenticatedUserService.UId;
-            var shop = await _shopRepository.Where(i => i.AccountId == userId)
-                 .Select(i => new
-                 {
-                     i.Id,
-                 })
-                .FirstOrDefaultAsync(cancellationToken);
+            var shopId = request.ShopId;
 
             // Get shop delivery configs
-            var deliveryConfigs = _shopPartnerConfigRepository.Where(i => i.ShopId == shop.Id).Select(i => new
+            var deliveryConfigs = _shopPartnerConfigRepository.Where(i => i.ShopId == shopId).Select(i => new
             {
                 i.ShopId,
                 i.PartnerConfigId,
@@ -141,11 +136,11 @@ namespace GHSTShipping.Application.Features.Orders.Queries
 
             var deliveryPricePlanes = await _mediator.Send(new GetShopDeliveryPricePlanesRequest
             {
-                ShopId = shop.Id,
+                ShopId = shopId,
                 //IsActivated = true, // TODO allow enable or disable delivery config price
             });
 
-            var myShops = await _mediator.Send(new GetShopByIdQuery { Id = shop.Id }, cancellationToken);
+            var myShops = await _mediator.Send(new GetShopByIdQuery { Id = shopId }, cancellationToken);
 
             var response = new GetOrderMetadataResponse()
             {

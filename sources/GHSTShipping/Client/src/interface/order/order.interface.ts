@@ -99,7 +99,7 @@ export interface IOrderViewDto {
   insuranceFee: number;
   totalAmount: number;
   codFailedAmount: number;
-  shopDeliveryPricePlaneId?: string;
+  deliveryPricePlaneId?: string;
 
   orderDeiveryPricePlanDetail?: IOrderDeiveryPricePlanDetailDto;
 

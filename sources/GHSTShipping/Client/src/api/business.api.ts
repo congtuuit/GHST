@@ -61,8 +61,8 @@ export const apiGetOrders = (params: IOrderPagedParameter) => {
   return request<IPaginationResponse<IOrderViewDto>>('get', `/orders/list?${queryString}`);
 };
 
-export const apiGetOrderDetail = (orderId: string | undefined) => {
-  return request<IOrderDetail>('get', `/orders/ghn/detail/${orderId}`);
+export const apiGetOrderDetail = (orderId: string | undefined, shopId: string = '') => {
+  return request<IOrderDetail>('get', `/orders/ghn/detail/${orderId}?shopId=${shopId}`);
 };
 
 export const apiCancelOrderGhn = (orderIds: string[]) => {
@@ -91,7 +91,7 @@ export const apiUpdateDeliveryConfigs = (payload: IDeliveryConfigDto[]) => reque
 export const apiCreateDeliveryConfig = (payload: any) => request('post', `/configs/delivery`, payload);
 
 export const apiUpdateShopDeliveryConfig = (payload: IUpdateShopDeliveryConfigRequest) => request('put', `/configs/shop`, payload);
-export const apiGetOrderMetaData = () => request<IOrderMetadata>('get', `/orders/metadata`);
+export const apiGetOrderMetaData = (shopId: string) => request<IOrderMetadata>('get', `/orders/metadata?shopId=${shopId}`);
 export const apiGetShopOrders = (params: IShopOrderParameter) => {
   const queryString = buildQueryString(params);
   return request<IPaginationResponse<ShopOrderViewDto>>('get', `/orders/group-by-shops?${queryString}`);

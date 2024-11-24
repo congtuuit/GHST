@@ -12,7 +12,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 {
     public class GHN_OrderShippingCostCalcRequest : IRequest<OrderShippingCostDto>
     {
-        public Guid ShopDeliveryPricePlaneId { get; set; }
+        public Guid DeliveryPricePlaneId { get; set; }
         public long Weight { get; set; } // Cân nặng của đơn hàng (gram)
         public long Length { get; set; } // Chiều dài của đơn hàng (cm)
         public long Width { get; set; } // Chiều rộng của đơn hàng (cm)
@@ -37,7 +37,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         {
             // Lấy thông tin bảng giá theo ShopDeliveryPricePlaneId
             var validPricePlane = await _repository
-                .Where(x => x.Id == request.ShopDeliveryPricePlaneId)
+                .Where(x => x.Id == request.DeliveryPricePlaneId)
                 .Select(x => new
                 {
                     x.Id,
@@ -107,7 +107,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             // Trả về kết quả tính toán
             return new OrderShippingCostDto
             {
-                ShopDeliveryPricePlaneId = request.ShopDeliveryPricePlaneId,
+                ShopDeliveryPricePlaneId = request.DeliveryPricePlaneId,
                 OrderWeight = finalWeight,
                 ShippingCost = shippingCost,
                 InsuranceFee = (long)insuranceFee,

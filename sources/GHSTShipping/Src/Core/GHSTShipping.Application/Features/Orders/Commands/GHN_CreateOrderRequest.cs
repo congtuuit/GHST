@@ -21,9 +21,11 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 {
     public class GHN_CreateOrderRequest : CreateDeliveryOrderRequest, IRequest<BaseResult<CreateDeliveryOrderResponse>>
     {
-        public Guid? ShopDeliveryPricePlaneId { get; set; }
+        public Guid? DeliveryPricePlaneId { get; set; }
 
         public Guid? OrderId { get; set; }
+
+        public Guid ShopId { get; set; }
     }
 
     public class GHN_CreateOrderRequestHandler : IRequestHandler<GHN_CreateOrderRequest, BaseResult<CreateDeliveryOrderResponse>>
@@ -76,14 +78,14 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
         public async Task<BaseResult<CreateDeliveryOrderResponse>> Handle(GHN_CreateOrderRequest request, CancellationToken cancellationToken)
         {
-            if (request.ShopDeliveryPricePlaneId.HasValue == false)
+            if (request.DeliveryPricePlaneId.HasValue == false)
             {
                 return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.AccessDenied, "Vui lòng chọn bảng giá!"));
             }
 
             LogRequestData(request);
 
-            var shop = await GetShopDetailsAsync(cancellationToken);
+            var shop = await GetShopDetailsAsync(request.ShopId, cancellationToken);
             if (shop == null || !shop.IsVerified)
             {
                 return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.AccessDenied, "Cửa hàng chưa được kích hoạt, vui lòng liên hệ Admin"));
@@ -97,7 +99,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
             if (shopDeliveryPricePlanes.Success)
             {
-                var validPricePlane = shopDeliveryPricePlanes.Data.FirstOrDefault(i => i.Id == request.ShopDeliveryPricePlaneId);
+                var validPricePlane = shopDeliveryPricePlanes.Data.FirstOrDefault(i => i.Id == request.DeliveryPricePlaneId);
                 if (validPricePlane == null)
                 {
                     return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.AccessDenied, "Bảng giá không hợp lệ, vui lòng kiểm tra lại!"));
@@ -196,7 +198,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
             OrderShippingCostDto deliveryFeePlan = await _mediator.Send(new GHN_OrderShippingCostCalcRequest()
             {
-                ShopDeliveryPricePlaneId = request.ShopDeliveryPricePlaneId.Value,
+                DeliveryPricePlaneId = request.DeliveryPricePlaneId.Value,
                 Height = request.Height,
                 Length = request.Length,
                 Weight = request.Weight,
@@ -236,7 +238,14 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                         o.ClientOrderCode,
                         o.CurrentStatus,
                         o.Created,
-                        o.CreatedBy
+                        o.CreatedBy,
+                        o.Weight,
+                        o.Length,
+                        o.Width,
+                        o.Height,
+                        o.CalculateWeight,
+                        o.ConvertedWeight,
+                        o.CustomDeliveryFee
                     })
                     .FirstOrDefaultAsync();
 
@@ -246,6 +255,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     return ("", new Guid());
                 }
 
+                // Not update some fields
                 order.Id = orderIdExisted.Id;
                 order.UniqueCode = orderIdExisted.UniqueCode;
                 order.ClientOrderCode = orderIdExisted.ClientOrderCode;
@@ -253,6 +263,16 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 order.Created = orderIdExisted.Created;
                 order.CreatedBy = orderIdExisted.CreatedBy;
 
+                if (_authenticatedUserService.IsAdmin)
+                {
+                    order.Weight = orderIdExisted.Weight;
+                    order.Length = orderIdExisted.Length;
+                    order.Width = orderIdExisted.Width;
+                    order.Height = orderIdExisted.Height;
+                    order.CalculateWeight = orderIdExisted.CalculateWeight;
+                    order.ConvertedWeight = orderIdExisted.ConvertedWeight;
+                    order.OrrverideDeliveryFee(orderIdExisted.CustomDeliveryFee);
+                }
 
                 _orderRepository.Update(order);
                 await _orderHistoryRepository.AddAsync(new OrderStatusHistory
@@ -305,7 +325,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 RootConvertedWeight = deliveryFeePlan.CalcOrderWeight,
                 RootCalculateWeight = deliveryFeePlan.OrderWeight,
 
-                DeliveryPricePlaneId = request.ShopDeliveryPricePlaneId,
+                DeliveryPricePlaneId = request.DeliveryPricePlaneId,
                 InsuranceFee = deliveryFeePlan.InsuranceFee,
 
                 PartnerShopId = partnerShopId,
@@ -432,11 +452,11 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             public bool IsVerified { get; set; }
 
         }
-        private async Task<ShopQueryDto> GetShopDetailsAsync(CancellationToken cancellationToken)
+
+        private async Task<ShopQueryDto> GetShopDetailsAsync(Guid shopId, CancellationToken cancellationToken)
         {
-            var userId = _authenticatedUserService.UId;
             return await _shopRepository
-                .Where(i => i.AccountId == userId)
+                .Where(i => i.Id == shopId)
                 .Select(i => new ShopQueryDto
                 {
                     Id = i.Id,

@@ -70,7 +70,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
             var pricePlan = await mediator.Send(new GHN_OrderShippingCostCalcRequest
             {
-                ShopDeliveryPricePlaneId = order.DeliveryPricePlaneId.Value,
+                DeliveryPricePlaneId = order.DeliveryPricePlaneId.Value,
                 Height = order.Height,
                 Length = order.Length,
                 Width = order.Width,

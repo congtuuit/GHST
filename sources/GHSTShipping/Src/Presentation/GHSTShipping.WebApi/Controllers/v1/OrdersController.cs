@@ -38,9 +38,9 @@ namespace GHSTShipping.WebApi.Controllers.v1
 
         [HttpGet]
         [Route("ghn/detail/{orderId}")]
-        public async Task<BaseResult<OrderDetailDto>> GetOrderDetail([FromRoute] Guid orderId)
+        public async Task<BaseResult<OrderDetailDto>> GetOrderDetail([FromRoute] Guid orderId, [FromQuery] Guid? shopId = null)
         {
-            return await Mediator.Send(new GetOrderDetailRequest() { OrderId = orderId });
+            return await Mediator.Send(new GetOrderDetailRequest() { OrderId = orderId, ShopId = shopId });
         }
 
         [HttpPost]

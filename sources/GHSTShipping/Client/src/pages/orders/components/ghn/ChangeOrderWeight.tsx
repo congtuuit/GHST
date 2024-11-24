@@ -37,7 +37,7 @@ const ChangeOrderWeight: React.FC<ChangeOrderWeightProps> = ({ order, onSubmit, 
       const editOrder = order as IOrderViewDto;
       const payload = {
         ...values,
-        shopDeliveryPricePlaneId: editOrder.orderDeiveryPricePlanDetail?.id ?? '',
+        deliveryPricePlaneId: editOrder.orderDeiveryPricePlanDetail?.id ?? '',
       };
       const response = await request('post', '/orders/calculate-shipping-cost', payload);
       if (response.success) {

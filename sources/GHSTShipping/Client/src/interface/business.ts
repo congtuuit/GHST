@@ -96,7 +96,7 @@ export interface ICreateDeliveryOrderRequest {
 
   client_order_code?: string; // Optional client order code
 
-  shopDeliveryPricePlaneId?: string;
+  deliveryPricePlaneId?: string;
 }
 
 interface DeliveryOrderItemDto {

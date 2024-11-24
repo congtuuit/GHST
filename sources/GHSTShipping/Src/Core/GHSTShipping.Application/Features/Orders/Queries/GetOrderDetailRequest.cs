@@ -16,6 +16,8 @@ namespace GHSTShipping.Application.Features.Orders.Queries
     public class GetOrderDetailRequest : IRequest<BaseResult<OrderDetailDto>>
     {
         public Guid? OrderId { get; set; }
+
+        public Guid? ShopId { get; set; }
     }
 
     public class GetOrderDetailRequestHandler(
@@ -48,8 +50,9 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 return BaseResult<OrderDetailDto>.Failure(new Error(ErrorCode.NotFound));
             }
 
-            // Hide some fields
-            if (authenticatedUserService.IsAdmin == false)
+            // Hide some fields when
+            // Request to get detail as shop or request is not admin
+            if (request.ShopId.HasValue || authenticatedUserService.IsAdmin == false)
             {
                 order.Height = order.RootHeight;
                 order.Length = order.RootLength;

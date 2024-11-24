@@ -5,8 +5,12 @@ import GHN_CreateOrderForm from './components/ghn/GHN_CreateOrderForm';
 import { apiGetOrderMetaData } from '@/api/business.api';
 import { IOrderMetadata } from '@/interface/shop';
 import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { shopIdSelector } from '@/stores/user.store';
 
 const CreateOrderPage = () => {
+  const shopId = useSelector(shopIdSelector);
+
   const [isActiveGhnForm, setIsActiveGhnForm] = useState<boolean>(false);
   const [orderMeataData, setCreateOrderMetadata] = useState<IOrderMetadata>();
 
@@ -15,7 +19,7 @@ const CreateOrderPage = () => {
   const isEdit = Boolean(id) ? true : false;
 
   const fetchCreateOrderMetadata = async () => {
-    const response = await apiGetOrderMetaData();
+    const response = await apiGetOrderMetaData(shopId);
     if (response.success) {
       setCreateOrderMetadata(response.data);
       const config = response.data.deliveryConfigs[0];

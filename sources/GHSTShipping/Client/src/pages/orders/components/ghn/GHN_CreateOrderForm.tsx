@@ -18,6 +18,7 @@ import { DeliveryPricePlaneFormDto } from '@/interface/shop';
 import { BasicShopInfoDto } from '@/features/shop';
 import { request } from '@/api/base/request';
 import { useParams } from 'react-router-dom';
+import { shopIdSelector } from '@/stores/user.store';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -49,7 +50,8 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   const { isActivated, deliveryPricePlanes = [], myShops = [] } = props;
   const dispatch = useDispatch();
   const session = useSelector(state => state?.user?.session);
-  const shopDeliveryPricePlaneId = useSelector(state => state?.order?.tempOrder?.shopDeliveryPricePlaneId ?? '');
+  const shopId = useSelector(shopIdSelector);
+  const deliveryPricePlaneId = useSelector(state => state?.order?.tempOrder?.deliveryPricePlaneId ?? '');
 
   const [pickShifts, setPickShifts] = useState<IPickShift[]>([]);
   const [form] = Form.useForm();
@@ -133,6 +135,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
         return;
       }
 
+      values.shopId = shopId;
       if (isEdit) {
         const response = await apiUpdateDeliveryOrder(id as string, values);
         if (response.success) {
@@ -201,12 +204,12 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
       }
     }
 
-    const { shopDeliveryPricePlaneId, weight, length, width, height } = currentValues;
-    if (shopDeliveryPricePlaneId == null || weight == null || length == null || width == null || height == null) {
+    const { deliveryPricePlaneId, weight, length, width, height } = currentValues;
+    if (deliveryPricePlaneId == null || weight == null || length == null || width == null || height == null) {
       console.error('All fields must be filled out');
     } else {
       calculateShippingCost({
-        shopDeliveryPricePlaneId: shopDeliveryPricePlaneId,
+        deliveryPricePlaneId: deliveryPricePlaneId,
         weight: Number(weight),
         length: Number(length),
         width: Number(width),
@@ -243,16 +246,16 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   };
 
   type CalculateShippingCostInput = {
-    shopDeliveryPricePlaneId: number; // Replace with `string` if it's not a number
+    deliveryPricePlaneId: number; // Replace with `string` if it's not a number
     weight: number;
     length: number;
     width: number;
     height: number;
   };
 
-  const calculateShippingCost = async ({ shopDeliveryPricePlaneId, weight, length, width, height }: CalculateShippingCostInput): Promise<any> => {
+  const calculateShippingCost = async ({ deliveryPricePlaneId, weight, length, width, height }: CalculateShippingCostInput): Promise<any> => {
     const payload = {
-      shopDeliveryPricePlaneId,
+      deliveryPricePlaneId,
       weight,
       length,
       width,
@@ -287,6 +290,8 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   useEffect(() => {
     if (isEdit) {
       const editOrderData = editOrder;
+
+      console.log("edit data ", editOrderData)
       form.setFieldsValue(editOrderData);
       if (editOrderData?.cod_failed_amount > 0) {
         setAllowFailedDelivery(true);
@@ -316,16 +321,19 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   }, []);
 
   useEffect(() => {
-    if (!Boolean(shopDeliveryPricePlaneId) && deliveryPricePlanes && deliveryPricePlanes.length > 0) {
-      form.setFieldValue('shopDeliveryPricePlaneId', deliveryPricePlanes[0]?.id);
+    // Nếu là tạo đơn hàng và giá trị ghi nhớ của deliveryPricePlaneId không tồn tại
+    // thì lấy giá trị đầu tiên trong danh sách
+    if (!Boolean(deliveryPricePlaneId) && !isEdit && deliveryPricePlanes && deliveryPricePlanes.length > 0) {
+      form.setFieldValue('deliveryPricePlaneId', deliveryPricePlanes[0]?.id);
     }
   }, [deliveryPricePlanes]);
 
   useEffect(() => {
-    if (Boolean(shopDeliveryPricePlaneId)) {
-      form.setFieldValue('shopDeliveryPricePlaneId', shopDeliveryPricePlaneId);
+    // Nếu là tạo đơn mới và có giá trị ghi nhớ thì set bảng giá theo giá trị đã ghi nhớ
+    if (Boolean(deliveryPricePlaneId) && !isEdit) {
+      form.setFieldValue('deliveryPricePlaneId', deliveryPricePlaneId);
     }
-  }, [shopDeliveryPricePlaneId]);
+  }, [deliveryPricePlaneId]);
 
   useEffect(() => {}, []);
 
@@ -345,7 +353,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
             <Col span={12}>
               <Form.Item
                 label="Bảng giá"
-                name="shopDeliveryPricePlaneId"
+                name="deliveryPricePlaneId"
                 rules={[
                   {
                     required: true,

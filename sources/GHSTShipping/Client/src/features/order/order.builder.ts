@@ -79,6 +79,7 @@ class OrderBuilder {
       errors: this.errors,
     };
   }
+
 }
 
 export default OrderBuilder;

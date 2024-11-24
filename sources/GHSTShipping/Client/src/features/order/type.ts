@@ -13,6 +13,8 @@ export interface IOrderItem {
 }
 
 export interface IOrder {
+  shopId: string;
+
   from_name?: string; // Tên người gửi (có thể lấy từ ShopID nếu không cung cấp)
   from_phone: string; // Số điện thoại người gửi
   from_address: string; // Địa chỉ người gửi
