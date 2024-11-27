@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, InputNumber, message, Row, Select, Typography } from 'antd';
+import { Button, Card, Col, Flex, Form, Input, InputNumber, message, Radio, Row, Select, Typography, Modal } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { apiCreateDeliveryOrder, apiGetPickShifts, apiUpdateDeliveryOrder } from '@/api/business.api';
@@ -19,18 +19,18 @@ import { BasicShopInfoDto } from '@/features/shop';
 import { request } from '@/api/base/request';
 import { useParams } from 'react-router-dom';
 import { shopIdSelector } from '@/stores/user.store';
+import { ServiceType, ServiceTypeValue } from './ServiceType';
 
 const { Title } = Typography;
 const { Option } = Select;
-
-const serviceType = {
-  HangNhe: 2,
-  HangNang: 5,
-};
+const { confirm } = Modal;
 
 type Item = {
   name: string;
   weight: number;
+  length: number;
+  width: number;
+  height: number;
   quantity: number;
   code?: string;
 };
@@ -40,6 +40,14 @@ interface FormOrderGhnProps {
   deliveryPricePlanes?: DeliveryPricePlaneFormDto[];
   myShops?: BasicShopInfoDto[];
 }
+
+type CalculateShippingCostInput = {
+  deliveryPricePlaneId: number; // Replace with `string` if it's not a number
+  weight: number;
+  length: number;
+  width: number;
+  height: number;
+};
 
 const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   const { id } = useParams<{ id: string }>();
@@ -57,14 +65,19 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   const [form] = Form.useForm();
   const fromAddressRef = useRef<any>(null);
   const toAddressRef = useRef<any>(null);
-  const [serviceTypeId, setServiceTypeId] = useState<number>(serviceType.HangNhe);
+  const [serviceTypeId, setServiceTypeId] = useState<ServiceTypeValue>(ServiceType.HangNhe);
   const [shopAddressSelected, setShopAddressSelected] = useState<BasicShopInfoDto>();
   const [allowEditSenderAddress, setAllowEditSenderAddress] = useState(true);
   const [convertedWeight, setConvertedWeight] = useState(0);
   const [isHighLight, setIsHighLight] = useState(false);
-
-  const [editProducts, setEditProducts] = useState<IProduct[]>([]);
   const [allowFailedDelivery, setAllowFailedDelivery] = useState(false);
+  const [editProducts, setEditProducts] = useState<IProduct[]>([
+    {
+      name: '',
+      weight: '100',
+      quantity: '1',
+    },
+  ]);
 
   const fetchPickShifts = async () => {
     try {
@@ -120,17 +133,17 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
       const values: IOrder = await form.validateFields();
       if (values.weight > 20000) {
         console.log('Đơn hàng lớn hơn 20kg');
-
         // Trong đó:  2: Hàng nhẹ, 5: Hàng nặng
-        values.service_type_id = serviceType.HangNang;
+        values.service_type_id = ServiceType.HangNang;
       } else {
-        values.service_type_id = serviceType.HangNhe;
+        values.service_type_id = ServiceType.HangNhe;
       }
 
       const orderBuilder = new OrderBuilder(values);
       const validate = orderBuilder.validateOrder();
 
-      if (!validate.verified) {
+      if (!validate.verified && values.service_type_id === ServiceType.HangNhe) {
+        console.log('validate ', validate.errors);
         message.error('Thông tin đơn chưa hợp lệ, vui lòng kiểm tra lại!');
         return;
       }
@@ -173,18 +186,55 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
 
       const totalWeight = calculateTotalWeight(orderItems);
       form.setFieldValue('weight', totalWeight);
+
+      // Nếu dịch vụ là hàng nặng thì tiến hàng tự động tính toán kích thước tổng đơn hàng
+      if (serviceTypeId === ServiceType.HangNang) {
+        const calculateTotalLength = (items: Item[]): number => {
+          return items.reduce((total, item) => total + (item.length ?? 0), 0);
+        };
+        const calculateTotalWidth = (items: Item[]): number => {
+          return items.reduce((total, item) => total + (item.width ?? 0), 0);
+        };
+        const calculateTotalHeight = (items: Item[]): number => {
+          return items.reduce((total, item) => total + (item.height ?? 0), 0);
+        };
+        const totalLength = calculateTotalLength(orderItems);
+        const totalWidth = calculateTotalWidth(orderItems);
+        const totalHeight = calculateTotalHeight(orderItems);
+        form.setFieldValue('length', totalLength);
+        form.setFieldValue('width', totalWidth);
+        form.setFieldValue('height', totalHeight);
+      }
+
+      if (totalWeight >= 20000 && serviceTypeId === ServiceType.HangNhe) {
+        showChangeServiceTypeNotification();
+        return;
+      }
     }
   };
 
   // Debounced update to Redux
   const handleValuesChange = debounce(changedValues => {
     handleCalc(changedValues);
-  }, 500);
+  }, 800);
 
   const handleCalc = (changedValues: any, auto_update_insurance_value: boolean = true) => {
     const currentValues = form.getFieldsValue();
     dispatch(setOrder({ ...currentValues, ...changedValues }));
     dispatch(setTempOrder({ ...currentValues, ...changedValues }));
+
+    // Nếu thay đổi service type sang hàng nặng, thì set quantity về 1 cho order items
+    // và disable một số fields để không cho phép nhập (tự động tính toán)
+    if (Boolean(changedValues?.service_type_id)) {
+      setServiceTypeId(changedValues?.service_type_id);
+      const items = currentValues?.items?.map((i: any) => {
+        return {
+          ...i,
+          quantity: 1,
+        };
+      });
+      form.setFieldValue('items', items);
+    }
 
     // Nếu thay đổi không phải là khối lượng đơn hàng thì tiến hành tính lại
     if (!Boolean(changedValues?.weight)) {
@@ -216,6 +266,23 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
     }
   };
 
+  const showChangeServiceTypeNotification = () => {
+    confirm({
+      title: 'Bạn có chắc chắn muốn xóa mục này?',
+      content:
+        'Với đơn hàng từ 20kg trở lên, hệ thống sẽ áp dụng dịch vụ Hàng nặng. Bạn có thể chuyển dịch vụ hoặc cập nhật lại khối lượng kích thước đơn hàng.',
+      okText: 'Tôi đã hiểu',
+      okType: 'danger',
+      cancelText: 'Cập nhật lại thông tin',
+      centered: true,
+      onOk() {
+        setServiceTypeId(ServiceType.HangNang);
+        form.setFieldValue('service_type_id', ServiceType.HangNang);
+      },
+      onCancel() {},
+    });
+  };
+
   const handleChangeSenderAddress = (value: string) => {
     const selectedShopAddress = myShops.find(i => i.id === value);
     if (Boolean(selectedShopAddress)) {
@@ -241,14 +308,6 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
         fromAddressRef.current?.update(senderInfo);
       }, 300);
     }
-  };
-
-  type CalculateShippingCostInput = {
-    deliveryPricePlaneId: number; // Replace with `string` if it's not a number
-    weight: number;
-    length: number;
-    width: number;
-    height: number;
   };
 
   const calculateShippingCost = async ({ deliveryPricePlaneId, weight, length, width, height }: CalculateShippingCostInput): Promise<any> => {
@@ -288,8 +347,6 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   useEffect(() => {
     if (isEdit) {
       const editOrderData = editOrder;
-
-      console.log("edit data ", editOrderData)
       form.setFieldsValue(editOrderData);
       if (editOrderData?.cod_failed_amount > 0) {
         setAllowFailedDelivery(true);
@@ -344,9 +401,9 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   };
 
   return (
-    <div style={{ maxHeight: '83vh', overflowY: 'auto' }}>
+    <div style={{ maxHeight: '78vh', overflowY: 'auto' }}>
       <Form layout="vertical" form={form} onValuesChange={handleValuesChange} disabled={!isActivated}>
-        <Card style={{ marginBottom: '16px' }}>
+        <Card style={{ marginBottom: '16px' }} className="custom-card">
           <Row gutter={[16, 16]}>
             <Col span={12}>
               <Form.Item
@@ -433,9 +490,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
               </Col>
             </Col>
             <div className="border-top-info"></div>
-            <Form.Item hidden name="service_type_id" initialValue={serviceTypeId}>
-              <InputNumber value={serviceTypeId} />
-            </Form.Item>
+
             <Col span={12}>
               <Form.Item
                 hidden={allowEditSenderAddress}
@@ -508,18 +563,36 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
           </Row>
         </Card>
 
-        <ProductForm products={editProducts} />
-        <OrderInfoForm allowFailedDelivery={allowFailedDelivery} convertedWeight={convertedWeight} highlight={isHighLight} />
+        <Col span={24} style={{ marginLeft: '10px', marginTop: '20px' }}>
+          <Flex vertical gap="middle">
+            <Form.Item name="service_type_id">
+              <Radio.Group defaultValue={serviceTypeId} buttonStyle="solid">
+                <Radio.Button value={ServiceType.HangNhe}>{'Hàng nhẹ (< 20 kg)'}</Radio.Button>
+                <Radio.Button value={ServiceType.HangNang}>{'Hàng nặng (>= 20 kg)'}</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+          </Flex>
+        </Col>
+
+        <ProductForm serviceType={serviceTypeId} products={editProducts} />
+        <OrderInfoForm
+          serviceType={serviceTypeId}
+          allowFailedDelivery={allowFailedDelivery}
+          convertedWeight={convertedWeight}
+          highlight={isHighLight}
+        />
         <NoteForm />
 
-        <Col span={12} style={{ marginTop: '16px' }}>
-          <Form.Item label="Hình thức thanh toán" name="payment_type_id" rules={[{ required: true, message: 'Vui lòng chọn' }]}>
-            <Select placeholder="Chọn Hình thức thanh toán">
-              <Option value={1}>Người gửi trả phí</Option>
-              <Option value={2}>Người nhận trả phí</Option>
-            </Select>
-          </Form.Item>
-        </Col>
+        <Card className="custom-card">
+          <Col span={12} style={{ marginTop: '16px' }}>
+            <Form.Item label="Hình thức thanh toán" name="payment_type_id" rules={[{ required: true, message: 'Vui lòng chọn' }]}>
+              <Select placeholder="Chọn Hình thức thanh toán">
+                <Option value={1}>Người gửi trả phí</Option>
+                <Option value={2}>Người nhận trả phí</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Card>
       </Form>
 
       <CreateOrderButton />

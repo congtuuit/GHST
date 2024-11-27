@@ -1,4 +1,5 @@
 import { Input, message } from 'antd';
+import { Variant } from 'antd/es/config-provider';
 import React, { useEffect, useState } from 'react';
 
 interface MyInputNumberProps {
@@ -9,6 +10,8 @@ interface MyInputNumberProps {
   max?: number;
   onChange?: (value: number) => void; // Callback to handle changes in the input
   style?: React.CSSProperties;
+  variant?: Variant;
+  disabled?: boolean;
 }
 
 const MyInputNumber: React.FC<MyInputNumberProps> = ({
@@ -19,6 +22,8 @@ const MyInputNumber: React.FC<MyInputNumberProps> = ({
   max = 20000,
   onChange,
   style,
+  variant,
+  disabled = false,
 }) => {
   const [inputValue, setInputValue] = useState<string>(defaultValue);
 
@@ -82,6 +87,8 @@ const MyInputNumber: React.FC<MyInputNumberProps> = ({
 
   return (
     <Input
+      disabled={disabled}
+      variant={variant}
       style={style}
       placeholder={placeholder}
       value={inputValue} // Display current state

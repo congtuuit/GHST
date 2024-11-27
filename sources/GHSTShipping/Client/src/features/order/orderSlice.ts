@@ -34,12 +34,6 @@ const orderSlice = createSlice({
     setShopInfo(state, action: PayloadAction<ShopOrderViewDto>) {
       state.shop = action.payload;
     },
-    setOrderFilter(state, action: PayloadAction<IOrderFilter>) {
-      state.orderFilter = {
-        ...state.orderFilter,
-        ...action.payload,
-      };
-    },
     addConfirmOrderToQueue(state, action: PayloadAction<string[]>) {
       let _array = [...state.confirmOrderQueue, ...action.payload]
       const uniqueArray = [...new Set(_array)];
@@ -55,5 +49,5 @@ const orderSlice = createSlice({
   },
 });
 
-export const { setTempOrder, setOrder, clearOrder, setShopInfo, setOrderFilter, addConfirmOrderToQueue, removeConfirmOrderToQueue } = orderSlice.actions;
+export const { setTempOrder, setOrder, clearOrder, setShopInfo, addConfirmOrderToQueue, removeConfirmOrderToQueue } = orderSlice.actions;
 export default orderSlice.reducer;

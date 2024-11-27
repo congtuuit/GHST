@@ -3,7 +3,7 @@ import React, { useState, CSSProperties, useEffect } from 'react';
 import OrderFilter, { OrderFilterState } from './ghn/OrderFilter';
 import { DownOutlined } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
-import { setOrderFilter } from '@/features/order/orderSlice';
+import { setOrderFilter } from '@/features/order/orderTempSlice';
 import dayjs, { Dayjs } from 'dayjs';
 
 interface AdminOrderFilterWrapperProps {

@@ -6,7 +6,7 @@ const { TextArea } = Input;
 
 const NoteForm = () => {
   return (
-    <Card title="Lưu ý - Ghi chú">
+    <Card title="Lưu ý - Ghi chú" className='custom-card'>
       {/* Delivery Notes Section */}
       <Form.Item
         name="required_note"

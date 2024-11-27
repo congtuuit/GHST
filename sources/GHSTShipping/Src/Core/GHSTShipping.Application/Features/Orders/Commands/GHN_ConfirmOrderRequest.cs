@@ -81,6 +81,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     DeliverStationId = i.DeliverStationId,
                     ServiceId = i.ServiceId,
                     Coupon = i.Coupon,
+                    CodFailedAmount = i.CodFailedAmount,
                     Items = i.Items.Select(oi => new OrderItem
                     {
                         Id = oi.Id,

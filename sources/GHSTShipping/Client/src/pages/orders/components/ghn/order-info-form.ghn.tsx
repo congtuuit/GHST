@@ -3,14 +3,17 @@ import { Card, Checkbox, Col, Form, Input, InputNumber, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import MyInputNumber from '../MyInputNumber';
+import { ServiceType, ServiceTypeValue } from './ServiceType';
+import NumberFormatter from '@/components/core/NumberFormatter';
 
 interface OrderInfoFormProps {
   convertedWeight: number;
   highlight: boolean;
   allowFailedDelivery?: boolean;
+  serviceType: ServiceTypeValue;
 }
 const OrderInfoForm = (props: OrderInfoFormProps) => {
-  const { convertedWeight, highlight, allowFailedDelivery } = props;
+  const { convertedWeight, highlight, allowFailedDelivery, serviceType } = props;
   const [failedDelivery, setFailedDelivery] = useState(false);
 
   const onFailedDeliveryChange = (e: any) => {
@@ -24,7 +27,7 @@ const OrderInfoForm = (props: OrderInfoFormProps) => {
   }, [allowFailedDelivery]);
 
   return (
-    <Card title="Thông tin đơn hàng" style={{ marginBottom: '16px' }}>
+    <Card title="Thông tin đơn hàng" style={{ marginBottom: '16px' }} className="custom-card">
       <Row gutter={16}>
         {/* Weight */}
         <Col span={4}>
@@ -36,15 +39,20 @@ const OrderInfoForm = (props: OrderInfoFormProps) => {
               {
                 type: 'number',
                 min: 1,
-                max: 50000,
-                message: 'Khối lượng từ 1 - 50.000 gram',
+                max: serviceType === ServiceType.HangNhe ? 50000 : 500000,
+                message: serviceType === ServiceType.HangNhe ? 'Khối lượng từ 1 - 50.000 gram' : 'Khối lượng từ 1 - 500.000 gram',
                 transform: value => {
                   return Number(value) || 0;
                 },
               },
             ]}
           >
-            <MyInputNumber style={{ color: `${!highlight ? 'orange' : 'black'}` }} max={50000} placeholder="Nhập giá trị" />
+            <MyInputNumber
+              disabled={serviceType === ServiceType.HangNang}
+              style={{ color: `${!highlight ? 'orange' : 'black'}` }}
+              max={serviceType === ServiceType.HangNhe ? 50000 : 500000}
+              placeholder="Nhập giá trị"
+            />
           </Form.Item>
         </Col>
 
@@ -66,7 +74,7 @@ const OrderInfoForm = (props: OrderInfoFormProps) => {
               },
             ]}
           >
-            <MyInputNumber max={200} placeholder="Nhập giá trị" />
+            <MyInputNumber disabled={serviceType === ServiceType.HangNang} max={200} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
         <Col span={4}>
@@ -86,7 +94,7 @@ const OrderInfoForm = (props: OrderInfoFormProps) => {
               },
             ]}
           >
-            <MyInputNumber max={200} placeholder="Nhập giá trị" />
+            <MyInputNumber disabled={serviceType === ServiceType.HangNang} max={200} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
         <Col span={4}>
@@ -106,12 +114,14 @@ const OrderInfoForm = (props: OrderInfoFormProps) => {
               },
             ]}
           >
-            <MyInputNumber max={200} placeholder="Nhập giá trị" />
+            <MyInputNumber disabled={serviceType === ServiceType.HangNang} max={200} placeholder="Nhập giá trị" />
           </Form.Item>
         </Col>
         <Col span={8}>
           <span>KL quy đổi (gram): </span>
-          <span style={{ color: `${highlight ? 'orange' : 'black'}` }}>{convertedWeight}</span>
+          <span style={{ color: `${highlight ? 'orange' : 'black'}` }}>
+            <NumberFormatter value={convertedWeight} style="decimal" />
+          </span>
         </Col>
       </Row>
 

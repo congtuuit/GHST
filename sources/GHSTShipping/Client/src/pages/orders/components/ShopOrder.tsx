@@ -35,6 +35,7 @@ import Price from '@/components/core/price';
 import CopyTextButton from '@/components/core/CopyTextButton';
 import OrderDeliveryPlanDetail from './OrderDeliveryPlanDetail';
 import { setStoreId } from '@/stores/user.store';
+import ActionButton from '@/components/core/ActionButton';
 
 const { Option } = Select;
 
@@ -49,7 +50,8 @@ const ShopOrders = (props: ShopOrdersProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { shopId } = useParams(); // Destructure shopId from useParams
-  const { orderFilter, confirmOrderQueue } = useSelector(state => state.order);
+  const { confirmOrderQueue } = useSelector(state => state.order);
+  const { orderFilter } = useSelector(state => state.orderTemp);
 
   const datatableRef = useRef<DatatableRef>(null);
   const [groupStatusFilterOptions, setGroupStatusFilterOptions] = useState<FilterStatusOption[]>(orderStatusSection);
@@ -444,27 +446,38 @@ const ShopOrders = (props: ShopOrdersProps) => {
       title: 'Thao tác',
       key: 'action',
       align: 'center' as const,
+      width: 150,
       render: (_: any, record: IOrderViewDto) => {
         if (record.status === 'waiting_confirm') {
           const isConfirming = confirmOrderQueue.indexOf(record.id) >= 0;
           return (
             <div key={record.id}>
-              <Button className="table-btn-action" size="small" onClick={() => handleEditOrder(record)}>
-                Chỉnh sửa
-              </Button>
+              <ActionButton
+                style={{ marginBottom: '15px', width: '90px' }}
+                iconAction="edit"
+                text="Sửa đơn"
+                onClick={() => handleEditOrder(record)}
+              />
+
               <Button
                 loading={isConfirming}
                 disabled={isConfirming}
                 type="dashed"
                 className="table-btn-action"
+                style={{ marginBottom: '15px', width: '90px' }}
                 size="middle"
                 onClick={() => handleConfirmOrder(record.id)}
               >
                 Xác nhận
               </Button>
-              <Button disabled={isConfirming} danger className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
-                Hủy đơn
-              </Button>
+
+              <ActionButton
+                style={{ marginBottom: '20px', width: '90px' }}
+                iconAction="delete"
+                danger
+                text="Hủy đơn"
+                onClick={() => handleCancelOrder(record.id)}
+              />
             </div>
           );
         }

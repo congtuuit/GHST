@@ -1,11 +1,10 @@
 // store/orderSlice.ts
-import { ICreateDeliveryOrderRequest } from '@/interface/business';
-import { IOrderViewDto, ShopOrderViewDto } from '@/interface/order/order.interface';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IOrderFilter } from './type';
 
 export interface IOrderTempState {
   editOrder: any;
+  orderFilter?: IOrderFilter;
 }
 
 const initialState: IOrderTempState = {
@@ -19,8 +18,17 @@ const orderTempSlice = createSlice({
     setEditOrder(state, action: PayloadAction<any>) {
       state.editOrder = action.payload;
     },
+    setOrderFilter(state, action: PayloadAction<IOrderFilter>) {
+      state.orderFilter = {
+        ...state.orderFilter,
+        ...action.payload,
+      };
+    },
   },
 });
 
-export const { setEditOrder } = orderTempSlice.actions;
+
+export const { setEditOrder, setOrderFilter } = orderTempSlice.actions;
+
+
 export default orderTempSlice.reducer;

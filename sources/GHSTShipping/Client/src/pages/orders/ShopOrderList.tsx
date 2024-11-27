@@ -21,6 +21,7 @@ import CopyTextButton from '@/components/core/CopyTextButton';
 import { useNavigate } from 'react-router-dom';
 import OrderDeliveryPlanDetail from './components/OrderDeliveryPlanDetail';
 import { executeHandleEditOrder } from '@/features/order';
+import ActionButton from '@/components/core/ActionButton';
 
 const _ghnOrderFilter = new ghnOrderFilter();
 const orderStatusSection = _ghnOrderFilter.filterStatus;
@@ -247,18 +248,25 @@ const ShopOrderList = () => {
     {
       title: 'Thao tác',
       key: 'action',
-      width: 200,
+      width: 150,
       align: 'center' as const,
       render: (_: any, record: IOrderViewDto) => {
         if (record.status === 'waiting_confirm' || record.status === 'draft' || record.status === 'ready_to_pick') {
           return (
             <div key={record.id}>
-              <Button className="table-btn-action" size="small" onClick={() => handleEditOrder(record)}>
-                Chỉnh sửa
-              </Button>
-              <Button danger className="table-btn-action" size="small" onClick={() => handleCancelOrder(record.id)}>
-                Hủy đơn
-              </Button>
+              <ActionButton
+                style={{ marginBottom: '15px', width: '90px' }}
+                iconAction="edit"
+                text="Sửa đơn"
+                onClick={() => handleEditOrder(record)}
+              />
+              <ActionButton
+                style={{ marginBottom: '20px', width: '90px' }}
+                iconAction="delete"
+                danger
+                text="Hủy đơn"
+                onClick={() => handleCancelOrder(record.id)}
+              />
             </div>
           );
         }

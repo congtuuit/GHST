@@ -1,6 +1,7 @@
 import { DeleteOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Form, Input, InputNumber, message, Row, Upload } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { ServiceType, ServiceTypeValue } from './ServiceType';
 
 import MyInputNumber from '../MyInputNumber';
 
@@ -8,16 +9,19 @@ export interface IProduct {
   name: string;
   code?: string;
   weight: string;
+  length?: string;
+  width?: string;
+  height?: string;
   quantity: string;
 }
 
 interface ProductFormProps {
   products?: IProduct[];
+  serviceType: ServiceTypeValue;
 }
 
 const ProductForm = (props: ProductFormProps) => {
-  const { products } = props;
-
+  const { products, serviceType } = props;
   const [_products, set_Products] = useState<IProduct[]>([{ name: '', code: '', weight: '200', quantity: '1' }]);
 
   const addProduct = () => {
@@ -26,7 +30,6 @@ const ProductForm = (props: ProductFormProps) => {
 
   const handleInputChange = (index: number, field: keyof IProduct, value: string) => {
     const newProducts: IProduct[] = [..._products];
-
     if (newProducts[index]) {
       newProducts[index][field] = value;
     }
@@ -37,13 +40,10 @@ const ProductForm = (props: ProductFormProps) => {
   const handleRemoveProduct = (index: number) => {
     if (_products.length === 1) {
       message.info('Đơn hàng phải có ít nhất 1 sản phẩm');
-
       return;
     }
-
     _products.splice(index, 1);
     const newProducts: IProduct[] = [..._products];
-
     set_Products(newProducts);
   };
 
@@ -54,19 +54,23 @@ const ProductForm = (props: ProductFormProps) => {
   }, [products]);
 
   return (
-    <Card title="Thông tin sản phẩm" style={{ marginBottom: '16px' }}>
+    <Card title="Thông tin sản phẩm" style={{ marginBottom: '16px', marginTop: '0' }} className="custom-card">
       {_products.map((product, index: number) => (
         <div key={index} style={{ marginBottom: 16, border: '1px solid #e8e8e8', padding: 16 }}>
           <Row gutter={[16, 16]}>
             {/* Product Name */}
             <Col span={6}>
-              <Form.Item label={`Sản phẩm ${index + 1}`} name={['items', index, 'name']} rules={[{ required: true, message: 'Vui lòng nhập' }]}>
+              <Form.Item
+                label={`${serviceType === ServiceType.HangNang ? 'Kiện hàng' : 'Sản phẩm'} ${index + 1}`}
+                name={['items', index, 'name']}
+                rules={[{ required: true, message: 'Vui lòng nhập' }]}
+              >
                 <Input placeholder="Nhập tên sản phẩm" value={product.name} onChange={e => handleInputChange(index, 'name', e.target.value)} />
               </Form.Item>
             </Col>
 
             {/* Weight */}
-            <Col span={6}>
+            <Col span={3}>
               <Form.Item
                 label="KL (gram)"
                 name={['items', index, 'weight']}
@@ -75,7 +79,7 @@ const ProductForm = (props: ProductFormProps) => {
                   {
                     type: 'number',
                     min: 1,
-                    message: 'Khối lượng phải lớn hơn 0',
+                    message: 'Giá trị phải lớn hơn 0',
                     transform: value => {
                       return Number(value) || 0;
                     },
@@ -83,8 +87,9 @@ const ProductForm = (props: ProductFormProps) => {
                 ]}
               >
                 <MyInputNumber
+                  max={50000}
+                  variant="outlined"
                   placeholder="Nhập giá trị"
-                  value={product.weight}
                   onChange={e => {
                     const value: string = e.toString();
                     handleInputChange(index, 'weight', value || '');
@@ -93,9 +98,94 @@ const ProductForm = (props: ProductFormProps) => {
               </Form.Item>
             </Col>
 
+            {serviceType === ServiceType.HangNang && (
+              <Col span={3}>
+                <Form.Item
+                  label="Dài (cm)"
+                  name={['items', index, 'length']}
+                  rules={[
+                    { required: true, message: 'Vui lòng nhập' },
+                    {
+                      type: 'number',
+                      min: 1,
+                      message: 'Giá trị phải lớn hơn 0',
+                      transform: value => {
+                        return Number(value) || 0;
+                      },
+                    },
+                  ]}
+                >
+                  <MyInputNumber
+                    placeholder="Nhập giá trị"
+                    onChange={e => {
+                      const value: string = e.toString();
+                      handleInputChange(index, 'length', value || '');
+                    }}
+                  />
+                </Form.Item>
+              </Col>
+            )}
+
+            {serviceType === ServiceType.HangNang && (
+              <Col span={3}>
+                <Form.Item
+                  label="Rộng (cm)"
+                  name={['items', index, 'width']}
+                  rules={[
+                    { required: true, message: 'Vui lòng nhập' },
+                    {
+                      type: 'number',
+                      min: 1,
+                      message: 'Giá trị phải lớn hơn 0',
+                      transform: value => {
+                        return Number(value) || 0;
+                      },
+                    },
+                  ]}
+                >
+                  <MyInputNumber
+                    placeholder="Nhập giá trị"
+                    onChange={e => {
+                      const value: string = e.toString();
+                      handleInputChange(index, 'width', value || '');
+                    }}
+                  />
+                </Form.Item>
+              </Col>
+            )}
+
+            {serviceType === ServiceType.HangNang && (
+              <Col span={3}>
+                <Form.Item
+                  label="Cao (cm)"
+                  name={['items', index, 'height']}
+                  rules={[
+                    { required: true, message: 'Vui lòng nhập' },
+                    {
+                      type: 'number',
+                      min: 1,
+                      message: 'Giá trị phải lớn hơn 0',
+                      transform: value => {
+                        return Number(value) || 0;
+                      },
+                    },
+                  ]}
+                >
+                  <MyInputNumber
+                    placeholder="Nhập giá trị"
+                    onChange={e => {
+                      const value: string = e.toString();
+                      handleInputChange(index, 'height', value || '');
+                    }}
+                  />
+                </Form.Item>
+              </Col>
+            )}
+
             {/* Quantity */}
-            <Col span={6}>
+            <Col span={2}>
               <Form.Item
+                hidden={serviceType === ServiceType.HangNang}
                 initialValue={1}
                 label="Số lượng"
                 name={['items', index, 'quantity']}
@@ -112,8 +202,8 @@ const ProductForm = (props: ProductFormProps) => {
                 ]}
               >
                 <MyInputNumber
+                  disabled={serviceType === ServiceType.HangNang}
                   placeholder="Nhập số lượng"
-                  value={product.quantity}
                   onChange={e => {
                     const value: string = e.toString();
                     handleInputChange(index, 'quantity', value || '');
@@ -123,9 +213,9 @@ const ProductForm = (props: ProductFormProps) => {
             </Col>
 
             {/* Product Code */}
-            <Col span={6}>
-              <Form.Item label="Mã sản phẩm" name={['items', index, 'code']}>
-                <Input placeholder="Nhập mã sản phẩm" value={product.code} onChange={e => handleInputChange(index, 'code', e.target.value)} />
+            <Col span={3}>
+              <Form.Item hidden={serviceType === ServiceType.HangNang} label="Mã sản phẩm" name={['items', index, 'code']}>
+                <Input placeholder="Nhập mã sản phẩm" onChange={e => handleInputChange(index, 'code', e.target.value)} />
               </Form.Item>
             </Col>
 
