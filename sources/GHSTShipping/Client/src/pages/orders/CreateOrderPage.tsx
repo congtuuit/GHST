@@ -1,19 +1,19 @@
-import { Card, Col } from 'antd';
+import { Button, Card, Col } from 'antd';
 import { useEffect, useState } from 'react';
 import { supplierKeys } from '@/constants/data';
 import GHN_CreateOrderForm from './components/ghn/GHN_CreateOrderForm';
 import { apiGetOrderMetaData } from '@/api/business.api';
 import { IOrderMetadata } from '@/interface/shop';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { shopIdSelector } from '@/stores/user.store';
 
 const CreateOrderPage = () => {
   const shopId = useSelector(shopIdSelector);
+  const navigate = useNavigate();
 
   const [isActiveGhnForm, setIsActiveGhnForm] = useState<boolean>(false);
   const [orderMeataData, setCreateOrderMetadata] = useState<IOrderMetadata>();
-
 
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id) ? true : false;
@@ -37,8 +37,9 @@ const CreateOrderPage = () => {
   }, []);
 
   return (
-    <Card className="my-card-containter" title={isEdit ? "Cập nhật đơn hàng": "Tạo đơn hàng"}>
+    <Card className="my-card-containter" title={isEdit ? 'Cập nhật đơn hàng' : 'Tạo đơn hàng'}>
       <Col span={24}>
+        {isEdit && <Button onClick={()=> navigate(-1)} type='primary'>Quay lại</Button>}
         <GHN_CreateOrderForm
           isActivated={isActiveGhnForm}
           deliveryPricePlanes={orderMeataData?.deliveryPricePlanes}
