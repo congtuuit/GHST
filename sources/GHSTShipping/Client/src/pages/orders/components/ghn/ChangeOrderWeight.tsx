@@ -6,13 +6,14 @@ import { debounce } from '@/utils/common';
 import { request } from '@/api/base/request';
 
 interface ChangeOrderWeightProps {
+  token: number;
   order?: IOrderViewDto;
   open: boolean;
   onSubmit?: (order: IOrderViewDto | undefined, values: { newLength: number; newWidth: number; newHeight: number }) => void;
   onCancel: () => void;
 }
 
-const ChangeOrderWeight: React.FC<ChangeOrderWeightProps> = ({ order, onSubmit, open, onCancel }) => {
+const ChangeOrderWeight: React.FC<ChangeOrderWeightProps> = ({ token, order, onSubmit, open, onCancel }) => {
   const [convertedWeight, setConvertedWeight] = useState<number>();
   const [calcWeight, setCalcWeight] = useState<number>();
   const [shippingCost, setShippingCost] = useState<number>();
@@ -32,7 +33,6 @@ const ChangeOrderWeight: React.FC<ChangeOrderWeightProps> = ({ order, onSubmit, 
 
   const calApiCalc = async () => {
     const values = form.getFieldsValue();
-    console.log('values ', values);
     if (Boolean(order)) {
       const editOrder = order as IOrderViewDto;
       const payload = {
@@ -65,7 +65,7 @@ const ChangeOrderWeight: React.FC<ChangeOrderWeightProps> = ({ order, onSubmit, 
       setCalcWeight(calcWeight);
       setShippingCost(deliveryFee);
     }
-  }, [order?.id]);
+  }, [order?.id, token]);
 
   return (
     <Modal centered title={`Đơn hàng #${order?.id}`} open={open} onOk={handleOk} onCancel={onCancel} destroyOnClose>

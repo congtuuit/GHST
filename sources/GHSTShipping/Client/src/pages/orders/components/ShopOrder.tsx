@@ -68,6 +68,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
   const [reloadTable, setReloadTable] = useState(false);
   const [searchOrderCodes, setSearchOrderCodes] = useState<string>('');
   const [selectedOrders, setSelectedOrders] = useState<IOrderViewDto[]>([]);
+  const [formToken, setFormToken] = useState(0);
 
   const pageSize = 5;
 
@@ -162,6 +163,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
   const handleChangeOrderWeight = (record: IOrderViewDto) => {
     setUpdateOrder(record);
     setOpenChangeOrderDialog(true);
+    setFormToken(formToken + 1);
   };
 
   const handleSubmitChangeOrderWeight = async (record: IOrderViewDto | undefined, newValues: any) => {
@@ -606,6 +608,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
 
           <OrderDetailDialog data={orderDetail} showSenderAddress={true} />
           <ChangeOrderWeight
+            token={formToken}
             order={updateOrder}
             open={openChangeOrderDialog}
             onCancel={() => setOpenChangeOrderDialog(false)}
