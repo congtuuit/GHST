@@ -36,6 +36,7 @@ const CustomerTable = () => {
   const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>();
   const [reloadTable, setReloadTable] = useState<boolean>(false);
   const [customerDetail, setCustomerDetail] = useState<IShopViewDetailDto>();
+  const [currentShopId, setCurrentShopId] = useState('');
 
   const fetchShops = async (pageNumber: number | undefined = 1, pageSize: number | undefined = 10) => {
     const { success, data } = await apiGetShops(pageNumber, pageSize);
@@ -60,7 +61,13 @@ const CustomerTable = () => {
       width: 120,
       render: (value: string, record: ShopDatatableDto) => {
         return (
-          <Button type="link" onClick={() => handleViewDetail(record.id)}>
+          <Button
+            type="link"
+            onClick={() => {
+              setCurrentShopId(record.id);
+              handleViewDetail(record.id);
+            }}
+          >
             {value}
           </Button>
         );
@@ -221,7 +228,7 @@ const CustomerTable = () => {
         }}
         onChange={handleChangeTable}
       />
-      <CustomerDetail data={customerDetail} onChange={handleChangeAllowPublishOrder} />
+      <CustomerDetail data={customerDetail} onChange={handleChangeAllowPublishOrder} callback={() => handleViewDetail(currentShopId)} />
     </Row>
   );
 };

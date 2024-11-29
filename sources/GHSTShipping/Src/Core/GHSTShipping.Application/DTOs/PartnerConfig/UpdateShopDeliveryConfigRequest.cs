@@ -8,9 +8,9 @@ namespace GHSTShipping.Application.DTOs.PartnerConfig
 
         public Guid DeliveryConfigId { get; set; }
 
-        public string? PartnerShopId { get; set; }
-
         public bool IsConnect { get; set; }
+
+        public string? PartnerShopId { get; set; }
 
         public string? ClientPhone { get; set; }
 

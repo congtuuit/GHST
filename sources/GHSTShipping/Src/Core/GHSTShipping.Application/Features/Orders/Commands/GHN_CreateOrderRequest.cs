@@ -6,6 +6,7 @@ using GHSTShipping.Application.Features.Configs.Queries;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Application.Wrappers;
+using GHSTShipping.Domain.DTOs;
 using GHSTShipping.Domain.Entities;
 using GHSTShipping.Domain.Enums;
 using MediatR;
@@ -97,15 +98,13 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 ShopId = shop.Id,
             });
 
-            if (shopDeliveryPricePlanes.Success)
+            if (!shopDeliveryPricePlanes.Success)
             {
-                var validPricePlane = shopDeliveryPricePlanes.Data.FirstOrDefault(i => i.Id == request.DeliveryPricePlaneId);
-                if (validPricePlane == null)
-                {
-                    return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.AccessDenied, "Bảng giá không hợp lệ, vui lòng kiểm tra lại!"));
-                }
+                return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.AccessDenied, "Bảng giá không hợp lệ, vui lòng kiểm tra lại!"));
             }
-            else
+
+            ShopDeliveryPricePlaneDto validPricePlane = shopDeliveryPricePlanes.Data.FirstOrDefault(i => i.Id == request.DeliveryPricePlaneId);
+            if (validPricePlane == null)
             {
                 return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.AccessDenied, "Bảng giá không hợp lệ, vui lòng kiểm tra lại!"));
             }
@@ -116,8 +115,13 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.NotFound, "Cấu hình vận chuyển không tồn tại."));
             }
 
-            var apiConfig = new ApiConfig(deliveryConfig.PartnerConfig.ProdEnv, deliveryConfig.PartnerConfig.ApiKey);
-            var response = await ProcessOrderAsync(shop, deliveryConfig, apiConfig, request);
+            var apiConfig = new ApiConfig(
+                deliveryConfig.PartnerConfig.ProdEnv,
+                deliveryConfig.PartnerConfig.ApiKey,
+                validPricePlane.PartnerShopId
+            );
+
+            var response = await ProcessOrderAsync(shop, deliveryConfig, validPricePlane, apiConfig, request);
 
             return response;
         }
@@ -133,6 +137,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         private async Task<BaseResult<CreateDeliveryOrderResponse>> ProcessOrderAsync(
             ShopQueryDto shop,
             DeliveryConfigDto deliveryConfig,
+            ShopDeliveryPricePlaneDto shopDeliveryPricePlaneDto,
             ApiConfig apiConfig,
             GHN_CreateOrderRequest request)
         {
@@ -149,31 +154,31 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 if (shop.AllowUsePartnerShopAddress)
                 {
                     int? _fromWardId = null;
-                    string stringNumber = deliveryConfig.WardCode;
+                    string stringNumber = shopDeliveryPricePlaneDto.WardCode;
                     if (int.TryParse(stringNumber, out int __fromWardId))
                     {
                         _fromWardId = __fromWardId;
                     }
-                    request.FromName = deliveryConfig.ShopName;
-                    request.FromPhone = deliveryConfig.ClientPhone;
+                    request.FromName = shopDeliveryPricePlaneDto.ShopName;
+                    request.FromPhone = shopDeliveryPricePlaneDto.ClientPhone;
                     request.FromWardId = _fromWardId;
-                    request.FromWardName = deliveryConfig.WardName;
-                    request.FromDistrictId = int.Parse(deliveryConfig.DistrictId);
-                    request.FromDistrictName = deliveryConfig.DistrictName;
-                    request.FromProvinceId = int.Parse(deliveryConfig.ProvinceId);
-                    request.FromProvinceName = deliveryConfig.ProvinceName;
+                    request.FromWardName = shopDeliveryPricePlaneDto.WardName;
+                    request.FromDistrictId = int.Parse(shopDeliveryPricePlaneDto.DistrictId);
+                    request.FromDistrictName = shopDeliveryPricePlaneDto.DistrictName;
+                    request.FromProvinceId = int.Parse(shopDeliveryPricePlaneDto.ProvinceId);
+                    request.FromProvinceName = shopDeliveryPricePlaneDto.ProvinceName;
                 }
 
-                var previewOrder = await _ghnApiClient.CreateDraftDeliveryOrderAsync(apiConfig, deliveryConfig.PartnerShopId, request);
+                var previewOrder = await _ghnApiClient.CreateDraftDeliveryOrderAsync(apiConfig, shopDeliveryPricePlaneDto.PartnerShopId, request);
                 if (previewOrder.Code != 200)
                 {
                     return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.Exception, $"{previewOrder.CodeMessageValue} {previewOrder.Message}"));
                 }
 
-                var (orderCode, orderId) = await SaveOrderAsync(request, shop, deliveryConfig.PartnerShopId);
+                var (orderCode, orderId) = await SaveOrderAsync(request, shop, shopDeliveryPricePlaneDto.PartnerShopId);
                 if (shop.AllowPublishOrder)
                 {
-                    var createOrder = await _ghnApiClient.CreateDeliveryOrderAsync(apiConfig, deliveryConfig.PartnerShopId, request);
+                    var createOrder = await _ghnApiClient.CreateDeliveryOrderAsync(apiConfig, shopDeliveryPricePlaneDto.PartnerShopId, request);
                     if (createOrder.Code == 200)
                     {
                         await UpdateOrderAsync(createOrder.Data, orderId);
@@ -473,17 +478,17 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         {
             public Guid ShopId { get; set; }
             public Guid PartnerConfigId { get; set; }
-            public string PartnerShopId { get; set; }
+            //public string PartnerShopId { get; set; }
 
-            public string ClientPhone { get; set; }
-            public string? Address { get; set; }
-            public string? WardName { get; set; }
-            public string? WardCode { get; set; }
-            public string? DistrictName { get; set; }
-            public string? DistrictId { get; set; }
-            public string? ProvinceName { get; set; }
-            public string? ProvinceId { get; set; }
-            public string ShopName { get; set; }
+            //public string ClientPhone { get; set; }
+            //public string? Address { get; set; }
+            //public string? WardName { get; set; }
+            //public string? WardCode { get; set; }
+            //public string? DistrictName { get; set; }
+            //public string? DistrictId { get; set; }
+            //public string? ProvinceName { get; set; }
+            //public string? ProvinceId { get; set; }
+            //public string ShopName { get; set; }
 
             public PartnerConfigDto PartnerConfig { get; set; }
         }
@@ -503,7 +508,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                {
                    ShopId = i.ShopId,
                    PartnerConfigId = i.PartnerConfigId,
-                   PartnerShopId = i.PartnerShopId,
+                   /*PartnerShopId = i.PartnerShopId,
                    ClientPhone = i.ClientPhone,
                    Address = i.Address,
                    WardCode = i.WardCode,
@@ -512,7 +517,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                    DistrictName = i.DistrictName,
                    ProvinceId = i.ProvinceId,
                    ProvinceName = i.ProvinceName,
-                   ShopName = i.ShopName,
+                   ShopName = i.ShopName,*/
                    PartnerConfig = new PartnerConfigDto
                    {
                        ApiKey = i.PartnerConfig.ApiKey,

@@ -1,18 +1,20 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Table, Button, Modal, Space, message, Select } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { request } from '@/api/base/request';
 import NumberFormatter from '@/components/core/NumberFormatter';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { DeliveryPricePlaneFormDto } from '@/interface/shop';
+import { DeleteOutlined } from '@ant-design/icons';
+import { DeliveryPricePlaneFormDto, IGhnShopDetailDto } from '@/interface/shop';
 const { confirm } = Modal;
 
 interface ShopDeliveryPricePlaneProps {
   shopId: string | undefined;
+  ghnShopDetails?: { [id: string]: IGhnShopDetailDto[] };
+  partnerConfigId: string;
 }
 
 const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
-  const { shopId } = props;
+  const { shopId, ghnShopDetails, partnerConfigId = '' } = props;
 
   const formRef = useRef<any>();
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,9 @@ const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
   const [shopPricePlanes, setShopPricePlanes] = useState<DeliveryPricePlaneFormDto[]>([]);
 
   const [selectedPricePlaneId, setSelectedPricePlaneId] = useState<string>('');
+  const [selectedPartnerShopId, setSelectedPartnerShopId] = useState<string>('');
+
+  const ghnShops = useMemo(() => ghnShopDetails?.[partnerConfigId] || [], [ghnShopDetails, partnerConfigId]);
 
   // Fetch danh sách DeliveryPricePlanes
   const fetchDeliveryPricePlanes = async () => {
@@ -85,10 +90,22 @@ const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
     setSelectedPricePlaneId(value);
   };
 
+  const handleSelectShopChange = (value: any) => {
+    setSelectedPartnerShopId(value);
+  };
+
   const handleAssignDeliveryPricePlaneToShop = async () => {
+    const partnerShop: IGhnShopDetailDto | undefined = ghnShops.find(i => i.id === selectedPartnerShopId);
     const req = {
       shopId: shopId,
-      deliveryPricePlaneIds: [selectedPricePlaneId],
+      deliveryPricePlaneId: selectedPricePlaneId,
+      deliveryConfigId: partnerConfigId,
+      partnerShopId: selectedPartnerShopId,
+      clientPhone: partnerShop?.phone,
+      address: partnerShop?.address,
+      wardName: partnerShop?.wardName,
+      districtName: partnerShop?.districtName,
+      provineName: partnerShop?.provineName,
     };
 
     const response = await request('post', '/DeliveryPricePlane/Assign', req);
@@ -100,6 +117,10 @@ const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
   };
 
   // Gọi fetchDeliveryPricePlanes khi page load
+  useEffect(() => {
+    fetchDeliveryPricePlanes();
+  }, [partnerConfigId, ghnShopDetails]);
+
   useEffect(() => {
     fetchDeliveryPricePlanes();
   }, []);
@@ -134,6 +155,12 @@ const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
 
   // Định nghĩa các cột cho bảng
   const columns: ColumnsType<DeliveryPricePlaneFormDto> = [
+    {
+      title: "Mã shop",
+      dataIndex: 'partnerShopId',
+      key: 'partnerShopId',
+      width: 120
+    },
     {
       title: 'Tên Bảng Giá',
       dataIndex: 'name',
@@ -184,7 +211,7 @@ const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
       title: 'Bước nhảy',
       dataIndex: 'step',
       key: 'step',
-      width: '300px',
+      width: 200,
       render: (value: number, record: DeliveryPricePlaneFormDto) => {
         return (
           <div>
@@ -216,11 +243,22 @@ const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
   return (
     <div>
       <Space style={{ marginBottom: 16 }}>
+        {ghnShops.length > 0 && (
+          <Select key={'shop'} showSearch placeholder="Chọn shop" style={{ width: '300px' }} onChange={handleSelectShopChange}>
+            {ghnShops.map(shop => (
+              <Select.Option key={shop.id} value={shop.id}>
+                {shop.displayName}
+              </Select.Option>
+            ))}
+          </Select>
+        )}
+
         <Select
-          onChange={handleSelectChange}
+          key={'price'}
+          showSearch
           placeholder="Chọn bảng giá..."
+          onChange={handleSelectChange}
           style={{ width: '300px' }}
-          value={selectedPricePlaneId}
           options={remainPricePlanes?.map(i => {
             return {
               value: i.id,

@@ -65,7 +65,18 @@ namespace GHSTShipping.Application.Features.Configs.Queries
                     ReturnFeeRate = i.ReturnFeeRate,
                     ConvertWeightRate = i.ConvertWeightRate,
 
-                    ParentId = i.RelatedToDeliveryPricePlaneId
+                    PartnerShopId = i.PartnerShopId,
+                    ParentId = i.RelatedToDeliveryPricePlaneId,
+
+                    ClientPhone = i.ClientPhone,
+                    Address = i.Address,
+                    WardName = i.WardName,
+                    WardCode = i.WardCode,
+                    DistrictName = i.DistrictName,
+                    DistrictId = i.DistrictId,
+                    ProvinceName = i.ProvinceName,
+                    ProvinceId = i.ProvinceId,
+                    ShopName = i.ShopName
                 })
                 .ToListAsync(cancellationToken);
 

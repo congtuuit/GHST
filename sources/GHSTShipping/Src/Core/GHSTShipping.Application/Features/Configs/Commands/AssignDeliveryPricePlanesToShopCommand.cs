@@ -1,6 +1,9 @@
-﻿using GHSTShipping.Application.Interfaces;
+﻿using Delivery.GHN.Models;
+using Delivery.GHN;
+using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
 using GHSTShipping.Domain.Entities;
+using GHSTShipping.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,49 +17,134 @@ namespace GHSTShipping.Application.Features.Configs.Commands
     public class AssignDeliveryPricePlanesToShopCommand : IRequest<bool>
     {
         public Guid ShopId { get; set; }
-        public List<Guid> DeliveryPricePlaneIds { get; set; }
 
-        public AssignDeliveryPricePlanesToShopCommand(Guid shopId, List<Guid> deliveryPricePlaneIds)
-        {
-            ShopId = shopId;
-            DeliveryPricePlaneIds = deliveryPricePlaneIds;
-        }
+        public Guid DeliveryPricePlaneId { get; set; }
+
+        public Guid DeliveryConfigId { get; set; }
+
+        public string PartnerShopId { get; set; }
+
+        public string ClientPhone { get; set; }
+
+        public string Address { get; set; }
+
+        public string WardName { get; set; }
+
+        public string DistrictName { get; set; }
+
+        public string ProvineName { get; set; }
     }
 
     public class AssignDeliveryPricePlanesToShopHandler : IRequestHandler<AssignDeliveryPricePlanesToShopCommand, bool>
     {
         private readonly IDeliveryPricePlaneRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPartnerConfigRepository _partnerConfigRepository;
+        private readonly IGhnApiClient _ghnApiClient;
 
-        public AssignDeliveryPricePlanesToShopHandler(IDeliveryPricePlaneRepository repository, IUnitOfWork unitOfWork)
+        public AssignDeliveryPricePlanesToShopHandler(
+            IDeliveryPricePlaneRepository repository,
+            IPartnerConfigRepository partnerConfigRepository,
+            IGhnApiClient ghnApiClient,
+            IUnitOfWork unitOfWork)
         {
             _repository = repository;
+            _partnerConfigRepository = partnerConfigRepository;
+            _ghnApiClient = ghnApiClient;
             _unitOfWork = unitOfWork;
         }
 
         public async Task<bool> Handle(AssignDeliveryPricePlanesToShopCommand request, CancellationToken cancellationToken)
         {
-            var deliveryPricePlanes = await _repository
-                .Where(i => request.DeliveryPricePlaneIds.Contains(i.Id))
+            var deliveryPricePlaneId = await _repository
+                .Where(i => request.DeliveryPricePlaneId == i.Id)
                 .Select(i => i.Id)
-                .ToListAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (deliveryPricePlanes == null || !deliveryPricePlanes.Any())
+            if (deliveryPricePlaneId == Guid.Empty)
             {
                 throw new KeyNotFoundException("No DeliveryPricePlanes found with the provided Ids.");
             }
 
-            var shopPricePlances = new List<DeliveryPricePlane>();
-            foreach (var planeId in deliveryPricePlanes)
+            string address = request.Address;
+            string wardName = request.WardName;
+            string wardId = string.Empty;
+            string districtName = request.DistrictName;
+            string districtId = string.Empty;
+            string provinceName = request.ProvineName;
+            string provinceId = string.Empty;
+            string shopName = string.Empty;
+
+            if (request.PartnerShopId != null)
             {
-                shopPricePlances.Add(new DeliveryPricePlane()
+                var partnerConfig = await _partnerConfigRepository.Where(i => i.Id == request.DeliveryConfigId).Select(i => new
                 {
-                    ShopId = request.ShopId,
-                    RelatedToDeliveryPricePlaneId = planeId,
-                });
+                    i.DeliveryPartner,
+                    i.ApiKey,
+                    i.ProdEnv,
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
+                if (partnerConfig != null && partnerConfig.DeliveryPartner == EnumDeliveryPartner.GHN)
+                {
+                    var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey);
+                    var shopsResult = await _ghnApiClient.GetAllShopsAsync(apiConfig, new GetAllShopsRequest
+                    {
+                        offset = 1,
+                        limit = 200,
+                        client_phone = request.ClientPhone,
+                    });
+
+                    if (shopsResult.Code == 200)
+                    {
+                        var shops = shopsResult.Data.shops;
+                        var targetShop = shops.FirstOrDefault(i => i._id.ToString() == request.PartnerShopId);
+                        if (targetShop != null)
+                        {
+                            address = targetShop.address;
+                            shopName = targetShop.name;
+
+                            var districts = await _ghnApiClient.GetDistrictAsync(apiConfig);
+                            var targetDisctrict = districts.FirstOrDefault(i => i.DistrictID == targetShop.district_id);
+                            if (targetDisctrict != null)
+                            {
+                                provinceName = targetDisctrict.ProvinceName;
+                                provinceId = targetDisctrict.ProvinceID.ToString();
+                                districtName = targetDisctrict.DistrictName;
+                                districtId = targetDisctrict.DistrictID.ToString();
+                            }
+
+                            var wards = await _ghnApiClient.GetWardAsync(apiConfig, targetDisctrict.DistrictID);
+                            var targetWard = wards.FirstOrDefault(i => i.WardCode == targetShop.ward_code);
+                            if (targetWard != null)
+                            {
+                                wardId = targetWard.WardCode;
+                                wardName = targetWard.WardName;
+                            }
+                        }
+                    }
+                }
             }
 
-            await _repository.AddRangeAsync(shopPricePlances);
+            var shopPricePlance = new DeliveryPricePlane()
+            {
+                ShopId = request.ShopId,
+                RelatedToDeliveryPricePlaneId = deliveryPricePlaneId,
+                PartnerShopId = request.PartnerShopId,
+                PartnerConfigId = request.DeliveryConfigId,
+                ClientPhone = request.ClientPhone,
+                ShopName = shopName,
+
+                Address = address,
+                WardName = wardName,
+                WardCode = wardId,
+                DistrictName = districtName,
+                DistrictId = districtId,
+                ProvinceName = provinceName,
+                ProvinceId = provinceId,
+            };
+
+            await _repository.AddAsync(shopPricePlance);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return true;

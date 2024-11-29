@@ -54,5 +54,42 @@ namespace GHSTShipping.Domain.Entities
 
         public bool IsActivated { get; set; }
 
+        #region Partner shop config
+
+        public Guid PartnerConfigId { get; set; }
+
+        [MaxLength(100)]
+        public string? PartnerShopId { get; set; }
+
+        [MaxLength(100)]
+        public string? ClientPhone { get; set; }
+
+        [MaxLength(500)]
+
+        public string? Address { get; set; }
+
+        [MaxLength(100)]
+        public string? WardName { get; set; }
+
+        [MaxLength(100)]
+        public string? WardCode { get; set; }
+
+        [MaxLength(100)]
+        public string? DistrictName { get; set; }
+
+        [MaxLength(100)]
+        public string? DistrictId { get; set; }
+
+        [MaxLength(100)]
+        public string? ProvinceName { get; set; }
+
+        [MaxLength(100)]
+        public string? ProvinceId { get; set; }
+
+        [MaxLength(100)]
+        public string ShopName { get; set; }
+
+        #endregion
+
     }
 }

@@ -10,13 +10,15 @@ import ShopDeliveryPricePlane from '../customer-price/ShopDeliveryPricePlane';
 interface CustomerDetailProps {
   data: IShopViewDetailDto | undefined;
   onChange: (id: IChangeOperationConfig) => void;
+  callback?: () => void;
 }
 
-const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
+const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange, callback }) => {
   const [detail, setDetail] = useState<IShopViewDetailDto | undefined>(data);
   const [open, setOpen] = useState(false);
   const [totalConnected, setTotalConnected] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<string>('SHOP_INFO');
+  const [partnerConfigId, setPartnerConfigId] = useState('');
 
   const showModal = () => {
     setActiveTab('SHOP_INFO');
@@ -45,8 +47,16 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
     if (Boolean(detail)) {
       showModal();
       setTotalConnected(detail?.shopConfigs?.length ?? 0);
+      if (detail?.shopConfigs && detail?.shopConfigs.length > 0) {
+        const _partnerConfigId = detail?.shopConfigs[0]?.partnerConfigId;
+        setPartnerConfigId(_partnerConfigId);
+      }
     }
   }, [detail]);
+
+  useEffect(() => {
+    setPartnerConfigId('');
+  }, []);
 
   return (
     <Modal
@@ -87,18 +97,24 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange }) => {
               </span>
             ),
             children: (
-              <ShopConfig shopId={detail?.id} partners={detail?.partners} ghnShopDetails={detail?.ghnShopDetails} shopConfigs={detail?.shopConfigs} />
+              <ShopConfig
+                callback={callback}
+                shopId={detail?.id}
+                partners={detail?.partners}
+                ghnShopDetails={detail?.ghnShopDetails}
+                shopConfigs={detail?.shopConfigs}
+              />
             ),
           },
           {
-            disabled: !detail?.isVerified,
             key: 'SHOP_DELIVERY_PRICE_PLANE',
             label: (
               <span>
                 <SettingOutlined /> Bảng giá
               </span>
             ),
-            children: <ShopDeliveryPricePlane shopId={detail?.id} />,
+            disabled: !detail?.isVerified || !Boolean(partnerConfigId),
+            children: <ShopDeliveryPricePlane ghnShopDetails={detail?.ghnShopDetails} partnerConfigId={partnerConfigId} shopId={detail?.id} />,
           },
         ]}
         onChange={handleTabChange}

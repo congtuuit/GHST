@@ -217,7 +217,7 @@ namespace GHSTShipping.Application.Services
             string provinceId = string.Empty;
             string shopName = string.Empty;
 
-            if (request.PartnerShopId != null)
+            if (!string.IsNullOrWhiteSpace(request.PartnerShopId))
             {
                 var partnerConfig = await partnerConfigRepository.Where(i => i.Id == request.DeliveryConfigId).Select(i => new
                 {
@@ -292,8 +292,10 @@ namespace GHSTShipping.Application.Services
                 if (existedConfig.Any())
                 {
                     var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}'";
-                    //var sqlQuery = $@"DELETE FROM ShopPartnerConfig WHERE ShopId = '{request.ShopId}' AND PartnerConfigId = '{request.DeliveryConfigId}'";
-                    await shopPartnerConfigRepository.ExecuteSqlRawAsync(sqlQuery);
+                    await unitOfWork.ExecuteSqlRawAsync(sqlQuery);
+
+                    var sqlQueryDeliveryPricePlane = $@"DELETE FROM DeliveryPricePlane WHERE ShopId = '{request.ShopId}'";
+                    await unitOfWork.ExecuteSqlRawAsync(sqlQueryDeliveryPricePlane);
 
                     // Remove all order and order item related to shop
                     var shopOrders = await orderRepository

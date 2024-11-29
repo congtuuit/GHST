@@ -26,12 +26,15 @@ export interface IShopViewDetailDto {
 }
 
 export interface IGhnShopDetailDto {
-  id: number;
+  id: string;
   name: string;
   displayName: string;
   phone: string;
   address: string;
   wardCode: string;
+  wardName: string;
+  districtName: string;
+  provineName: string;
   districtId: string;
 }
 

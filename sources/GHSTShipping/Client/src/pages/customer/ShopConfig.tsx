@@ -10,6 +10,7 @@ interface ShopInfoProps {
   partners?: IDeliveryParter[];
   ghnShopDetails?: { [id: string]: IGhnShopDetailDto[] };
   shopConfigs?: IShopConfig[];
+  callback?: () => void;
 }
 
 interface PartnerConnectionProps {
@@ -111,7 +112,7 @@ const PartnerConnection: React.FC<PartnerConnectionProps> = ({ partner, shopId, 
   );
 };
 
-const ShopConfig: React.FC<ShopInfoProps> = ({ shopId, partners, ghnShopDetails, shopConfigs }) => {
+const ShopConfig: React.FC<ShopInfoProps> = ({ shopId, partners, ghnShopDetails, shopConfigs, callback }) => {
   const [currentShopConfigs, setCurrentShopConfigs] = useState(shopConfigs);
 
   const fetchShopDetail = async () => {
@@ -122,11 +123,22 @@ const ShopConfig: React.FC<ShopInfoProps> = ({ shopId, partners, ghnShopDetails,
     }
   };
 
+  useEffect(() => {
+    fetchShopDetail();
+  }, [shopId, partners, ghnShopDetails]);
+
+  useEffect(() => {
+    fetchShopDetail();
+  }, []);
+
   return (
     <Row gutter={[10, 10]} style={{ gap: '12px' }} className="shop-config">
       {partners?.map((partner, index) => (
         <PartnerConnection
-          onChange={fetchShopDetail}
+          onChange={() => {
+            fetchShopDetail();
+            callback && callback();
+          }}
           key={index}
           partner={partner}
           shopId={shopId}
