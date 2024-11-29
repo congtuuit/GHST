@@ -41,9 +41,9 @@ export interface IGhnShopDetailDto {
 export interface IUpdateShopDeliveryConfigRequest {
   shopId?: string;
   deliveryConfigId: string;
-  partnerShopId: string;
+  //partnerShopId: string;
   isConnect: boolean;
-  clientPhone: string;
+  //clientPhone: string;
 }
 
 export interface IShopConfig {

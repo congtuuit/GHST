@@ -1,5 +1,5 @@
 import type { IDeliveryParter, IGhnShopDetailDto, IShopConfig, IUpdateShopDeliveryConfigRequest } from '@/interface/shop';
-import { Button, Card, Col, Row, Select, message } from 'antd';
+import { Button, Card, Col, Row, Select, Tag, message } from 'antd';
 import { ApiOutlined, DisconnectOutlined } from '@ant-design/icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { apiGetShopDetail, apiUpdateShopDeliveryConfig } from '@/api/business.api';
@@ -37,18 +37,18 @@ const PartnerConnection: React.FC<PartnerConnectionProps> = ({ partner, shopId, 
   }, [partner.partnerConfigId, shopConfigs]);
 
   const updateConnection = async (isConnect: boolean) => {
-    if (partner.partnerName === DeliveryParterName.GHN && !ghnShopId && isConnect) {
-      message.error('Vui lòng chọn cửa hàng vận chuyển cần kết nối');
-      return;
-    }
+    // if (partner.partnerName === DeliveryParterName.GHN && !ghnShopId && isConnect) {
+    //   message.error('Vui lòng chọn cửa hàng vận chuyển cần kết nối');
+    //   return;
+    // }
 
     setIsLoading(true);
     const payload: IUpdateShopDeliveryConfigRequest = {
       shopId,
       deliveryConfigId: partner.partnerConfigId,
-      partnerShopId: ghnShopId.toString(),
+      //partnerShopId: ghnShopId.toString(),
       isConnect,
-      clientPhone,
+      //clientPhone,
     };
     const response = await apiUpdateShopDeliveryConfig(payload);
     if (response.success) {
@@ -73,9 +73,11 @@ const PartnerConnection: React.FC<PartnerConnectionProps> = ({ partner, shopId, 
     <Card style={{ width: '350px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }} className={isConnected ? 'connected' : ``}>
       <Row gutter={10}>
         <Col span={24}>
-          <span>Đơn vị vận chuyển: {partner.partnerName}</span>
+          <div>Đơn vị vận chuyển: <Tag color='cyan'>{partner.partnerName}</Tag></div>
+          <div>Tài khoản: <b>{partner.partnerAccountName}</b></div>
         </Col>
-        <Col span={24}>
+
+        {/* <Col span={24}>
           <span>Tài khoản: {partner.partnerAccountName}</span>
         </Col>
         <Col span={24}>
@@ -95,7 +97,8 @@ const PartnerConnection: React.FC<PartnerConnectionProps> = ({ partner, shopId, 
               ))}
             </Select>
           )}
-        </Col>
+        </Col> */}
+
         <Col span={24} style={{ marginTop: 20 }}>
           {isConnected ? (
             <Button type="primary" loading={isLoading} onClick={() => updateConnection(false)}>
