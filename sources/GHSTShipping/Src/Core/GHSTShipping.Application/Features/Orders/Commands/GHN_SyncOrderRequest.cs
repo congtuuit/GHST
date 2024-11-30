@@ -1,5 +1,6 @@
 ﻿using Delivery.GHN;
 using Delivery.GHN.Models;
+using GHSTShipping.Application.Features.Orders.Queries;
 using GHSTShipping.Application.Helpers;
 using GHSTShipping.Application.Interfaces;
 using GHSTShipping.Application.Interfaces.Repositories;
@@ -34,19 +35,84 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
         public async Task<BaseResult> Handle(GHN_SyncOrderRequest request, CancellationToken cancellationToken)
         {
-            var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, request.ShopId);
-            var ghnOrdersResponse = await ghnApiClient.SearchOrdersAsync(apiConfig, new Delivery.GHN.Models.ShippingOrderSearchRequest
+            try
             {
-                ShopId = int.Parse(apiConfig.ShopId),
-                OptionValue = request.PartnerOrderCode
-            });
+                // Lấy danh sách cấu hình API cho ShopId
+                var apiConfigs = await OrderUtils.GetApiConfigsByShopIdAsync(unitOfWork, request.ShopId, EnumDeliveryPartner.GHN);
 
-            var shopUniqueCode = await shopRepository.Where(i => i.Id == request.ShopId)
+                if (apiConfigs == null || !apiConfigs.Any())
+                {
+                    throw new InvalidOperationException($"Không tìm thấy cấu hình API nào cho ShopId '{request.ShopId}'.");
+                }
+
+                // Lấy mã duy nhất của shop
+                var shopUniqueCode = await shopRepository
+                    .Where(i => i.Id == request.ShopId)
                     .Select(i => i.UniqueCode)
                     .FirstOrDefaultAsync(cancellationToken);
 
-            var (orders, orderItems) = await ListOrderMappingAsync(ghnOrdersResponse, request.ShopId, shopUniqueCode, apiConfig, ghnApiClient);
-            await BatchSaveAsync(unitOfWork, orders, orderItems);
+                if (string.IsNullOrEmpty(shopUniqueCode))
+                {
+                    throw new InvalidOperationException($"ShopId '{request.ShopId}' không có mã duy nhất hợp lệ.");
+                }
+
+                // Danh sách để lưu kết quả đồng bộ
+                var allOrders = new List<Order>();
+                var allOrderItems = new List<OrderItem>();
+
+                foreach (var apiConfig in apiConfigs)
+                {
+                    if (!int.TryParse(apiConfig.ShopId, out int parsedShopId))
+                    {
+                        Console.WriteLine($"Bỏ qua apiConfig vì ShopId '{apiConfig.ShopId}' không hợp lệ.");
+                        continue; // Bỏ qua cấu hình này
+                    }
+
+                    try
+                    {
+                        // Gửi yêu cầu tìm kiếm đơn hàng qua GHN API
+                        var ghnOrdersResponse = await ghnApiClient.SearchOrdersAsync(apiConfig, new Delivery.GHN.Models.ShippingOrderSearchRequest
+                        {
+                            ShopId = parsedShopId,
+                            OptionValue = request.PartnerOrderCode
+                        });
+
+                        if (ghnOrdersResponse == null || ghnOrdersResponse.Data.Count == 0)
+                        {
+                            Console.WriteLine($"Không nhận được phản hồi hợp lệ từ GHN API với ShopId '{apiConfig.ShopId}'.");
+                            continue; // Bỏ qua nếu không có kết quả
+                        }
+
+                        // Mapping dữ liệu từ API
+                        var (orders, orderItems) = await ListOrderMappingAsync(ghnOrdersResponse, request.ShopId, shopUniqueCode, apiConfig, ghnApiClient);
+
+                        // Thêm vào danh sách kết quả
+                        allOrders.AddRange(orders);
+                        allOrderItems.AddRange(orderItems);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Lỗi khi xử lý apiConfig với ShopId '{apiConfig.ShopId}': {ex.Message}");
+                    }
+                }
+
+                // Lưu toàn bộ dữ liệu đồng bộ
+                if (allOrders.Any() && allOrderItems.Any())
+                {
+                    await BatchSaveAsync(unitOfWork, allOrders, allOrderItems);
+                    Console.WriteLine("Đồng bộ thành công.");
+                }
+                else
+                {
+                    Console.WriteLine("Không có dữ liệu nào để đồng bộ.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi hoặc ghi log
+                Console.Error.WriteLine($"Lỗi xảy ra: {ex.Message}");
+                throw;
+            }
 
             return BaseResult.Ok();
         }

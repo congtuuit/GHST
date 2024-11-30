@@ -21,6 +21,8 @@ namespace GHSTShipping.Domain.DTOs
 
 
         //
+        public string ApiKey { get; set; }
+        public string ProdEnv { get; set; }
         public string PartnerShopId { get; set; }
         public string ClientPhone { get; set; }
         public string? Address { get; set; }

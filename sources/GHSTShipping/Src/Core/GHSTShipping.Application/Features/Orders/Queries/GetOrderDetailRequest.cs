@@ -8,6 +8,7 @@ using GHSTShipping.Domain.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,6 +45,16 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 .ProjectTo<OrderDetailDto>(mapperConfiguration)
                 .FirstOrDefaultAsync(cancellationToken);
 
+            var orderSyncInfo = await orderRepository
+                .Where(i => i.Id == request.OrderId)
+                .Select(i => new
+                {
+                    i.Id,
+                    i.ApiKey,
+                    i.ProdEnv,
+                    i.PartnerShopId,
+                }).FirstOrDefaultAsync(cancellationToken);
+
             // Early return if the order is not found
             if (order == null)
             {
@@ -69,7 +80,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
             }
 
             // Fetch API config for the delivery partner (GHN)
-            var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, order.ShopId.Value);
+            var apiConfig = new Delivery.GHN.Models.ApiConfig(orderSyncInfo.ProdEnv, orderSyncInfo.ApiKey, orderSyncInfo.PartnerShopId);
 
             // Fetch the delivery order details from GHN
             var apiResult = await ghnApiClient.DetailDeliveryOrderAsync(apiConfig, order.PrivateOrderCode);

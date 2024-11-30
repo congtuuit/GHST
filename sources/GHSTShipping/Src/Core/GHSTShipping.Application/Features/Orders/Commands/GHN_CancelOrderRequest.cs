@@ -75,7 +75,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             {
                 // Get API config to send request to GHN
                 var shopId = orders.First().ShopId;
-                var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, shopId.Value);
+
                 var orderCodes = orders.Where(i => !string.IsNullOrWhiteSpace(i.private_order_code)).Select(i => i.private_order_code).ToList();
                 if (orderCodes.Count > 0)
                 {

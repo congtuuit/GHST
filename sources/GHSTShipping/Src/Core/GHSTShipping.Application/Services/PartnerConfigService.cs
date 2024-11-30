@@ -27,27 +27,26 @@ namespace GHSTShipping.Application.Services
         , IUnitOfWork unitOfWork) : IPartnerConfigService
     {
 
-        public async Task<ApiConfig> GetApiConfigAsync(EnumDeliveryPartner enumDeliveryPartner, Guid shopId)
-        {
-            var partnerConfig = await shopPartnerConfigRepository
-                .Where(i => i.ShopId == shopId && i.PartnerConfig.DeliveryPartner == enumDeliveryPartner)
-                .Select(i => new
-                {
-                    i.PartnerConfig.ProdEnv,
-                    i.PartnerConfig.ApiKey,
-                    i.PartnerShopId
-                })
-                .FirstOrDefaultAsync();
+        //public async Task<ApiConfig> GetApiConfigAsync(EnumDeliveryPartner enumDeliveryPartner, Guid shopId)
+        //{
+        //    var partnerConfig = await shopPartnerConfigRepository
+        //        .Where(i => i.ShopId == shopId && i.PartnerConfig.DeliveryPartner == enumDeliveryPartner)
+        //        .Select(i => new
+        //        {
+        //            i.PartnerConfig.ProdEnv,
+        //            i.PartnerConfig.ApiKey,
+        //        })
+        //        .FirstOrDefaultAsync();
 
-            if (partnerConfig == null)
-            {
-                return null;
-            }
+        //    if (partnerConfig == null)
+        //    {
+        //        return null;
+        //    }
 
-            var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey, partnerConfig.PartnerShopId);
+        //    var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey, partnerConfig.PartnerShopId);
 
-            return apiConfig;
-        }
+        //    return apiConfig;
+        //}
 
         public async Task<PartnerConfigDto> GetPartnerConfigAsync(EnumDeliveryPartner enumDeliveryPartner)
         {

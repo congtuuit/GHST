@@ -94,11 +94,11 @@ namespace GHSTShipping.Application.Features.Shops.Queries
                 shop.ShopConfigs = deliveryConfigs.ToList();
 
                 // Get current GHN shop Id has been connected
-                var ghnConfig = await _partnerConfigService.GetApiConfigAsync(EnumDeliveryPartner.GHN, shop.Id);
+                /*var ghnConfig = await _partnerConfigService.GetApiConfigAsync(EnumDeliveryPartner.GHN, shop.Id);
                 if (ghnConfig != null)
                 {
                     shop.CurrentGhnShopId = ghnConfig.ShopId;
-                }
+                }*/
             }
 
             return BaseResult<ShopViewDetailDto>.Ok(shop);

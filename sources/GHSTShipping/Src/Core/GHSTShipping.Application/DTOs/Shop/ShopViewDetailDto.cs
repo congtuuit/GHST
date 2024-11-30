@@ -26,7 +26,7 @@ namespace GHSTShipping.Application.DTOs.Shop
         public bool AllowUsePartnerShopAddress { get; set; }
 
         public int? GhnShopId { get; set; }
-        public string CurrentGhnShopId { get; set; }
+        //public string CurrentGhnShopId { get; set; }
 
         public string Status
         {

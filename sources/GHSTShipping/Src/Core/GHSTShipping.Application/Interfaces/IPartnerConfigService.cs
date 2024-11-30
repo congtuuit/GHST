@@ -13,7 +13,7 @@ namespace GHSTShipping.Application.Interfaces
 {
     public interface IPartnerConfigService
     {
-        Task<ApiConfig> GetApiConfigAsync(EnumDeliveryPartner enumDeliveryPartner, Guid shopId);
+        //Task<ApiConfig> GetApiConfigAsync(EnumDeliveryPartner enumDeliveryPartner, Guid shopId);
 
         Task<PartnerConfigDto> GetPartnerConfigAsync(EnumDeliveryPartner enumDeliveryPartner);
 

@@ -55,7 +55,8 @@ namespace GHSTShipping.Domain.Entities
         public bool IsActivated { get; set; }
 
         #region Partner shop config
-
+        public string ApiKey { get; set; }
+        public string ProdEnv { get; set; }
         public Guid PartnerConfigId { get; set; }
 
         [MaxLength(100)]

@@ -16,6 +16,16 @@ namespace GHSTShipping.Domain.Entities
         public string PartnerShopId { get; set; }
 
         /// <summary>
+        /// Khi đơn được tạo từ web sẽ có thông tin
+        /// </summary>
+        public string ApiKey { get; set; }
+
+        /// <summary>
+        /// Khi đơn được tạo từ web sẽ có thông tin
+        /// </summary>
+        public string ProdEnv { get; set; }
+
+        /// <summary>
         /// System customer shop id
         /// </summary>
         public Guid? ShopId { get; set; } // NEED TO MAPPING

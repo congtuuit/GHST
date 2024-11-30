@@ -74,6 +74,8 @@ namespace GHSTShipping.Application.Features.Configs.Commands
             string provinceName = request.ProvineName;
             string provinceId = string.Empty;
             string shopName = string.Empty;
+            string apiKey = string.Empty;
+            string prodEnv = string.Empty;
 
             if (request.PartnerShopId != null)
             {
@@ -85,6 +87,12 @@ namespace GHSTShipping.Application.Features.Configs.Commands
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
+                if (partnerConfig != null)
+                {
+                    apiKey = partnerConfig.ApiKey;
+                    prodEnv = partnerConfig.ProdEnv;
+                }
+
                 if (partnerConfig != null && partnerConfig.DeliveryPartner == EnumDeliveryPartner.GHN)
                 {
                     var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey);
@@ -94,6 +102,8 @@ namespace GHSTShipping.Application.Features.Configs.Commands
                         limit = 200,
                         client_phone = request.ClientPhone,
                     });
+
+                    
 
                     if (shopsResult.Code == 200)
                     {
@@ -131,6 +141,8 @@ namespace GHSTShipping.Application.Features.Configs.Commands
                 ShopId = request.ShopId,
                 RelatedToDeliveryPricePlaneId = deliveryPricePlaneId,
                 PartnerShopId = request.PartnerShopId,
+                ApiKey = apiKey,
+                ProdEnv = prodEnv,
                 PartnerConfigId = request.DeliveryConfigId,
                 ClientPhone = request.ClientPhone,
                 ShopName = shopName,

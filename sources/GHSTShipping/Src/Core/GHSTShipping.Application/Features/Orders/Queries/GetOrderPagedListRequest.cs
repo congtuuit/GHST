@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Delivery.GHN;
 using Delivery.GHN.Constants;
+using Delivery.GHN.Models;
 using GHSTShipping.Application.DTOs;
 using GHSTShipping.Application.Extensions;
 using GHSTShipping.Application.Features.Configs.Queries;
@@ -165,7 +166,46 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         private async Task<BaseResult<PaginationResponseDto<OrderDto>>> SyncOrdersFromGHNAsync(
             GetOrderPagedListRequest request, Guid shopId, string shopUniqueCode, int skipCount, CancellationToken cancellationToken)
         {
-            var apiConfig = await partnerConfigService.GetApiConfigAsync(EnumDeliveryPartner.GHN, shopId);
+            var apiConfigs = await OrderUtils.GetApiConfigsByShopIdAsync(unitOfWork, shopId, EnumDeliveryPartner.GHN);
+            if (apiConfigs.Count == 0)
+            {
+                throw new Exception("Partner config not found");
+            }
+
+            List<Order> syncOrders = [];
+            List<OrderItem> syncOrderItems = [];
+            foreach (var apiConfig in apiConfigs)
+            {
+                var (entityOrders, entityOrderItems) = await GHN_HandleSearchOrdersAsync(apiConfig, shopId, shopUniqueCode, request);
+                syncOrders.AddRange(entityOrders);
+                syncOrderItems.AddRange(entityOrderItems);
+            }
+
+            if (syncOrders.Count > 0)
+            {
+                var orderIdsSaved = await GHN_SyncOrderRequestHandler.BatchSaveAsync(unitOfWork, syncOrders, syncOrderItems);
+                var mappedOrders = await unitOfWork.Orders.Where(i => orderIdsSaved.Contains(i.Id))
+                    .ProjectTo<OrderDto>(mapperConfiguration)
+                    .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
+
+                var deliveryPricePlaneIds = mappedOrders.Data
+                   .Where(i => i.DeliveryPricePlaneId.HasValue)
+                   .Select(i => i.DeliveryPricePlaneId.Value)
+                   .ToList();
+
+                var deliveryPricePlanes = await mediator.Send(new GetShopDeliveryPricePlanesRequest
+                {
+                    Ids = deliveryPricePlaneIds
+                });
+
+                return MapPaginationResult(mappedOrders, skipCount, authenticatedUser.IsAdmin, deliveryPricePlanes.Data);
+            }
+
+            return BaseResult<PaginationResponseDto<OrderDto>>.Ok(null);
+        }
+
+        private async Task<(List<Order>, List<OrderItem>)> GHN_HandleSearchOrdersAsync(ApiConfig apiConfig, Guid shopId, string shopUniqueCode, GetOrderPagedListRequest request)
+        {
             var searchParams = new Delivery.GHN.Models.ShippingOrderSearchRequest
             {
                 Status = request.GroupStatus.GetDetails(),
@@ -212,28 +252,7 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 apiConfig,
                 ghnApiClient);
 
-            if (entityOrders.Count > 0)
-            {
-                var orderIdsSaved = await GHN_SyncOrderRequestHandler.BatchSaveAsync(unitOfWork, entityOrders, entityOrderItems);
-
-                var mappedOrders = await unitOfWork.Orders.Where(i => orderIdsSaved.Contains(i.Id))
-                    .ProjectTo<OrderDto>(mapperConfiguration)
-                    .ToPaginationAsync(request.PageNumber, request.PageSize);
-
-                var deliveryPricePlaneIds = mappedOrders.Data
-                   .Where(i => i.DeliveryPricePlaneId.HasValue)
-                   .Select(i => i.DeliveryPricePlaneId.Value)
-                   .ToList();
-
-                var deliveryPricePlanes = await mediator.Send(new GetShopDeliveryPricePlanesRequest
-                {
-                    Ids = deliveryPricePlaneIds
-                });
-
-                return MapPaginationResult(mappedOrders, skipCount, authenticatedUser.IsAdmin, deliveryPricePlanes.Data);
-            }
-
-            return BaseResult<PaginationResponseDto<OrderDto>>.Ok(null);
+            return (entityOrders, entityOrderItems);
         }
 
         private static BaseResult<PaginationResponseDto<OrderDto>> MapPaginationResult(

@@ -37,7 +37,6 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 {
                     Id = i.Id,
                     CurrentStatus = i.CurrentStatus,
-                    PartnerShopId = i.PartnerShopId,
                     ShopId = i.ShopId,
 
                     PickShift = i.PickShift,
@@ -95,6 +94,10 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                         Height = oi.Height,
                         Weight = oi.Weight,
                     }).ToList(),
+
+                    PartnerShopId = i.PartnerShopId,
+                    ProdEnv = i.ProdEnv,
+                    ApiKey = i.ApiKey,
                 })
                 .FirstOrDefaultAsync();
 
@@ -110,7 +113,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 // Send order to GHN
                 var shopId = order.ShopId.Value;
                 var createDeliveryOrderRequest = mapper.Map<CreateDeliveryOrderRequest>(order);
-                var apiConfig = await partnerConfigService.GetApiConfigAsync(Domain.Enums.EnumDeliveryPartner.GHN, shopId);
+                var apiConfig = new Delivery.GHN.Models.ApiConfig(order.ProdEnv, order.ApiKey, order.PartnerShopId);
 
                 /// DEBUG
                 var previewOrder = await ghnApiClient.CreateDraftDeliveryOrderAsync(apiConfig, order.PartnerShopId, createDeliveryOrderRequest);

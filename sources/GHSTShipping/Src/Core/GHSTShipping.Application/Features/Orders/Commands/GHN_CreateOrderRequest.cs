@@ -311,7 +311,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             }
         }
 
-        private Order CreateOrderEntity(
+        private static Order CreateOrderEntity(
             GHN_CreateOrderRequest request,
             ShopQueryDto shop,
             OrderShippingCostDto deliveryFeePlan,
