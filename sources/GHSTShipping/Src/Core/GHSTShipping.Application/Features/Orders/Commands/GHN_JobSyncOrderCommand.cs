@@ -43,21 +43,35 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                                              {
                                                  shop.Id,
                                                  shop.UniqueCode,
-                                                 config.PartnerConfig.ProdEnv,
-                                                 config.PartnerConfig.ApiKey,
-                                                 config.PartnerShopId
                                              })
                                      .ToListAsync(cancellationToken);
 
                     if (shopConfigs.Count == 0) return BaseResult.Ok();
 
-                    var apiConfigs = shopConfigs
+                    var deliveryPricePlanes = await unitOfWork.DeliveryPricePlanes
+                        .Where(i => i.ShopId.HasValue && shopConfigs.Select(s => s.Id).Contains(i.ShopId.Value))
                         .Select(i => new
                         {
-                            i.Id,
-                            i.UniqueCode,
+                            i.ProdEnv,
+                            i.ShopId,
+                            i.PartnerShopId,
                             i.ApiKey,
-                            ApiConfig = new ApiConfig(i.ProdEnv, i.ApiKey, i.PartnerShopId)
+                        })
+                        .ToListAsync(cancellationToken);
+
+                    deliveryPricePlanes = deliveryPricePlanes.DistinctBy(i => i.ApiKey).Where(i => !string.IsNullOrWhiteSpace(i.ProdEnv)).ToList();
+
+                    var apiConfigs = deliveryPricePlanes
+                        .Select(i =>
+                        {
+                            var shop = shopConfigs.FirstOrDefault(s => s.Id == i.ShopId);
+                            return new
+                            {
+                                ShopId = shop.Id,
+                                UniqueCode = shop.UniqueCode,
+                                i.ApiKey,
+                                ApiConfig = new ApiConfig(i.ProdEnv, i.ApiKey, i.PartnerShopId)
+                            };
                         })
                         .ToList();
 
@@ -107,7 +121,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                             {
                                 var (orders, orderItems) = await GHN_SyncOrderRequestHandler.ListOrderMappingAsync(
                                     ghnOrdersResponse,
-                                    shopConfig.Id,
+                                    shopConfig.ShopId,
                                     shopConfig.UniqueCode,
                                     shopConfig.ApiConfig,
                                     ghnApiClient);
@@ -131,7 +145,7 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 }
                 catch (Exception ex)
                 {
-                    Serilog.Log.Error(ex, "An error occurred while executing the cron job.");
+                    Serilog.Log.Error(ex, "[ERR] [SYNC ORDER JOB] An error occurred while executing the cron job.");
                 }
             }
 
