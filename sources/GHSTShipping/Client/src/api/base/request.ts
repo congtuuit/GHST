@@ -8,14 +8,18 @@ import { useNavigate } from 'react-router-dom'; // v6 navigation
 import store from '@/stores';
 import { setGlobalState } from '@/stores/global.store';
 
+// Extend AxiosRequestConfig to include the skipLoading flag
+export interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  skipLoading?: boolean;
+}
+
 const axiosInstance = axios.create({
   timeout: 6000,
 });
 
 axiosInstance.interceptors.request.use(
-  config => {
+  (config: CustomAxiosRequestConfig) => {
     const token = localStorage.getItem('t'); // Or get from Redux store using store.getState()
-
     if (token) {
       // Attach the token to the Authorization header
       // Ensure config.headers is defined
@@ -23,11 +27,14 @@ axiosInstance.interceptors.request.use(
       config.headers['Authorization'] = `Bearer ${token}`;
     }
 
-    store.dispatch(
-      setGlobalState({
-        loading: true,
-      }),
-    );
+    // If the config has 'skipLoading' set to true, don't dispatch loading
+    if (!config?.skipLoading) {
+      store.dispatch(
+        setGlobalState({
+          loading: true,
+        }),
+      );
+    }
 
     return config;
   },

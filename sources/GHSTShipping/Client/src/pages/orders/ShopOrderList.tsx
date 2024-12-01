@@ -388,13 +388,17 @@ const ShopOrderList = () => {
             dataSource={orderPagination}
             onSearch={handleSearchOrder}
             onChange={handleChangeTable}
+            onSelectedRows={(selectedRows: any[]) => setSelectedOrders(selectedRows)}
+            mode="multiple"
             headerBox={
               <div>
                 <AdminOrderFilterWrapper
+                  isAdmin={false}
                   style={{ marginTop: '10px', marginBottom: '10px' }}
                   styleContent={{ width: '200px' }}
                   selectedRows={selectedOrders.length}
                   handleRefresh={() => setReloadTable(!reloadTable)}
+                  handleCancelOrders={() => {}}
                 />
               </div>
             }

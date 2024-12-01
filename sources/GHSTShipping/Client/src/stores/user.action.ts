@@ -45,7 +45,14 @@ export const loginAsync = createAsyncAction<LoginParams, boolean>(payload => {
 export const logoutAsync = () => {
   return async (dispatch: Dispatch) => {
     await apiLogout();
-    localStorage.clear();
+
+    localStorage.removeItem("pickShifts");
+    localStorage.removeItem("senderAddress");
+    localStorage.removeItem("session");
+    localStorage.removeItem("t");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("persist:root");
+    
     dispatch(
       setUserItem({
         logged: false,

@@ -1,5 +1,5 @@
 import { Button, Card, Col, Flex, Form, Input, InputNumber, message, Radio, Row, Select, Typography, Modal } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { apiCreateDeliveryOrder, apiGetPickShifts, apiUpdateDeliveryOrder } from '@/api/business.api';
 import AddressComponent from '../address.component';
@@ -16,10 +16,13 @@ import { IOrder } from '@/features/order/type';
 import './style.css';
 import { DeliveryPricePlaneFormDto } from '@/interface/shop';
 import { BasicShopInfoDto } from '@/features/shop';
-import { request } from '@/api/base/request';
+import { CustomAxiosRequestConfig, request } from '@/api/base/request';
 import { useParams } from 'react-router-dom';
 import { shopIdSelector } from '@/stores/user.store';
 import { ServiceType, ServiceTypeValue } from './ServiceType';
+import AddressCache from '@/features/address';
+import { ICacheAddressInfo } from '@/features/address/type';
+import { AxiosRequestConfig } from 'axios';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -48,6 +51,8 @@ type CalculateShippingCostInput = {
   width: number;
   height: number;
 };
+
+const addressCache = new AddressCache();
 
 const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   const { id } = useParams<{ id: string }>();
@@ -149,9 +154,16 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
       }
 
       values.shopId = shopId;
+
+      // cache to address
+      handleSaveAddress(values);
+
       if (isEdit) {
         const response = await apiUpdateDeliveryOrder(id as string, values);
         if (response.success) {
+          // cache to address
+          handleSaveAddress(values);
+
           message.success('Cật nhật đơn hàng thành công');
           form.resetFields();
           localStorage.removeItem(`${id}}`);
@@ -162,6 +174,9 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
       } else {
         const response = await apiCreateDeliveryOrder(values);
         if (response.success) {
+          // cache to address
+          handleSaveAddress(values);
+
           message.success('Tạo đơn thành công');
           form.resetFields();
           setTimeout(() => {
@@ -175,6 +190,22 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
     } catch (error) {
       message.info('Thông tin đơn hàng chưa đủ, vui lòng kiểm tra lại!');
     }
+  };
+
+  const handleSaveAddress = (values: IOrder) => {
+    const address: ICacheAddressInfo = {
+      shopId: values.shopId,
+      to_address: values.to_address,
+      to_district_id: values.to_district_id,
+      to_district_name: values.to_district_name,
+      to_name: values.to_name,
+      to_phone: values.to_phone,
+      to_province_id: values.to_province_id,
+      to_province_name: values.to_province_name,
+      to_ward_id: values.to_ward_id,
+      to_ward_name: values.to_ward_name,
+    };
+    addressCache.save(address);
   };
 
   const handleCalcTotalWeigh = (currentValues: any) => {
@@ -218,7 +249,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
     handleCalc(changedValues);
   }, 800);
 
-  const handleCalc = (changedValues: any, auto_update_insurance_value: boolean = true) => {
+  const handleCalc = (changedValues: any, auto_update_insurance_value: boolean = true, force_update: boolean = false) => {
     const currentValues = form.getFieldsValue();
     dispatch(setOrder({ ...currentValues, ...changedValues }));
     dispatch(setTempOrder({ ...currentValues, ...changedValues }));
@@ -237,7 +268,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
     }
 
     // Nếu thay đổi không phải là khối lượng đơn hàng thì tiến hành tính lại
-    if (!Boolean(changedValues?.weight)) {
+    if (!Boolean(changedValues?.weight) || force_update) {
       handleCalcTotalWeigh(currentValues);
     }
 
@@ -263,6 +294,17 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
         width: Number(width),
         height: Number(height),
       });
+    }
+
+    if (changedValues?.to_phone) {
+      const toAddress = addressCache.get(shopId, changedValues?.to_phone);
+      if (toAddress && (!Boolean(currentValues?.to_address) || !Boolean(currentValues?.to_district_name) || !Boolean(currentValues?.to_ward_name))) {
+        //TODO
+        setTimeout(() => {
+          form.setFieldsValue(toAddress);
+          toAddressRef.current?.update(toAddress);
+        }, 300);
+      }
     }
   };
 
@@ -318,13 +360,49 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
       width,
       height,
     };
-    const response = await request('post', '/orders/calculate-shipping-cost', payload);
+    const response = await request('post', '/orders/calculate-shipping-cost', payload, {
+      skipLoading: true,
+    } as CustomAxiosRequestConfig);
     if (response.success) {
       const convertedWeight = response?.data?.calcOrderWeight ?? 0;
       setConvertedWeight(convertedWeight);
       setIsHighLight(convertedWeight > weight);
     }
   };
+
+  function getCurrentShift(shifts: IPickShift[]): IPickShift | null {
+    const now = new Date();
+    const currentDate = formatDate(now); // Ngày hiện tại dạng DD-MM-YYYY
+    const currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+
+    // Hàm chuyển ngày sang định dạng DD-MM-YYYY
+    function formatDate(date: Date): string {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
+
+    // Tìm ca trong ngày hiện tại
+    const todayShift = shifts.find(shift => shift.title.includes(currentDate) && currentSeconds >= shift.fromTime && currentSeconds < shift.toTime);
+
+    if (todayShift) return todayShift;
+
+    // Nếu không tìm thấy, tìm ca của ngày hôm sau
+    const nextDate = new Date(now.getTime() + 86400000); // Ngày hôm sau
+    const nextDay = formatDate(nextDate); // Chuyển sang định dạng DD-MM-YYYY
+    const nextDayShift = shifts.find(shift => shift.title.includes(nextDay));
+
+    return nextDayShift || null; // Nếu không tìm thấy, trả về null
+  }
+
+  // Create a debounced version of handleCalc
+  const debouncedHandleCalc = useCallback(
+    debounce(formValues => {
+      handleCalc(formValues, false, true);
+    }, 500), // 500ms delay
+    [handleCalc],
+  );
 
   useEffect(() => {
     if (myShops && myShops.length > 0) {
@@ -374,6 +452,16 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
   useEffect(() => {
     fetchPickShifts();
   }, []);
+
+  useEffect(() => {
+    if (pickShifts && pickShifts?.length > 0) {
+      const currentShift = getCurrentShift(pickShifts);
+      if (currentShift) {
+        // auto pick shift
+        form.setFieldValue('pick_shift', [currentShift?.id]);
+      }
+    }
+  }, [pickShifts]);
 
   useEffect(() => {
     // Nếu là tạo đơn hàng và giá trị ghi nhớ của deliveryPricePlaneId không tồn tại
@@ -426,18 +514,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="Ca lấy hàng"
-                name="pick_shift"
-                valuePropName="value"
-                getValueFromEvent={value => [value]}
-                rules={[
-                  {
-                    required: true,
-                    message: 'Vui lòng chọn ca lấy hàng',
-                  },
-                ]}
-              >
+              <Form.Item label="Ca lấy hàng" name="pick_shift" valuePropName="value" getValueFromEvent={value => [value]}>
                 <Select placeholder="Chọn ca lấy hàng">
                   {pickShifts.map(i => (
                     <Option key={i.id} value={i.id}>
@@ -574,7 +651,25 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
           </Flex>
         </Col>
 
-        <ProductForm serviceType={serviceTypeId} products={editProducts} />
+        <ProductForm
+          serviceType={serviceTypeId}
+          products={editProducts}
+          onChange={() => {
+            const formValues = form.getFieldsValue();
+            debouncedHandleCalc(formValues); // Use the debounced function
+          }}
+          onRemove={(index: number) => {
+            const formValues = form.getFieldsValue();
+            if (formValues?.items && formValues?.items?.length > 0) {
+              const items = formValues?.items;
+              items.splice(index, 1);
+              form.setFieldValue('items', items);
+
+              const _formValues = form.getFieldsValue();
+              debouncedHandleCalc(_formValues); // Use the debounced function
+            }
+          }}
+        />
         <OrderInfoForm
           serviceType={serviceTypeId}
           allowFailedDelivery={allowFailedDelivery}

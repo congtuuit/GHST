@@ -247,7 +247,17 @@ const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
     <div>
       <Space style={{ marginBottom: 16 }}>
         {ghnShops.length > 0 && (
-          <Select key={'shop'} showSearch placeholder="Chọn shop" style={{ width: '300px' }} onChange={handleSelectShopChange}>
+          <Select
+            key="shop"
+            showSearch
+            placeholder="Chọn shop"
+            style={{ width: '300px' }}
+            onChange={handleSelectShopChange}
+            filterOption={(input: any, option: any) =>
+              option?.value?.toString().toLowerCase().includes(input.toLowerCase()) ||
+              option?.children?.toString().toLowerCase().includes(input.toLowerCase())
+            }
+          >
             {ghnShops.map(shop => (
               <Select.Option key={shop.id} value={shop.id}>
                 {shop.displayName}

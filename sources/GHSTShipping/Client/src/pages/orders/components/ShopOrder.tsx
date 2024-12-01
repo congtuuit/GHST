@@ -594,11 +594,13 @@ const ShopOrders = (props: ShopOrdersProps) => {
                 headerBox={
                   <div>
                     <AdminOrderFilterWrapper
+                      isAdmin={true}
                       style={{ marginTop: '10px', marginBottom: '10px' }}
                       styleContent={{ width: '200px' }}
                       selectedRows={selectedOrders.length}
                       handleConfirmOrders={handleConfirmOrders}
                       handleRefresh={() => setReloadTable(!reloadTable)}
+                      handleCancelOrders={() => {}}
                     />
                   </div>
                 }

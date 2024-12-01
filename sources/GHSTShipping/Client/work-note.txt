@@ -1,0 +1,54 @@
+- Chỉnh sửa đơn hàng | DONE
+
+- Tạo đơn hàng với loại lớn hơn 20kg
+
+- Hiện tên bảng giá sau khi tạo đơn lên bảng danh sách đơn hàng | DONE
+    + (check hiển thị theo cú pháp ở zalo)
+- Ở trang khách hàng, hiển thị mục tra cứu, tổng hợp COD và đối soát
+
+- Thêm nút tạo đơn ở Trang cửa hàng | DONE
+
+- Hiển thị thông tin kích thước đơn hàng 2 loại | DONE
+ + Khách nhập
+ + Thực tế đẩy qua GHN
+
+
+____TÍNH NĂNG MỞ RỘNG
+- Cho phép lọc đơn theo giá
+- Cho phép đẩy nhiều đơn cho 1 đơn vị vận chuyển chỉ định
+===============================================================
+DOING
+Tính năng đang phát triển
+- Cho phép lọc đơn theo giá
+- Cho phép đẩy nhiều đơn cho 1 đơn vị vận chuyển chỉ định
+
+======================================================================
+- Tạo đơn hàng > 20kg (50% - Kiểm tra UI, tiến hàng tạo đơn)
+
+- Ở trang kết nối GHN loại bỏ chọn shop, move chọn shop qua chỗ add bảng giá
+- Check lại phần tạo đơn, nếu chọn bảng giá nào link tới shop nào thì sẽ dùng shop GHN đó
+- Đồng bộ đơn hàng theo setting của đơn hàng
+- Nếu cửa hàng đang không cho tạo đơn trực tiếp thì vẫn lưu vào hệ thống và cho phép đẩy đơn sang đơn vị vận chuyển khác
+
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+1- Tạo đơn > 20kg . ||| DONE
+2- Thêm bảng giá vào từng cửa hàng => 1 Shop web đc đẩy đơn qua nhiều cửa hàng của đơn vị vận chuyển (Logic khi web shop tạo đơn mặc định đã được tính toán cho cửa hàng nào của đơn vị vận chuyển rồi)
+3- Đẩy đơn hàng loạt =>Filter lại theo bộ lọc bảng giá 
+- Cần phải xem lại số lượng đơn đẩy nếu nhiều tầm 500-1000 đơn có ảnh hưởng đến API với đơn vị vận chuyển không?
+> Có giải pháp cho việc xuất file từ màn hình admin xuống => theo format đẩy đơn excel của Đơn vị vận chuyển 
+> show all danh sách đơn hàng 
+
+4- Tạo đơn bị lỗi 
+- Nếu mà admin bật tính năng cho tạo đơn trực tiếp => hiển thị popup báo lỗi 
+- Nếu tắt tính năng => nhảy vào danh mục chờ xác nhận (cần có highlight) => thêm trạng thái đơn LỖI 
+=> cho phép chuyển đơn sang ĐVVC khác. 
+
+5- Đồng bộ đơn hàng .
+
+6- Thêm nút back khi chỉnh sửa đơn hàng ||| DONE
+7- Thiết kế lại chỗ xác nhận đơn/hủy đơn/chỉnh sửa => bo gọn lại ||| DONE
+8- Lỗi hiển thị khi đẩy đơn thành công => chưa đồng bộ ||| DONE
+9- Phần chỉnh sửa trên màn hình admin => đang tự lưu dữ liệu nhập => chỉ lưu khi ấn cập nhật ||| DONE
+10- GTB thu tiền chưa cập nhật sang đơn vị vận chuyển ||| DONE

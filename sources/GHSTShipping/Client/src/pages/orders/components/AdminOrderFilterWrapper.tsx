@@ -11,11 +11,13 @@ interface AdminOrderFilterWrapperProps {
   styleContent?: CSSProperties;
   selectedRows?: number;
   handleConfirmOrders?: () => void;
+  handleCancelOrders?: () => void;
   handleRefresh?: () => void;
+  isAdmin: boolean;
 }
 
 const AdminOrderFilterWrapper: React.FC<AdminOrderFilterWrapperProps> = (props: AdminOrderFilterWrapperProps) => {
-  const { style, styleContent, selectedRows, handleConfirmOrders, handleRefresh } = props;
+  const { style, styleContent, selectedRows, handleConfirmOrders, handleCancelOrders, handleRefresh, isAdmin } = props;
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const [fromDate, setFromDate] = useState<Dayjs | null>(dayjs().subtract(1, 'month').startOf('month'));
@@ -41,9 +43,9 @@ const AdminOrderFilterWrapper: React.FC<AdminOrderFilterWrapperProps> = (props: 
     );
   };
 
-  const onConfirmOrders=()=> {
+  const onConfirmOrders = () => {
     handleConfirmOrders && handleConfirmOrders();
-  }
+  };
 
   useEffect(() => {
     dispatch(
@@ -73,12 +75,21 @@ const AdminOrderFilterWrapper: React.FC<AdminOrderFilterWrapperProps> = (props: 
         Đến <DatePicker value={toDate} onChange={handleChangeToDate} placeholder="Chọn ngày" format="DD/MM/YYYY" />
       </div>
 
-      <Button onClick={handleConfirmOrders} type="primary" disabled={!selectedRows || selectedRows <= 0}>
-        Xác nhận {selectedRows && selectedRows > 0 ? `(${selectedRows}) đơn` : ''}
-      </Button>
+      {Boolean(selectedRows) && (selectedRows as number) > 0 && isAdmin && (
+        <Button onClick={handleConfirmOrders} type="primary" disabled={!selectedRows || selectedRows <= 0}>
+          Xác nhận {selectedRows && selectedRows > 0 ? `(${selectedRows}) đơn` : ''}
+        </Button>
+      )}
+
       <Button onClick={handleRefresh} type="default">
         Làm mới
       </Button>
+
+      {Boolean(selectedRows) && (selectedRows as number) > 0 && (
+        <Button onClick={handleConfirmOrders} type="primary" disabled={!selectedRows || selectedRows <= 0}>
+          Hủy {selectedRows && selectedRows > 0 ? `(${selectedRows}) đơn` : ''}
+        </Button>
+      )}
     </Space>
   );
 };

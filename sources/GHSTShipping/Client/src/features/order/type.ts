@@ -29,6 +29,10 @@ export interface IOrder {
   to_district_name: string; // Quận/Huyện người nhận | Bắt buộc
   to_province_name: string; // Tỉnh/Thành phố người nhận
 
+  to_district_id: number; // OPTIONAL: form value
+  to_province_id: number;
+  to_ward_id: string;
+
   return_phone?: string; // Số điện thoại trả hàng
   return_address?: string; // Địa chỉ trả hàng
   return_district_name?: string; // Quận/Huyện trả hàng
@@ -103,3 +107,5 @@ export interface IDeliveryStatus {
   transporting: number;
   waiting_to_return: number;
 }
+
+

@@ -18,10 +18,12 @@ export interface IProduct {
 interface ProductFormProps {
   products?: IProduct[];
   serviceType: ServiceTypeValue;
+  onChange?: () => void;
+  onRemove: (index: number) => void;
 }
 
 const ProductForm = (props: ProductFormProps) => {
-  const { products, serviceType } = props;
+  const { products, serviceType, onChange, onRemove } = props;
   const [_products, set_Products] = useState<IProduct[]>([{ name: '', code: '', weight: '200', quantity: '1' }]);
 
   const addProduct = () => {
@@ -33,7 +35,6 @@ const ProductForm = (props: ProductFormProps) => {
     if (newProducts[index]) {
       newProducts[index][field] = value;
     }
-
     set_Products(newProducts);
   };
 
@@ -45,6 +46,7 @@ const ProductForm = (props: ProductFormProps) => {
     _products.splice(index, 1);
     const newProducts: IProduct[] = [..._products];
     set_Products(newProducts);
+    onRemove(index);
   };
 
   useEffect(() => {
@@ -52,6 +54,10 @@ const ProductForm = (props: ProductFormProps) => {
       set_Products(products ?? []);
     }
   }, [products]);
+
+  useEffect(() => {
+    onChange && onChange();
+  }, [_products]);
 
   return (
     <Card title="Thông tin sản phẩm" style={{ marginBottom: '16px', marginTop: '0' }} className="custom-card">
