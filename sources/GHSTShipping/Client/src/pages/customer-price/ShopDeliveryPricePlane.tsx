@@ -11,10 +11,11 @@ interface ShopDeliveryPricePlaneProps {
   shopId: string | undefined;
   ghnShopDetails?: { [id: string]: IGhnShopDetailDto[] };
   partnerConfigId: string;
+  disabled?: boolean;
 }
 
 const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
-  const { shopId, ghnShopDetails, partnerConfigId = '' } = props;
+  const { shopId, ghnShopDetails, partnerConfigId = '', disabled = false } = props;
 
   const formRef = useRef<any>();
   const [loading, setLoading] = useState(false);
@@ -113,6 +114,8 @@ const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
     if (response.success) {
       fetchDeliveryPricePlanes();
       message.success('Thêm thành công');
+    } else {
+      message.error(response?.errors[0]?.description);
     }
   };
 
@@ -156,10 +159,10 @@ const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
   // Định nghĩa các cột cho bảng
   const columns: ColumnsType<DeliveryPricePlaneFormDto> = [
     {
-      title: "Mã shop",
+      title: 'Mã shop',
       dataIndex: 'partnerShopId',
       key: 'partnerShopId',
-      width: 120
+      width: 120,
     },
     {
       title: 'Tên Bảng Giá',
@@ -266,7 +269,7 @@ const ShopDeliveryPricePlane = (props: ShopDeliveryPricePlaneProps) => {
             };
           })}
         ></Select>
-        <Button disabled={selectedPricePlaneId === ''} type="primary" onClick={handleAssignDeliveryPricePlaneToShop}>
+        <Button disabled={selectedPricePlaneId === '' || disabled} type="primary" onClick={handleAssignDeliveryPricePlaneToShop}>
           Thêm
         </Button>
 

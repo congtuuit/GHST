@@ -96,6 +96,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange, callbac
                 <SettingOutlined /> Kết nối đơn vị vận chuyển {totalConnected > 0 ? `(${totalConnected})` : ''}
               </span>
             ),
+            destroyInactiveTabPane: true,
             children: (
               <ShopConfig
                 callback={callback}
@@ -114,7 +115,8 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ data, onChange, callbac
               </span>
             ),
             disabled: !detail?.isVerified || !Boolean(partnerConfigId),
-            children: <ShopDeliveryPricePlane ghnShopDetails={detail?.ghnShopDetails} partnerConfigId={partnerConfigId} shopId={detail?.id} />,
+            destroyInactiveTabPane: true,
+            children: <ShopDeliveryPricePlane disabled={!detail?.isVerified || !Boolean(partnerConfigId)} ghnShopDetails={detail?.ghnShopDetails} partnerConfigId={partnerConfigId} shopId={detail?.id} />,
           },
         ]}
         onChange={handleTabChange}

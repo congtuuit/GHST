@@ -82,6 +82,7 @@ namespace GHSTShipping.Application.Features.Configs.Commands
                 var partnerConfig = await _partnerConfigRepository.Where(i => i.Id == request.DeliveryConfigId).Select(i => new
                 {
                     i.DeliveryPartner,
+                    i.PhoneNumber,
                     i.ApiKey,
                     i.ProdEnv,
                 })
@@ -96,17 +97,18 @@ namespace GHSTShipping.Application.Features.Configs.Commands
                 if (partnerConfig != null && partnerConfig.DeliveryPartner == EnumDeliveryPartner.GHN)
                 {
                     var apiConfig = new ApiConfig(partnerConfig.ProdEnv, partnerConfig.ApiKey);
+
+                    /// Lấy thông tin của các shop thuộc token GHN
                     var shopsResult = await _ghnApiClient.GetAllShopsAsync(apiConfig, new GetAllShopsRequest
                     {
                         offset = 1,
                         limit = 200,
-                        client_phone = request.ClientPhone,
+                        client_phone = partnerConfig.PhoneNumber,
                     });
-
-                    
 
                     if (shopsResult.Code == 200)
                     {
+                        // Mapping thông tin địa chỉ
                         var shops = shopsResult.Data.shops;
                         var targetShop = shops.FirstOrDefault(i => i._id.ToString() == request.PartnerShopId);
                         if (targetShop != null)
@@ -132,10 +134,14 @@ namespace GHSTShipping.Application.Features.Configs.Commands
                                 wardName = targetWard.WardName;
                             }
                         }
+                    } else
+                    {
+                        throw new Exception(shopsResult.CodeMessageValue);
                     }
                 }
             }
 
+            // Tạo kết nối cùng với bảng giá
             var shopPricePlance = new DeliveryPricePlane()
             {
                 ShopId = request.ShopId,

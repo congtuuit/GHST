@@ -69,6 +69,7 @@ namespace GHSTShipping.Application.Features.Shops.Queries
 
                 Guid? ghnParterConfigId = null;
                 // Fetch ghn shop by configs
+                /// Lấy thông tin các shop con theo token của GHN
                 var ghnShopDetails = new Dictionary<Guid, IEnumerable<GhnShopDetailDto>>();
                 foreach (var parterConfig in parterConfigs)
                 {
