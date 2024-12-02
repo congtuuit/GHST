@@ -169,14 +169,20 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     request.FromProvinceName = shopDeliveryPricePlaneDto.ProvinceName;
                 }
 
+                var isStationError = false;
                 var previewOrder = await _ghnApiClient.CreateDraftDeliveryOrderAsync(apiConfig, shopDeliveryPricePlaneDto.PartnerShopId, request);
                 if (previewOrder.Code != 200)
                 {
-                    return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.Exception, $"{previewOrder.CodeMessageValue} {previewOrder.Message}"));
+                    string stationOverload = "quá tải";
+                    isStationError = previewOrder.CodeMessageValue.Contains(stationOverload);
+                    if (!isStationError)
+                    {
+                        return BaseResult<CreateDeliveryOrderResponse>.Failure(new Error(ErrorCode.Exception, $"{previewOrder.CodeMessageValue} {previewOrder.Message}"));
+                    }
                 }
 
-                var (orderCode, orderId) = await SaveOrderAsync(request, shop, shopDeliveryPricePlaneDto.PartnerShopId);
-                if (shop.AllowPublishOrder)
+                var (orderCode, orderId) = await SaveOrderAsync(request, shop, shopDeliveryPricePlaneDto.PartnerShopId, isStationError, apiConfig);
+                if (shop.AllowPublishOrder && isStationError == false)
                 {
                     var createOrder = await _ghnApiClient.CreateDeliveryOrderAsync(apiConfig, shopDeliveryPricePlaneDto.PartnerShopId, request);
                     if (createOrder.Code == 200)
@@ -195,7 +201,9 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         private async Task<(string, Guid)> SaveOrderAsync(
             GHN_CreateOrderRequest request,
             ShopQueryDto shop,
-            string partnerShopId)
+            string partnerShopId,
+            bool isThirdError,
+            ApiConfig apiConfig)
         {
             var shopId = shop.Id;
             var uniqueShopCode = shop.UniqueCode;
@@ -227,7 +235,9 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 request,
                 shop,
                 deliveryFeePlan,
-                partnerShopId);
+                partnerShopId,
+                isThirdError,
+                apiConfig);
 
             order.OrrverideDeliveryFee(order.DeliveryFee);
 
@@ -250,7 +260,10 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                         o.Height,
                         o.CalculateWeight,
                         o.ConvertedWeight,
-                        o.CustomDeliveryFee
+                        o.CustomDeliveryFee,
+                        o.ApiKey,
+                        o.ProdEnv,
+                        o.PartnerShopId
                     })
                     .FirstOrDefaultAsync();
 
@@ -267,6 +280,9 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 order.CurrentStatus = orderIdExisted.CurrentStatus;
                 order.Created = orderIdExisted.Created;
                 order.CreatedBy = orderIdExisted.CreatedBy;
+                order.ApiKey = apiConfig.Token;
+                order.ProdEnv = apiConfig.BaseUrl;
+                order.PartnerShopId = apiConfig.ShopId;
 
                 if (_authenticatedUserService.IsAdmin)
                 {
@@ -315,15 +331,27 @@ namespace GHSTShipping.Application.Features.Orders.Commands
             GHN_CreateOrderRequest request,
             ShopQueryDto shop,
             OrderShippingCostDto deliveryFeePlan,
-            string partnerShopId)
+            string partnerShopId,
+            bool isThirdError,
+            ApiConfig config)
         {
             var shopId = shop.Id;
             var uniqueShopCode = shop.UniqueCode;
             var allowPublishOrder = shop.AllowPublishOrder;
             var allowUsePartnerShopAddress = shop.AllowUsePartnerShopAddress;
 
+            var orderStatus = allowPublishOrder ? OrderStatus.READY_TO_PICK : OrderStatus.WAITING_CONFIRM;
+            if (isThirdError)
+            {
+                orderStatus = OrderStatus.RESEND_THIRDPARTY;
+            }
+
             return new Order
             {
+                ProdEnv = config.BaseUrl, // config gửi sang third party
+                ApiKey = config.Token,
+                PartnerShopId = partnerShopId,
+
                 ConvertedWeight = deliveryFeePlan.CalcOrderWeight,
                 CalculateWeight = deliveryFeePlan.OrderWeight,
 
@@ -333,14 +361,13 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                 DeliveryPricePlaneId = request.DeliveryPricePlaneId,
                 InsuranceFee = deliveryFeePlan.InsuranceFee,
 
-                PartnerShopId = partnerShopId,
                 ShopId = shopId,
                 UniqueCode = uniqueShopCode,
                 IsPublished = allowPublishOrder ? true : false,
                 DeliveryPartner = EnumSupplierConstants.GHN,
                 DeliveryFee = deliveryFeePlan.ShippingCost,
                 PublishDate = allowPublishOrder ? DateTime.UtcNow : null,
-                CurrentStatus = allowPublishOrder ? OrderStatus.READY_TO_PICK : OrderStatus.WAITING_CONFIRM,
+                CurrentStatus = orderStatus,
                 Note = request.Note,
                 ReturnPhone = request.ReturnPhone,
                 ReturnAddress = request.ReturnAddress,

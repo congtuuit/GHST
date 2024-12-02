@@ -31,6 +31,11 @@ namespace GHSTShipping.Domain.Entities
 
         public const string WAITING_CONFIRM = "waiting_confirm";
 
+        /// <summary>
+        /// Nếu đơn hàng bị third trả lỗi
+        /// </summary>
+        public const string RESEND_THIRDPARTY = "resend_thirdparty";
+
         // Mapping to GHN_OrderStatus
         public const string READY_TO_PICK = "ready_to_pick";
         public const string PICKING = "picking";
