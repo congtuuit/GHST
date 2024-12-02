@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
+const { generateVersionFromDate } = require('./update-release-version');
 
 // Get the directory path and options from the command-line arguments
 const args = process.argv.slice(2);
@@ -11,9 +12,12 @@ let outputPath = null;
 function getCurrentDateFormatted() {
   const now = new Date();
   const day = String(now.getDate()).padStart(2, '0');
-  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-  const year = now.getFullYear();
-  return `${day}${month}${year}`;
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const year = String(now.getFullYear()).slice(2); // Get last 2 digits of the year
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+
+  return `${year}${month}${day}_${hours}${minutes}`;
 }
 
 // Helper function to parse command-line arguments
@@ -57,7 +61,7 @@ async function compressDirectory() {
     console.log(`Created zip file: ${outputPath} (${archive.pointer()} total bytes)`);
   });
 
-  archive.on('error', function(err) {
+  archive.on('error', function (err) {
     throw err;
   });
 
