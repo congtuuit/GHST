@@ -391,7 +391,7 @@ namespace Delivery.GHN
         }
 
 
-        public async Task<GhnApiResponse<CancelOrderResponse>> CancelOrderAsync(ApiConfig config, List<string> orderCodes)
+        public async Task<GhnApiResponse<List<CancelOrderResponse>>> CancelOrderAsync(ApiConfig config, List<string> orderCodes)
         {
             try
             {
@@ -404,7 +404,7 @@ namespace Delivery.GHN
 
                 // Read the response content
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<GhnApiResponse<CancelOrderResponse>>(jsonResponse);
+                var result = JsonConvert.DeserializeObject<GhnApiResponse<List<CancelOrderResponse>>>(jsonResponse);
 
                 // Return the result or throw if it's null
                 return result ?? throw new InvalidOperationException("Received a null response from the API.");

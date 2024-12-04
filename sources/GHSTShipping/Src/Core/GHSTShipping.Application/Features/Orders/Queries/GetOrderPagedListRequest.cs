@@ -164,7 +164,11 @@ namespace GHSTShipping.Application.Features.Orders.Queries
         }
 
         private async Task<BaseResult<PaginationResponseDto<OrderDto>>> SyncOrdersFromGHNAsync(
-            GetOrderPagedListRequest request, Guid shopId, string shopUniqueCode, int skipCount, CancellationToken cancellationToken)
+            GetOrderPagedListRequest request,
+            Guid shopId,
+            string shopUniqueCode,
+            int skipCount,
+            CancellationToken cancellationToken)
         {
             var apiConfigs = await OrderUtils.GetApiConfigsByShopIdAsync(unitOfWork, shopId, EnumDeliveryPartner.GHN);
             if (apiConfigs.Count == 0)
@@ -181,27 +185,36 @@ namespace GHSTShipping.Application.Features.Orders.Queries
                 syncOrderItems.AddRange(entityOrderItems);
             }
 
+            var orderStatuses = request.GroupStatus.GetDetails();
+            var query = unitOfWork.Orders.Where(i => i.ShopId == shopId);
             if (syncOrders.Count > 0)
             {
                 var orderIdsSaved = await GHN_SyncOrderRequestHandler.BatchSaveAsync(unitOfWork, syncOrders, syncOrderItems);
-                var mappedOrders = await unitOfWork.Orders.Where(i => orderIdsSaved.Contains(i.Id))
-                    .ProjectTo<OrderDto>(mapperConfiguration)
-                    .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
-
-                var deliveryPricePlaneIds = mappedOrders.Data
-                   .Where(i => i.DeliveryPricePlaneId.HasValue)
-                   .Select(i => i.DeliveryPricePlaneId.Value)
-                   .ToList();
-
-                var deliveryPricePlanes = await mediator.Send(new GetShopDeliveryPricePlanesRequest
-                {
-                    Ids = deliveryPricePlaneIds
-                });
-
-                return MapPaginationResult(mappedOrders, skipCount, authenticatedUser.IsAdmin, deliveryPricePlanes.Data);
+                query = query.Where(i => orderIdsSaved.Contains(i.Id) || orderStatuses.Contains(i.CurrentStatus));
+            } 
+            else
+            {
+                query = query.Where(i => orderStatuses.Contains(i.CurrentStatus));
             }
 
-            return BaseResult<PaginationResponseDto<OrderDto>>.Ok(null);
+            var mappedOrders = await query
+                .OrderByDescending(i => i.LastModified)
+                .ProjectTo<OrderDto>(mapperConfiguration)
+                .ToPaginationAsync(request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
+
+            var deliveryPricePlaneIds = mappedOrders.Data
+               .Where(i => i.DeliveryPricePlaneId.HasValue)
+               .Select(i => i.DeliveryPricePlaneId.Value)
+               .ToList();
+
+            var deliveryPricePlanes = await mediator.Send(new GetShopDeliveryPricePlanesRequest
+            {
+                Ids = deliveryPricePlaneIds
+            }, cancellationToken);
+
+            var results = MapPaginationResult(mappedOrders, skipCount, authenticatedUser.IsAdmin, deliveryPricePlanes.Data);
+
+            return results;
         }
 
         private async Task<(List<Order>, List<OrderItem>)> GHN_HandleSearchOrdersAsync(ApiConfig apiConfig, Guid shopId, string shopUniqueCode, GetOrderPagedListRequest request)

@@ -43,10 +43,6 @@ const AdminOrderFilterWrapper: React.FC<AdminOrderFilterWrapperProps> = (props: 
     );
   };
 
-  const onConfirmOrders = () => {
-    handleConfirmOrders && handleConfirmOrders();
-  };
-
   useEffect(() => {
     dispatch(
       setOrderFilter({
@@ -75,18 +71,18 @@ const AdminOrderFilterWrapper: React.FC<AdminOrderFilterWrapperProps> = (props: 
         Đến <DatePicker value={toDate} onChange={handleChangeToDate} placeholder="Chọn ngày" format="DD/MM/YYYY" />
       </div>
 
+      <Button onClick={handleRefresh} type="default">
+        Làm mới
+      </Button>
+
       {Boolean(selectedRows) && (selectedRows as number) > 0 && isAdmin && (
         <Button onClick={handleConfirmOrders} type="primary" disabled={!selectedRows || selectedRows <= 0}>
           Xác nhận {selectedRows && selectedRows > 0 ? `(${selectedRows}) đơn` : ''}
         </Button>
       )}
 
-      <Button onClick={handleRefresh} type="default">
-        Làm mới
-      </Button>
-
       {Boolean(selectedRows) && (selectedRows as number) > 0 && (
-        <Button onClick={handleConfirmOrders} type="primary" disabled={!selectedRows || selectedRows <= 0}>
+        <Button onClick={handleCancelOrders} type="default" disabled={!selectedRows || selectedRows <= 0}>
           Hủy {selectedRows && selectedRows > 0 ? `(${selectedRows}) đơn` : ''}
         </Button>
       )}

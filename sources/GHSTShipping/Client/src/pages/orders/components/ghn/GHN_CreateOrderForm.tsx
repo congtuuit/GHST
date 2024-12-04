@@ -210,6 +210,7 @@ const GHN_CreateOrderForm = (props: FormOrderGhnProps) => {
 
   const handleCalcTotalWeigh = (currentValues: any) => {
     const orderItems = currentValues['items'] as Item[];
+    console.log('orderItems ', orderItems);
     if (Boolean(orderItems) && orderItems?.length > 0) {
       const calculateTotalWeight = (items: Item[]): number => {
         return items.reduce((total, item) => total + (item.weight ?? 0) * (item.quantity ?? 0), 0);

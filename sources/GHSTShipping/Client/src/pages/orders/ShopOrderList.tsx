@@ -74,6 +74,17 @@ const ShopOrderList = () => {
     }
   };
 
+  const handleCancelOrders = async () => {
+    const orders = selectedOrders;
+    const orderIds = orders.map(i => i.id);
+    const response = await apiCancelOrderGhn(orderIds);
+    if (response.success) {
+      message.success('Hủy đơn thành công!');
+      setReloadTable(!reloadTable);
+      setSelectedOrders([])
+    }
+  };
+
   const handleEditOrder = async (record: IOrderViewDto) => {
     executeHandleEditOrder(record, () => {
       navigate(`/order/update/${record.id}`);
@@ -332,7 +343,7 @@ const ShopOrderList = () => {
     if (shopId) {
       fetchCountOrderByStatus(shopId as string);
     }
-  }, [shopId, orderStatusFilter]);
+  }, [shopId, orderStatusFilter, reloadTable]);
 
   useEffect(() => {
     fetchOrders({
@@ -398,7 +409,7 @@ const ShopOrderList = () => {
                   styleContent={{ width: '200px' }}
                   selectedRows={selectedOrders.length}
                   handleRefresh={() => setReloadTable(!reloadTable)}
-                  handleCancelOrders={() => {}}
+                  handleCancelOrders={handleCancelOrders}
                 />
               </div>
             }

@@ -189,6 +189,20 @@ const ShopOrders = (props: ShopOrdersProps) => {
     }
   };
 
+  const handleCancelOrders = async () => {
+    if (selectedOrders.length <= 0) {
+      return;
+    }
+
+    const orders = selectedOrders;
+    const orderIds = orders.map(i => i.id);
+    const response = await apiCancelOrderGhn(orderIds);
+    if (response.success) {
+      message.success('Hủy đơn thành công!');
+      setReloadTable(!reloadTable);
+    }
+  };
+
   const handleClearSelection = () => {
     datatableRef.current?.clearSelectedRows();
     setSelectedOrders([]);
@@ -530,7 +544,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
     if (supplierSelected === supplierKeys.GHN) {
       fetchCountOrderByStatus(shopId as string);
     }
-  }, [shopId, orderStatusFilter, supplierSelected]);
+  }, [shopId, orderStatusFilter, supplierSelected, reloadTable]);
 
   useEffect(() => {
     if (confirmOrderQueue.length > 0) {
@@ -600,7 +614,7 @@ const ShopOrders = (props: ShopOrdersProps) => {
                       selectedRows={selectedOrders.length}
                       handleConfirmOrders={handleConfirmOrders}
                       handleRefresh={() => setReloadTable(!reloadTable)}
-                      handleCancelOrders={() => {}}
+                      handleCancelOrders={handleCancelOrders}
                     />
                   </div>
                 }

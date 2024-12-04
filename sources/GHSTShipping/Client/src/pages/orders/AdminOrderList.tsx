@@ -35,14 +35,6 @@ const AdminOrderList = () => {
     }
   };
 
-  const handleCancelOrder = async (orderCode: string | undefined) => {
-    if (!Boolean(orderCode)) return;
-    const response = await apiCancelOrderGhn([orderCode as string]);
-    if (response.success) {
-      message.success('Hủy đơn thành công!');
-    }
-  };
-
   const handleViewShopOrders = (record: ShopOrderViewDto) => {
     setShopSelected(record);
     dispatch(setShopInfo(record));

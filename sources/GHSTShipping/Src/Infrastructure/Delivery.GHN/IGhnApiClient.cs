@@ -80,7 +80,7 @@ namespace Delivery.GHN
         /// <returns>A task representing the asynchronous operation, with a response containing the order details.</returns>
         Task<GhnApiResponse<OrderDetailResponse>> DetailDeliveryOrderAsync(ApiConfig config, string orderCode);
 
-        Task<GhnApiResponse<CancelOrderResponse>> CancelOrderAsync(ApiConfig config, List<string> orderCodes);
+        Task<GhnApiResponse<List<CancelOrderResponse>>> CancelOrderAsync(ApiConfig config, List<string> orderCodes);
 
         // Location methods
 

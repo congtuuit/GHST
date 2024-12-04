@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static CreateDeliveryOrderRequest;
 
 namespace GHSTShipping.Application.Features.Orders.Commands
 {
@@ -30,8 +31,6 @@ namespace GHSTShipping.Application.Features.Orders.Commands
         IMediator mediator
         ) : IRequestHandler<GHN_CancelOrderRequest, BaseResult>
     {
-        private ApiConfig apiConfig;
-
         public async Task<BaseResult> Handle(GHN_CancelOrderRequest request, CancellationToken cancellationToken)
         {
             var orders = await orderRepository.Where(i => request.OrderIds.Contains(i.Id))
@@ -40,7 +39,9 @@ namespace GHSTShipping.Application.Features.Orders.Commands
                     Id = i.Id,
                     ShopId = i.ShopId,
                     CurrentStatus = i.CurrentStatus,
-                    private_order_code = i.private_order_code
+                    private_order_code = i.private_order_code,
+                    ProdEnv = i.ProdEnv,
+                    ApiKey = i.ApiKey,
                 })
                 .ToListAsync(cancellationToken);
 
@@ -51,58 +52,59 @@ namespace GHSTShipping.Application.Features.Orders.Commands
 
             var orderHistories = new List<OrderStatusHistory>();
             orderRepository.ModifyRange(orders);
-            foreach (var item in orders)
-            {
-                item.Cancel();
-
-                orderHistories.Add(new OrderStatusHistory
-                {
-                    OrderId = item.Id,
-                    Status = OrderStatus.CANCEL,
-                    ChangedBy = authenticatedUserService.UserId,
-                    Notes = "Cancel order"
-                });
-            }
-
-            if (orderHistories.Count > 0)
-            {
-                await orderHistoryRepository.AddRangeAsync(orderHistories);
-            }
-
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-
+            
             try
             {
                 // Get API config to send request to GHN
-                var shopId = orders.First().ShopId;
-
-                var orderCodes = orders.Where(i => !string.IsNullOrWhiteSpace(i.private_order_code)).Select(i => i.private_order_code).ToList();
-                if (orderCodes.Count > 0)
+                foreach (var o in orders)
                 {
-                    var apiResult = await ghnApiClient.CancelOrderAsync(apiConfig, orderCodes);
+                    // Nếu đơn hàng không phải là đơn bên GHN thì bỏ qua
+                    if (string.IsNullOrWhiteSpace(o.private_order_code))
+                    {
+                        o.Cancel();
+                        orderHistories.Add(new OrderStatusHistory
+                        {
+                            OrderId = o.Id,
+                            Status = OrderStatus.CANCEL,
+                            ChangedBy = authenticatedUserService.UserId,
+                            Notes = "Cancel order"
+                        });
+                        continue;
+                    }
+
+                    var ghnOrderCode = o.private_order_code;
+                    var apiConfig = new ApiConfig(o.ProdEnv, o.ApiKey);
+                    var apiResult = await ghnApiClient.CancelOrderAsync(apiConfig, new List<string>() { ghnOrderCode });
                     if (apiResult.Code == 200)
                     {
-                        foreach (var orderCode in orderCodes)
+                        o.Cancel();
+                        orderHistories.Add(new OrderStatusHistory
                         {
-                            await mediator.Send(new GHN_SyncOrderRequest
-                            {
-                                ShopId = shopId.Value,
-                                PartnerOrderCode = orderCode
-                            },
-                            cancellationToken);
-                        }
+                            OrderId = o.Id,
+                            Status = OrderStatus.CANCEL,
+                            ChangedBy = authenticatedUserService.UserId,
+                            Notes = "Cancel order"
+                        });
 
-                        return BaseResult<CancelOrderResponse>.Ok(apiResult.Data);
-                    }
-                    else
-                    {
-                        return BaseResult<CancelOrderResponse>.Failure(new Error(ErrorCode.ErrorInIdentity, apiResult.Message));
+                        await mediator.Send(new GHN_SyncOrderRequest
+                        {
+                            ShopId = o.ShopId.Value,
+                            PartnerOrderCode = ghnOrderCode,
+                        },cancellationToken);
                     }
                 }
+
+                if (orderHistories.Count > 0)
+                {
+                    await orderHistoryRepository.AddRangeAsync(orderHistories);
+                }
+
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return BaseResult<CancelOrderResponse>.Ok();
             }
             catch (Exception ex)
             {
-
             }
 
             return BaseResult.Ok();
